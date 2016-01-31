@@ -4,3 +4,4 @@ void expr_prime();
 void term();
 void term_prime();
 void factor();
+int legal_lookahead (int ,...);

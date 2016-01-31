@@ -1,13 +1,13 @@
 /* Revised parser  */
 
 #include <stdio.h>
-#include "lex.h"
+#include "include/lex.h"
 
 void    factor      ( void );
 void    term        ( void );
 void    expression  ( void );
 
-statements()
+void statements()
 {
     /*  statements -> expression SEMI |  expression SEMI statements */
 
@@ -22,7 +22,7 @@ statements()
     }
 }
 
-void    expression()
+void expression()
 {
     /* expression  -> term expression'
      * expression' -> PLUS term expression' |  epsilon

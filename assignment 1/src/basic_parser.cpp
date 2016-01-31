@@ -1,7 +1,7 @@
 /* Basic parser, shows the structure but there's no code generation */
 
 #include <stdio.h>
-#include "lex.h"
+#include "include/lex.h"
 
 statements()
 {

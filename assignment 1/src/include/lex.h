@@ -8,4 +8,8 @@
 
 extern char *yytext;		/* in lex.c			*/
 extern int yyleng;
-extern yylineno;
+extern int yylineno;
+
+int lex(void);
+int match(int token);
+void advance(void);
