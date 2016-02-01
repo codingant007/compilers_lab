@@ -1,8 +1,64 @@
 /* Revised parser  */
 
 #include <stdio.h>
-#include "include/lex.h"
-#include "include/modified_parser.h"
+#include "lex.h"
+#include <bits/stdc++.h>
+
+//void    factor      ( void );
+//void    term        ( void );
+//void    expression  ( void );
+
+/* GRAMMAR
+expr -> sub_expr expr'
+expr' -> EQ sub_expr | LT sub_expr | GT sub_expr
+sub_expr -> term pm_expr
+pm_expr -> MINUS sub_expr | plus_expr | EPS
+plus_expr -> PLUS sub_expr
+term -> factor mul_term
+mul_term -> MUL term | div_term | EPS
+div_term -> DIV term
+factor -> NUM | ID | LP expr RP 
+*/
+
+
+void statementList(){
+
+}
+
+void statement(){
+
+}
+
+string expression(){
+
+}
+
+string  expressionPrime(){
+
+}
+
+string subExpression(){
+
+}
+
+string plusMinusExpression(){
+
+}
+
+string plusExpression(){
+
+}
+
+string term(){
+
+}
+
+string 
+
+
+
+
+
 
 void statements()
 {
@@ -26,7 +82,7 @@ void    expression()
      */
 
     if( !legal_lookahead( NUM_OR_ID, LP, 0 ) )
-	return;
+    return;
 
     term();
     while( match( PLUS ) )
@@ -39,7 +95,7 @@ void    expression()
 void    term()
 {
     if( !legal_lookahead( NUM_OR_ID, LP, 0 ) )
-	return;
+    return;
 
     factor();
     while( match( TIMES ) )
@@ -52,7 +108,7 @@ void    term()
 void    factor()
 {
     if( !legal_lookahead( NUM_OR_ID, LP, 0 ) )
-	return;
+    return;
 
     if( match(NUM_OR_ID) )
         advance();
@@ -67,14 +123,15 @@ void    factor()
             fprintf( stderr, "%d: Mismatched parenthesis\n", yylineno );
     }
     else
-	fprintf( stderr, "%d: Number or identifier expected\n", yylineno );
+    fprintf( stderr, "%d: Number or identifier expected\n", yylineno );
 }
 #include <stdarg.h>
 
 #define MAXFIRST 16
-#define SYNCH	 SEMI
+#define SYNCH    SEMI
 
-int	legal_lookahead( int first_arg ,... )
+int legal_lookahead(  first_arg )
+int first_arg;
 {
     /* Simple error detection and recovery. Arguments are a 0-terminated list of
      * those tokens that can legitimately come next in the input. If the list is
@@ -86,45 +143,45 @@ int	legal_lookahead( int first_arg ,... )
      * false if we can't recover.
      */
 
-    va_list  	args;
-    int		tok;
-    int		lookaheads[MAXFIRST], *p = lookaheads, *current;
-    int		error_printed = 0;
-    int		rval	      = 0;
+    va_list     args;
+    int     tok;
+    int     lookaheads[MAXFIRST], *p = lookaheads, *current;
+    int     error_printed = 0;
+    int     rval          = 0;
 
     va_start( args, first_arg );
 
     if( !first_arg )
     {
-	if( match(EOI) )
-	    rval = 1;
+    if( match(EOI) )
+        rval = 1;
     }
     else
     {
-	*p++ = first_arg;
-	while( (tok = va_arg(args, int)) && p < &lookaheads[MAXFIRST] )
-	    *p++ = tok;
+    *p++ = first_arg;
+    while( (tok = va_arg(args, int)) && p < &lookaheads[MAXFIRST] )
+        *p++ = tok;
 
-	while( !match( SYNCH ) )
-	{
-	    for( current = lookaheads; current < p ; ++current )
-		if( match( *current ) )
-		{
-		    rval = 1;
-		    goto exit;
-		}
+    while( !match( SYNCH ) )
+    {
+        for( current = lookaheads; current < p ; ++current )
+        if( match( *current ) )
+        {
+            rval = 1;
+            goto exit;
+        }
 
-	    if( !error_printed )
-	    {
-		fprintf( stderr, "Line %d: Syntax error\n", yylineno );
-		error_printed = 1;
-	    }
+        if( !error_printed )
+        {
+        fprintf( stderr, "Line %d: Syntax error\n", yylineno );
+        error_printed = 1;
+        }
 
-	    advance();
-	}
+        advance();
+    }
     }
 
 exit:
-    va_end( args );
+    va_end( args )
     return rval;
 }

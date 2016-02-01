@@ -1,6 +1,9 @@
-#include "include/lex.h"
 #include <stdio.h>
 #include <ctype.h>
+#include <string>
+#include <string.h>
+#include <iostream>
+using namespace std;
 
 
 char* yytext = ""; /* Lexeme (not '\0'
@@ -42,21 +45,80 @@ int lex(void){
             return SEMI;
            case '+':
             return PLUS;
-           // case '-':
-           //  return MINUS;
+           case '-':
+            return MINUS;
            case '*':
             return TIMES;
-           // case '/':
-           //  return DIV;
+           case '/':
+            return DIV;
            case '(':
             return LP;
            case ')':
             return RP;
+
+            //Relational Operators
+            case '>':
+             return GR;
+            case '<':
+             return LS;
+
            case '\n':
            case '\t':
            case ' ' :
             break;
+
+
            default:
+
+           //Reserved Keywords OR Identifier
+
+           if (isalpha(*current)){
+              char tempWord[1024];
+              int iterat=0;
+              while(isalnum(*(current+iterat))){
+                tempWord[iterat] = *(current + iterat);
+                iterat++;
+              }
+              tempWord[iterat]='\0';
+              //cout<<strcmp(tempWord,"then")<<endl;
+              yyleng = current - yytext;
+              if(strcmp(tempWord,"if")==0)
+                //printf("a");
+                return IF;
+              if (strcmp(tempWord,"then")==0)
+                return THEN;
+              if (strcmp(tempWord,"while")==0)
+                return WHILE;
+              if (strcmp(tempWord,"do")==0)
+                return DO;
+              if (strcmp(tempWord,"begin")==0)
+                return BEGIN;
+              if (strcmp(tempWord,"end")==0)
+                return END;
+
+              return ID;
+
+           }
+
+            //Check if it's a number
+            if (isdigit(*current)){
+              while(isdigit(*current)){
+                ++current;
+              }
+              yyleng = current - yytext;
+              return NUM;
+            }
+
+            if ((*current) == '=' && (current+1) <=&input_buffer[1023] && *(current+1)== '=' ){
+              yyleng = 2;
+              return EQQ;
+            }
+            else if (*(current) == '='){
+              return EQ;
+            }
+
+
+            /*
             if(!isalnum(*current))
                fprintf(stderr, "Not alphanumeric <%c>\n", *current);
             else{
@@ -64,7 +126,7 @@ int lex(void){
                   ++current;
                yyleng = current - yytext;
                return NUM_OR_ID;
-            }
+            }*/
             break;
          }
       }
@@ -90,3 +152,8 @@ void advance(void){
 
     Lookahead = lex();
 }
+
+string getCurrentToken(){
+  return string(yytext, yytext + yyleng);
+}
+
