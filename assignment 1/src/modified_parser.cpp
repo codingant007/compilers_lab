@@ -244,19 +244,18 @@ int plusMinusExpression(){
 int term(){
     int factorValReg = factor();
     mainCode << "PUSH " << registerManager.getRegName(factorValReg) << endl;
+    registerManager.deallocReg(factorValReg);
     return mulTerm();
 }
 
 int mulTerm(){
     if(match(MUL)){
         advance();
-        mainCode << "POP ax" << endl;
+        mainCode << "POP eax" << endl;
         int termValReg = term();
         mainCode << "MUL " << registerManager.getRegName(termValreg) << endl;
-        registerManager.deallocReg(termValReg);
-        int reg = registerManager.allocReg();
-        mainCode << "MOV " << registerManager.getRegName(reg) ",eax" << endl;
-        return reg;
+        mainCode << "MOV " << registerManager.getRegName(termValreg) ",eax" << endl;
+        return termValreg;
     }
     else{
         return divTerm();
@@ -268,19 +267,21 @@ int divTerm(){
     if(!legal_lookahead(DIV)){
         return;
     }
+
+    mainCode << "POP eax" << endl;
+    int reg = registerManager.allocReg();
+
     if(match(DIV)){
         advance();
-        mainCode << "POP eax" << endl;
-        int reg = registerManager.allocReg();
         int termValReg = term();
         mainCode << "DIV " << registerManager.getRegName(termValReg) << endl;
-        mainCode << "MOV " << registerManager.getRegName(reg) << "," <<   << endl;
-        ree
+        registerManager.deallocReg(termValreg);
+        mainCode << "MOV " << registerManager.getRegName(reg) << ",eax" <<   << endl;
     }
     else{
-        mainCode << "POP eax" << endl;
-        int reg = registerManager.allocReg(reg);
-    } 
+        mainCode << "MOV " << registerManager.getRegName(reg) << ",eax" << endl;
+    }
+    return reg;
 }
 
 int factor(){
@@ -289,16 +290,23 @@ int factor(){
     }
     if(match(NUM)){
         int reg = registerManager.allocReg();
-        string currToken = getCurrentToken();
-        mainCode << "MOV " << registerManager.getRegName(reg) ","<< currToken << endl;
+        string currLiteral = getCurrentToken();
+        mainCode << "MOV " << registerManager.getRegName(reg) ","<< currLiteral << endl;
         advance();
         return reg;
     }
     if(match(ID)){
         int reg = registerManager.allocReg();
         string currId = getCurrentToken();
+        string nextToken = getNextToken();
+        // If not already present then only allow on RHS
         if(idCollection.find(currId) == idCollection.end()){
-            dataSection << currId <<" DD "<<getDDCount()<<endl;
+            if(nextToken.compare("=")==0){
+                dataSection << currId <<" DD "<<getDDCount()<<endl;
+            }
+            else{
+                fprintf(stderr, "declaration error at line no %d\n",yylineno);
+            }
         }
         mainCode << "MOV " << registerManager.getRegName(reg) "," << currId << endl;
         advance();

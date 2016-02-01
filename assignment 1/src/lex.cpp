@@ -160,3 +160,7 @@ string getCurrentToken(){
   return string(yytext, yytext + yyleng);
 }
 
+// To be completed // -Nikhil
+string getNextToken(){
+
+}
