@@ -1,7 +1,16 @@
-void statements();
-void expression();
-void expr_prime();
-void term();
-void term_prime();
-void factor();
+#include <bits/stdc++.h>
+
+using namespace std;
+
 int legal_lookahead (int ,...);
+void statementList();
+void statement();
+string expression();
+string  expressionPrime();
+string subExpression();
+string plusMinusExpression();
+string plusExpression();
+string mulTerm();
+string divTerm();
+string factor();
+string term();

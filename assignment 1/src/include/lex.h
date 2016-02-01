@@ -1,3 +1,7 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
 #define EOI		0	/* End of input			*/
 #define SEMI		1	/* ; 				*/
 #define PLUS 		2	/* + 				*/
@@ -29,9 +33,10 @@
 
 extern char *yytext;		/* in lex.c			*/
 extern int yyleng;
-extern yylineno;
+extern int yylineno;
 
 //New Functions Added
 int match(int token);
-void moveForward();
 string getCurrentToken();
+void advance();
+int lex();

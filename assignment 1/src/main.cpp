@@ -2,5 +2,5 @@
 
 main ()
 {
-	statements ();
+	statementList();
 }

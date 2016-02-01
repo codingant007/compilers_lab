@@ -1,9 +1,12 @@
 /* Revised parser  */
 
 #include <stdio.h>
-#include "lex.h"
+#include "include/lex.h"
+#include "include/modified_parser.h"
+#include <string>
 #include <bits/stdc++.h>
 
+using namespace std;
 //void    factor      ( void );
 //void    term        ( void );
 //void    expression  ( void );
@@ -53,12 +56,17 @@ string term(){
 
 }
 
-string 
+string mulTerm(){
 
+}
 
+string divTerm(){
 
+}
 
+string factor(){
 
+}
 
 void statements()
 {
@@ -75,63 +83,12 @@ void statements()
     }
 }
 
-void    expression()
-{
-    /* expression  -> term expression'
-     * expression' -> PLUS term expression' |  epsilon
-     */
-
-    if( !legal_lookahead( NUM_OR_ID, LP, 0 ) )
-    return;
-
-    term();
-    while( match( PLUS ) )
-    {
-        advance();
-        term();
-    }
-}
-
-void    term()
-{
-    if( !legal_lookahead( NUM_OR_ID, LP, 0 ) )
-    return;
-
-    factor();
-    while( match( TIMES ) )
-    {
-        advance();
-        factor();
-    }
-}
-
-void    factor()
-{
-    if( !legal_lookahead( NUM_OR_ID, LP, 0 ) )
-    return;
-
-    if( match(NUM_OR_ID) )
-        advance();
-
-    else if( match(LP) )
-    {
-        advance();
-        expression();
-        if( match(RP) )
-            advance();
-        else
-            fprintf( stderr, "%d: Mismatched parenthesis\n", yylineno );
-    }
-    else
-    fprintf( stderr, "%d: Number or identifier expected\n", yylineno );
-}
 #include <stdarg.h>
 
 #define MAXFIRST 16
 #define SYNCH    SEMI
 
-int legal_lookahead(  first_arg )
-int first_arg;
+int legal_lookahead(  int first_arg ,... )
 {
     /* Simple error detection and recovery. Arguments are a 0-terminated list of
      * those tokens that can legitimately come next in the input. If the list is
@@ -182,6 +139,6 @@ int first_arg;
     }
 
 exit:
-    va_end( args )
+    va_end( args );
     return rval;
 }
