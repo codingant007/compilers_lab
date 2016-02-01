@@ -36,7 +36,7 @@ extern int yyleng;
 extern int yylineno;
 
 //New Functions Added
+int lex();
+void advance();
 int match(int token);
 string getCurrentToken();
-void advance();
-int lex();

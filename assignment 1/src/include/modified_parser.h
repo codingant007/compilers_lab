@@ -2,15 +2,19 @@
 
 using namespace std;
 
-int legal_lookahead (int ,...);
-void statementList();
+int term();
+int factor();
+int mulTerm();
+int divTerm();
 void statement();
-string expression();
-string  expressionPrime();
-string subExpression();
-string plusMinusExpression();
-string plusExpression();
-string mulTerm();
-string divTerm();
-string factor();
-string term();
+int expression();
+int subExpression();
+int plusExpression();
+void statementList();
+int  expressionPrime();
+int plusMinusExpression();
+int legal_lookahead (int ,...);
+
+//Register and Label Managers
+class RegisterManager;
+class LabelManager;
