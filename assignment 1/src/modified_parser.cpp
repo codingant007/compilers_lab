@@ -98,8 +98,14 @@ void statement(){
     //Check for reserved keywords IF
     if (match(IF)){
         advance();
-        registerManager.deallocReg(expression());
+        int outputExpression = expression();
         string labelIfEnd = labelManager.getLabel();
+        //mainCode << labelIf <<" :\n";
+        mainCode<< "CMP "<< registerManager.getRegName(outputExpression)<<", 1"<<endl;
+        
+        registerManager.deallocReg(outputExpression);
+        //registerManager.deallocReg(expression());
+        
         mainCode<<"\n JNZ " << labelIfEnd <<"\n";
         if(match(THEN)){            
             advance();
@@ -116,14 +122,20 @@ void statement(){
     
     if(match(WHILE)){
         advance();
-        mainCode<<labelManager.getLabel()<<":\n";
-        registerManager.deallocReg(expression());
+        string labelWhileBegin = labelManager.getLabel();
+        mainCode<<labelWhileBegin<<":\n";
+        int outputExpression = expression();
+        mainCode << "CMP " << registerManager.getRegName( outputExpression )<<", 1"<<endl;
+        registerManager.deallocReg(outputExpression);
+        //registerManager.deallocReg(expression());
         string labelWhileEnd = labelManager.getLabel();
         mainCode << "JNZ " << labelWhileEnd << "\n";  
         if (match(DO)){
             advance();
             statement();
+            mainCode << "JMP "<< labelWhileBegin<< endl;
             mainCode << "\n" << labelWhileEnd << ":\n";
+
         }
         else{
             fprintf(stderr,"while without do is invalid");            
@@ -163,10 +175,10 @@ void statement(){
 
 string jumpOn(int relationalOperator){
      if(relationalOperator == GR)
-       return "JG ";
+       return "JNG ";
      if (relationalOperator == LS)
-       return "JL ";
-     return "JZ ";
+       return "JNL ";
+     return "JNZ ";
 }
 
 int expression(){
@@ -203,7 +215,7 @@ int expression(){
       
         tempRegisterValue = registerManager.allocReg();
         labelEq = labelManager.getLabel();
-        mainCode<<jumpOn(relationalOperator)<< labelEq <<"\n";
+        mainCode<< jumpOn(relationalOperator) << labelEq <<"\n";
         mainCode<<"MOV "<< registerManager.getRegName(tempRegisterValue) << ", 1\n";
         labelEqq = labelManager.getLabel();
         mainCode <<"JMP "<< labelEqq<< endl;
@@ -290,9 +302,9 @@ int mulTerm(){
     if(match(MUL)){
         advance();
         int termValReg = term();
-        mainCode << "POP eax" << endl;
+        mainCode << "POP ax" << endl;
         mainCode << "MUL " << registerManager.getRegName(termValReg) << endl;
-        mainCode << "MOV " << registerManager.getRegName(termValReg) << ",eax" << endl;
+        mainCode << "MOV " << registerManager.getRegName(termValReg) << ",ax" << endl;
         return termValReg;
     }
     else{
@@ -314,14 +326,14 @@ int divTerm(){
     if(match(DIV)){
         advance();
         int termValReg = term();
-        mainCode << "POP eax" << endl;
+        mainCode << "POP ax" << endl;
         mainCode << "DIV " << registerManager.getRegName(termValReg) << endl;
         registerManager.deallocReg(termValReg);
-        mainCode << "MOV " << registerManager.getRegName(reg) << ", eax" << endl;
+        mainCode << "MOV " << registerManager.getRegName(reg) << ", ax" << endl;
     }
     else{
-        mainCode << "POP eax" << endl;
-        mainCode << "MOV " << registerManager.getRegName(reg) << ", eax" << endl;
+        mainCode << "POP ax" << endl;
+        mainCode << "MOV " << registerManager.getRegName(reg) << ", ax" << endl;
     }
     return reg;
 }

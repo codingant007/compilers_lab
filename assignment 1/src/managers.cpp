@@ -4,7 +4,7 @@ using namespace std;
 
 extern int yylineno;
 
-char* RegisterManager::Names[] = { "ebx", "ecx", "edx" };//"%rbx", "%rcx", "%rdx","%r8","%r9","%r10","%r11","%r12","%r13","%r14","%r15" }; //"%rax"
+char* RegisterManager::Names[] = { "bx", "cx", "dx" };//"%rbx", "%rcx", "%rdx","%r8","%r9","%r10","%r11","%r12","%r13","%r14","%r15" }; //"%rax"
 
 RegisterManager::RegisterManager()
 {
