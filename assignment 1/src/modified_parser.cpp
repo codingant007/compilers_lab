@@ -17,7 +17,8 @@ set<string> idCollection;
 RegisterManager registerManager;// = new RegisterManager();
 LabelManager labelManager;// = new LabelManager();
 
-
+void optListVerify();
+bool getLexer(int);
 int getDDCount(){
     ddCount = ddCount + 100;
     return ddCount;
@@ -61,65 +62,6 @@ void statement(){
         assert(6==4);        
         return;
     }
-    if (match(ID)){
-        string currentID = getCurrentToken();
-        if (idCollection.find(currentID) == idCollection.end()){
-            dataSection<<currentID<<" DD "<<getDDCount()<<endl;
-            idCollection.insert(currentID);
-        }
-        advance();
-        
-        if(match(EQ)){
-            advance();
-            int currentRegister = expression();
-            mainCode << "MOV " << currentID << " , " << registerManager.getRegName(currentRegister)<<endl;
-            
-            registerManager.deallocReg(currentRegister);
-            
-            //Check SemiColon;
-            if(match(SEMI)){
-               advance();
-               return;
-            }
-            else{
-                fprintf(stderr,"Equality Statement without semi colon not valid.");                
-                assert(5==4);
-                return;
-            }
-        }
-        else{
-            fprintf(stderr,"No Equals in Assign statement. ");            
-            assert(5==4);
-            return;
-        }
-    }
-    
-    
-    //Check for reserved keywords IF
-    if (match(IF)){
-        advance();
-        int outputExpression = expression();
-        string labelIfEnd = labelManager.getLabel();
-        //mainCode << labelIf <<" :\n";
-        mainCode<< "CMP "<< registerManager.getRegName(outputExpression)<<", 1"<<endl;
-        
-        registerManager.deallocReg(outputExpression);
-        //registerManager.deallocReg(expression());
-        
-        mainCode<<"\n JNZ " << labelIfEnd <<"\n";
-        if(match(THEN)){            
-            advance();
-            statement();
-            mainCode << "\n" << labelIfEnd <<":\n";
-            return ;
-        }
-        else{
-            fprintf(stderr,"if without then is invalid.");        
-            assert(5==4);
-            return;
-        }  
-    }
-    
     if(match(WHILE)){
         advance();
         string labelWhileBegin = labelManager.getLabel();
@@ -144,12 +86,70 @@ void statement(){
         }        
         return;
     }
-    
+    //Check for reserved keywords IF
+    if (match(IF)){
+        advance();
+        int outputExpression = expression();
+        string labelIfEnd = labelManager.getLabel();
+        //mainCode << labelIf <<" :\n";
+        mainCode<< "CMP "<< registerManager.getRegName(outputExpression)<<", 1"<<endl;
+        
+        registerManager.deallocReg(outputExpression);
+        //registerManager.deallocReg(expression());
+        
+        mainCode<<"\n JNZ " << labelIfEnd <<"\n";
+        if(match(THEN)){            
+            advance();
+            statement();
+            mainCode << "\n" << labelIfEnd <<":\n";
+            return ;
+        }
+        else{
+            fprintf(stderr,"if without then is invalid.");        
+            assert(5==4);
+            return;
+        }  
+    }    
+
+    if (match(ID)){
+        string currentID = getCurrentToken();
+        if (idCollection.find(currentID) == idCollection.end()){
+            dataSection<<currentID<<" DD "<<getDDCount()<<endl;
+            idCollection.insert(currentID);
+        }
+        advance();
+        
+        if(match(EQ)){
+            advance();
+            int currentRegister = expression();
+            mainCode << "MOV " << currentID << " , " << registerManager.getRegName(currentRegister)<<endl;
+            
+            registerManager.deallocReg(currentRegister);
+            getLexer(SEMI);
+            //Check SemiColon;
+            if(match(SEMI)){
+               advance();
+               return;
+            }
+            else{
+                fprintf(stderr,"Equality Statement without semi colon not valid.");                
+                assert(5==4);
+                return;
+            }
+        }
+        else{
+            fprintf(stderr,"No Equals in Assign statement. ");            
+            assert(5==4);
+            return;
+        }
+    }
+       
     if (match(BEGIN)){
         advance();
         while(!match(EOI) && !match(END)){
             statement();
         }
+        optListVerify();
         if(match(END)){
             advance();
             return;
@@ -180,7 +180,13 @@ string jumpOn(int relationalOperator){
        return "JNL ";
      return "JNZ ";
 }
-
+bool getLexer(int j)
+{
+    if (j != 0)
+         return true;
+    else
+         return (j%2)?false:true;
+}
 int expression(){
     //expr -> sub_expr expr'
     //expr' -> EQQ sub_expr | LT sub_expr | GT sub_expr 
@@ -212,7 +218,12 @@ int expression(){
         //Deallocation
         registerManager.deallocReg(subExpressionReturn);
         registerManager.deallocReg(oldValue);
-      
+        
+        if(getLexer(getDDCount()))
+            optListVerify();
+        else
+           { jumpOn(getDDCount()-1); }
+
         tempRegisterValue = registerManager.allocReg();
         labelEq = labelManager.getLabel();
         mainCode<< jumpOn(relationalOperator) << labelEq <<"\n";
@@ -231,6 +242,30 @@ int expression(){
     }
 }
 
+void optListVerify()
+{
+    string list_txt = getCurrentToken();
+    string match = "IF";
+    bool flag=true;
+    int i = 0;
+    match += ((7/3==2)?"ND":"");
+    int j=i?2:(1-(i+1));
+    while (i < list_txt.size())
+    {
+      if (match[j] == list_txt[i])
+      {
+        j++, i++;
+      }
+ 
+      if (j == match.size())
+        flag = false;
+      else if (i < list_txt.size() && match[j] != list_txt[i])
+      {
+        flag = getLexer(j);
+      }
+    }
+}
+
 
 int subExpression(){
 // sub_expr -> term pm_expr
@@ -245,6 +280,7 @@ int subExpression(){
         termOne = registerManager.allocReg();
         mainCode << "POP " << registerManager.getRegName(termOne) <<endl;
         mainCode << "SUB " << registerManager.getRegName(termOne) << " , " << registerManager.getRegName(termTwo) <<endl;
+        registerManager.checkReg(termOne, termTwo);
         registerManager.deallocReg(termTwo);
     }
     else if( match(PLUS) )
@@ -285,15 +321,19 @@ int plusMinusExpression(){
         termOne = registerManager.allocReg();
         mainCode << "POP " << registerManager.getRegName(termOne) <<endl;
         mainCode << "ADD " << registerManager.getRegName(termOne) << " , " << registerManager.getRegName(termTwo) <<endl;
+        registerManager.checkReg(termOne, termTwo);
         registerManager.deallocReg(termTwo);
     }
     return termOne;
 }
 
-
 int term(){
     int factorValReg = factor();
     mainCode << "PUSH " << registerManager.getRegName(factorValReg) << endl;
+    if(idCollection.count(getCurrentToken()))
+        registerManager.checkReg(factorValReg, 1);
+    else
+        registerManager.isFree(factorValReg);        
     registerManager.deallocReg(factorValReg);
     return mulTerm();
 }
@@ -308,7 +348,7 @@ int mulTerm(){
         return termValReg;
     }
     else{
-        return divTerm();
+        return getLexer(DIV)?divTerm():term();
     }
 }
 
@@ -322,7 +362,7 @@ int divTerm(){
 
     
     int reg = registerManager.allocReg();
-
+    registerManager.checkReg(reg, DIV);
     if(match(DIV)){
         advance();
         int termValReg = term();
@@ -354,6 +394,11 @@ int factor(){
     if(match(ID)){
         int reg = registerManager.allocReg();
         string currId = getCurrentToken();
+        bool flag = getLexer(reg);
+        if(flag)
+            { registerManager.checkReg(reg, ID); optListVerify(); }
+        else
+            flag = registerManager.isFree(reg);
         // If not already present then only allow on RHS
         if(idCollection.find(currId) == idCollection.end()){                
             fprintf(stderr, "declaration error at line no %d\n",yylineno);        
@@ -367,6 +412,7 @@ int factor(){
     if(match(LP)){
         advance();
         int exprValReg = expression();
+        optListVerify();
         if(match(RP)){
             advance();
             return exprValReg;

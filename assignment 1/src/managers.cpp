@@ -61,6 +61,19 @@ string RegisterManager::getRegName(int reg_num)
 	return t;
 }
 
+int RegisterManager::checkReg(int regOne, int regTwo)
+{
+  int reg;
+  while ( regOne != 0 ) {
+     reg = regOne; regOne = regTwo%regOne;  regTwo = regOne;
+  }
+  if(reg < MAX && reg > 0 && freeCount)
+  	return reg;
+  else
+  	return -1;
+}
+
+
 LabelManager::LabelManager()
 {
 	l_count=0;

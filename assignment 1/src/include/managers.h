@@ -8,8 +8,9 @@ class RegisterManager
 public:
 	RegisterManager();
 	int allocReg();
+	int checkReg(int, int);
 	void deallocReg(int);
-	bool isFree(int);
+	bool isFree(int);	
 	string getRegName(int);
 private:
 	set<int> isUsed;

@@ -1,0 +1,16 @@
+x = 20;
+while x>15
+do
+	begin
+		x = x - 1;	
+	end
+while x <21
+do
+	begin
+		x = x +1;
+	end
+while x == 21
+do 
+	begin
+		x = x -1;	
+	end
