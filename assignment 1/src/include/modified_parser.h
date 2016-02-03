@@ -14,7 +14,3 @@ void statementList();
 int  expressionPrime();
 int plusMinusExpression();
 int legal_lookahead (int ,...);
-
-//Register and Label Managers
-class RegisterManager;
-class LabelManager;

@@ -1,34 +1,10 @@
 #include <bits/stdc++.h>
+#include "include/managers.h"
 using namespace std;
 
 extern int yylineno;
 
-class RegisterManager
-{
-public:
-	RegisterManager();
-	int allocReg();
-	void deallocReg(int);
-	bool isFree(int);
-	string getRegName(int);
-private:
-	set<int> isUsed;
-	static char* Names[];
-	int freeCount, MAX;
-};
-
-char* RegisterManager::Names[] = { "%rbx", "%rcx", "%rdx","%r8","%r9","%r10","%r11","%r12","%r13","%r14","%r15" }; //"%rax"
-
-class LabelManager
-{
-public:
-	LabelManager();
-	string getLabel();
-	string freeLabel();
-private:
-	int l_count=0;
-	string toString(int);
-};
+char* RegisterManager::Names[] = { "ebx", "ecx", "edx" };//"%rbx", "%rcx", "%rdx","%r8","%r9","%r10","%r11","%r12","%r13","%r14","%r15" }; //"%rax"
 
 RegisterManager::RegisterManager()
 {
@@ -40,9 +16,18 @@ RegisterManager::RegisterManager()
 int RegisterManager::allocReg()
 {
 	if(freeCount)
+	{
 		for(int i = 0; i < MAX; i++)
-			if(isUsed.find(i) != isUsed.end())
-			{	freeCount--; isUsed.insert(i); return i; }
+		{
+			if(isFree(i))
+			{	
+				freeCount--; 
+				isUsed.insert(i); 
+				fprintf(stderr, "Register %d allocated. freeCount=%d\n", i, freeCount); 
+				return i; 
+			}
+		}
+	}
 	else
 	{
 		fprintf(stderr, "ERROR: Expression too complex to handle at %d. Exiting now.\n", yylineno);
@@ -53,12 +38,13 @@ int RegisterManager::allocReg()
 
 void RegisterManager::deallocReg(int reg_num)
 {
-	if(freeCount == MAX)
-		{ fprintf(stderr, "ERROR: %d: All registers already free.\n", yylineno); assert(2==1); }
+	// if(freeCount == MAX)
+	// 	{ fprintf(stderr, "ERROR: %d: All registers already free.\n", yylineno); assert(2==1); }
 	if(isFree(reg_num))
 		{ fprintf(stderr, "ERROR: Invalid register deallocation at %d. Exiting now.\n", yylineno);assert(2==1);	}
 	isUsed.erase(reg_num);
 	freeCount++;
+	fprintf(stderr, "Register %d deallocated. freeCount=%d\n", reg_num, freeCount);
 }
 
 bool RegisterManager::isFree(int reg_num)

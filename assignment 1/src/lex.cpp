@@ -41,6 +41,7 @@ int lex(void){
       }
       for(; *current; ++current){
          /* Get the next token */
+         fprintf(stderr, "%c\n", *current);
          yytext = current;
          yyleng = 1;
          switch( *current ){
@@ -51,7 +52,7 @@ int lex(void){
            case '-':
             return MINUS;
            case '*':
-            return TIMES;
+            return MUL;
            case '/':
             return DIV;
            case '(':
@@ -78,9 +79,10 @@ int lex(void){
            if (isalpha(*current)){
               char tempWord[1024];
               int iterat=0;
-              while(isalnum(*(current+iterat))){
-                tempWord[iterat] = *(current + iterat);
+              while(isalnum(*(current))){
+                tempWord[iterat] = *(current );
                 iterat++;
+                current++;
               }
               tempWord[iterat]='\0';
               //cout<<strcmp(tempWord,"then")<<endl;

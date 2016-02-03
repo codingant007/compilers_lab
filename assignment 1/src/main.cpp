@@ -1,6 +1,10 @@
+#include <bits/stdc++.h>
 #include "include/modified_parser.h"
 
-main ()
+using namespace std;
+
+int main ()
 {
 	statementList();
+	return 0;
 }

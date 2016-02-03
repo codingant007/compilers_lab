@@ -5,7 +5,7 @@ using namespace std;
 #define EOI		0	/* End of input			*/
 #define SEMI		1	/* ; 				*/
 #define PLUS 		2	/* + 				*/
-#define TIMES		3	/* * 				*/
+#define MUL		3	/* * 				*/
 #define LP		4	/* (				*/
 #define RP		5	/* )				*/
 #define NUM 	6	/* Decimal Number  */

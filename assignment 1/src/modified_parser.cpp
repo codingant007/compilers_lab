@@ -1,23 +1,24 @@
-/* Revised parser  */
+/*   */
 
 #include <stdio.h>
 #include "include/lex.h"
 #include "include/modified_parser.h"
+#include "include/managers.h"
 #include <string>
 #include <bits/stdc++.h>
 
 using namespace std;
 
 
-int ddCount;
+static int ddCount;
 stringstream mainCode;
 stringstream dataSection;
-set<int> idCollection;
-RegisterManager registerManager = new RegisterManager();
-LabelManagerm labelManager = new LabelManager();
+set<string> idCollection;
+RegisterManager registerManager;// = new RegisterManager();
+LabelManager labelManager;// = new LabelManager();
 
 
-getDDCount(){
+int getDDCount(){
     ddCount = ddCount + 100;
     return ddCount;
 }
@@ -33,19 +34,17 @@ factor -> NUM | ID | LP expr RP
 */
 
 void statementList(){
-    dataSection << "org 100h\nJMP start\n";
-    error = false;
+    dataSection << "org 100h\n\n";    
     ddCount = 800;
     while(1){
         if(match(EOI))
             break;
         statement();
+        mainCode<<"\n";
     }
-    if (!error)
-    {
-     cout<< dataSection.str() << "\nstart:"<<endl;
-     cout<< mainCode << "\nRET" <<endl;
-    }
+    dataSection <<" JMP start \n";
+    cout<< dataSection.str() << "\nstart:"<<endl;
+    cout<< mainCode.str() << "\nRET" <<endl;
 }
 
 void statement(){
@@ -54,39 +53,45 @@ void statement(){
                 IF expr THEN stmt_list 
                 WHILE expr DO stmt_list 
                 BEGIN stmt_list END 
-                expr SEMI */
+                 */
     
     if (!legal_lookahead(NUM,ID,IF,WHILE,BEGIN,LP))
+    {
+        fprintf(stderr, "ERROR: Expected token at line %d\n", yylineno);
+        assert(6==4);        
         return;
-    
+    }
     if (match(ID)){
         string currentID = getCurrentToken();
         if (idCollection.find(currentID) == idCollection.end()){
             dataSection<<currentID<<" DD "<<getDDCount()<<endl;
+            idCollection.insert(currentID);
         }
         advance();
         
-        if(match(ASSIGN)){
+        if(match(EQ)){
             advance();
             int currentRegister = expression();
-            mainCode << "MOV " << currentID << " , " << registerManager.getRegName(currentRegister);
+            mainCode << "MOV " << currentID << " , " << registerManager.getRegName(currentRegister)<<endl;
+            
             registerManager.deallocReg(currentRegister);
             
             //Check SemiColon;
             if(match(SEMI)){
                advance();
+               return;
             }
             else{
-                fprintf(stderr,"Equality Statement without semi colon not valid.");
-                error = true;
+                fprintf(stderr,"Equality Statement without semi colon not valid.");                
+                assert(5==4);
+                return;
             }
         }
         else{
-            fprintf(stderr,"No Equals in Assign statement. ")
-            error = true;
+            fprintf(stderr,"No Equals in Assign statement. ");            
+            assert(5==4);
+            return;
         }
-        
-        return;    
     }
     
     
@@ -94,36 +99,37 @@ void statement(){
     if (match(IF)){
         advance();
         registerManager.deallocReg(expression());
-        if(match(THEN)){
-            
+        string labelIfEnd = labelManager.getLabel();
+        mainCode<<"\n JNZ " << labelIfEnd <<"\n";
+        if(match(THEN)){            
             advance();
             statement();
-            mainCode << "\n" << labelManager.getLabel() <<":\n";
+            mainCode << "\n" << labelIfEnd <<":\n";
+            return ;
         }
         else{
-            fprintf(stderr,"if without then is invalid.");
-            error = true;
-        }
-        
-        return;
+            fprintf(stderr,"if without then is invalid.");        
+            assert(5==4);
+            return;
+        }  
     }
     
     if(match(WHILE)){
         advance();
         mainCode<<labelManager.getLabel()<<":\n";
         registerManager.deallocReg(expression());
-        
+        string labelWhileEnd = labelManager.getLabel();
+        mainCode << "JNZ " << labelWhileEnd << "\n";  
         if (match(DO)){
             advance();
             statement();
-            mainCode <<"JMP "<<labelManager.freeLabel()<<"\n";
-            mainCode <<labelManager.getLabel()<<"\n";
+            mainCode << "\n" << labelWhileEnd << ":\n";
         }
         else{
-            fprintf(stderr,"while without do is invalid");
-            error = true;
-        }
-        
+            fprintf(stderr,"while without do is invalid");            
+            assert(5==4);
+            return;
+        }        
         return;
     }
     
@@ -136,55 +142,82 @@ void statement(){
             advance();
         }
         else{
-            fprintf(stderr,"begin without end is not valid");
-            error = true;
-        }
-        
-        return;
+            fprintf(stderr,"begin without end is not valid at line no %d",yylineno);
+            assert(5==4);
+            return;
+        }       
     }
     
-    expression();
+    /*expression();
     if(match(SEMI)){
        advance(); 
     }
-    else{
-        fprintf(stderr,"An expression without semicolon is invalid.");
-        error = true;
-    }
+    else{*/
+        fprintf(stderr,"An expression without semicolon is invalid.");        
+        assert(5==4);
+        return;
+    //}
     
+}
+
+string jumpOn(int relationalOperator){
+     if(relationalOperator == GR)
+       return "JG ";
+     if (relationalOperator == LS)
+       return "JL ";
+     return "JZ ";
 }
 
 int expression(){
     //expr -> sub_expr expr'
-    //expr' -> EQQ sub_expr | LT sub_expr | GT sub_expr
-
+    //expr' -> EQQ sub_expr | LT sub_expr | GT sub_expr 
 
     int subExpressionReturn,oldValue;
-    bool noExpressionPrime = true;
+    int tempRegisterValue,relationalOperator;
+    string labelEq,labelEqq;
+    //bool noExpressionPrime = true;
     subExpressionReturn = subExpression();
     
-    int tempEQQ,tempLS,tempGR;
-    tempEQ = match(EQQ);
-    tempLS = match(LS);
-    tempGR = match(GR);
-    
-    if (match(EQQ)){
-        mainCode << " PUSH "<< registerManager.getRegName(subExpression)<<endl;
+    if(match(EQQ))
+      relationalOperator = EQQ;
+    if(match(GR))
+      relationalOperator = GR;
+    if(match(LS))
+       relationalOperator = LS;
+           
+    if (match(EQQ)|| match(LS)|| match(GR)){
+        mainCode << " PUSH "<< registerManager.getRegName(subExpressionReturn)<<endl;
     
         advance();
+
         registerManager.deallocReg(subExpressionReturn);    
         
         subExpressionReturn = subExpression();
         oldValue = registerManager.allocReg();
-        mainCode<<" POP "<<oldValue<<endl;
-        mainCode<<" CMP "<<oldValue<<" , "<< subExpressionReturn<<endl;
+        mainCode<<" POP "<< registerManager.getRegName(oldValue)<<endl;
+        mainCode<<" CMP "<< registerManager.getRegName(oldValue) <<" , "<< registerManager.getRegName(subExpressionReturn)<<endl;
+        //Deallocation
+        registerManager.deallocReg(subExpressionReturn);
+        registerManager.deallocReg(oldValue);
+      
+        tempRegisterValue = registerManager.allocReg();
+        labelEq = labelManager.getLabel();
+        mainCode<<jumpOn(relationalOperator)<< labelEq <<"\n";
+        mainCode<<"MOV "<< registerManager.getRegName(tempRegisterValue) << ", 1\n";
+        labelEqq = labelManager.getLabel();
+        mainCode <<"JMP "<< labelEqq<< endl;
+        mainCode<< labelEq<<":\n";
+        mainCode<< "MOV "<< registerManager.getRegName(tempRegisterValue) <<", 0\n";
+        mainCode<<labelEqq<<":\n";
+        
+        return tempRegisterValue;
         //codeSection<<" JNZ "<< labelManager.getLabel();
+    }
+    else{
+      return subExpressionReturn;
     }
 }
 
-int  expressionPrime(){
-
-}
 
 int subExpression(){
 // sub_expr -> term pm_expr
@@ -253,9 +286,9 @@ int mulTerm(){
         advance();
         mainCode << "POP eax" << endl;
         int termValReg = term();
-        mainCode << "MUL " << registerManager.getRegName(termValreg) << endl;
-        mainCode << "MOV " << registerManager.getRegName(termValreg) ",eax" << endl;
-        return termValreg;
+        mainCode << "MUL " << registerManager.getRegName(termValReg) << endl;
+        mainCode << "MOV " << registerManager.getRegName(termValReg) << ",eax" << endl;
+        return termValReg;
     }
     else{
         return divTerm();
@@ -264,9 +297,11 @@ int mulTerm(){
 
 
 int divTerm(){
-    if(!legal_lookahead(DIV)){
-        return;
-    }
+    // if(!legal_lookahead(DIV)){
+    //     fprintf(stderr, "ERROR: Expected token DIV at line %d\n", yylineno);        
+    //     assert(5==4);
+    //     return -1;
+    // }
 
     mainCode << "POP eax" << endl;
     int reg = registerManager.allocReg();
@@ -275,56 +310,51 @@ int divTerm(){
         advance();
         int termValReg = term();
         mainCode << "DIV " << registerManager.getRegName(termValReg) << endl;
-        registerManager.deallocReg(termValreg);
-        mainCode << "MOV " << registerManager.getRegName(reg) << ",eax" <<   << endl;
+        registerManager.deallocReg(termValReg);
+        mainCode << "MOV " << registerManager.getRegName(reg) << ", eax" << endl;
     }
     else{
-        mainCode << "MOV " << registerManager.getRegName(reg) << ",eax" << endl;
+        mainCode << "MOV " << registerManager.getRegName(reg) << ", eax" << endl;
     }
     return reg;
 }
 
 int factor(){
-    if(!legal_lookahead(NUM,ID,LP)){
-        return;
+    if(!legal_lookahead(NUM,ID,LP,0)){
+        fprintf(stderr, "ERROR: Expected token at line %d\n", yylineno);
+        assert(5==4);
+        return -1;
     }
     if(match(NUM)){
         int reg = registerManager.allocReg();
         string currLiteral = getCurrentToken();
-        mainCode << "MOV " << registerManager.getRegName(reg) ","<< currLiteral << endl;
+        mainCode << "MOV " << registerManager.getRegName(reg) << ","<< currLiteral << endl;
         advance();
         return reg;
     }
     if(match(ID)){
         int reg = registerManager.allocReg();
         string currId = getCurrentToken();
-        string nextToken = getNextToken();
         // If not already present then only allow on RHS
-        if(idCollection.find(currId) == idCollection.end()){
-            if(nextToken.compare("=")==0){
-                dataSection << currId <<" DD "<<getDDCount()<<endl;
-            }
-            else{
-                fprintf(stderr, "declaration error at line no %d\n",yylineno);
-            }
+        if(idCollection.find(currId) == idCollection.end()){                
+            fprintf(stderr, "declaration error at line no %d\n",yylineno);        
+            assert(6==4);
+            return -1;
         }
-        mainCode << "MOV " << registerManager.getRegName(reg) "," << currId << endl;
+        mainCode << "MOV " << registerManager.getRegName(reg) << " , " << currId << endl;
         advance();
         return reg;
     }
     if(match(LP)){
-        advance();
         int exprValReg = expression();
         if(match(RP)){
             advance();
             return exprValReg;
         }
-        fprintf(stderr,"Right parenthesis at not found at line %d\n",yylineno);
-        error = true;
+        fprintf(stderr,"Right parenthesis at not found at line %d\n",yylineno);        
+        assert(5==4);
+        return -1;
     }
-    fprintf(stderr,"Number or Identifier or expression not found at line no %d\n"yylineno);
-    error = true;
-    return 0;
 }
 
 void statements()
