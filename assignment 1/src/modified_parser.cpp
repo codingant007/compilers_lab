@@ -140,6 +140,7 @@ void statement(){
         }
         if(match(END)){
             advance();
+            return;
         }
         else{
             fprintf(stderr,"begin without end is not valid at line no %d",yylineno);
@@ -225,23 +226,25 @@ int subExpression(){
     int termOne = term();
     if ( match(MINUS) )
     {
-        mainCode << "PUSH " << termOne <<endl;
+        mainCode << "PUSH " << registerManager.getRegName(termOne) <<endl;
         registerManager.deallocReg(termOne);
         advance();
         int termTwo = plusMinusExpression();
         termOne = registerManager.allocReg();
-        mainCode << "POP " << termOne <<endl;
-        mainCode << "SUB " << termOne << " , " << termTwo <<endl;
+        mainCode << "POP " << registerManager.getRegName(termOne) <<endl;
+        mainCode << "SUB " << registerManager.getRegName(termOne) << " , " << registerManager.getRegName(termTwo) <<endl;
+        registerManager.deallocReg(termTwo);
     }
     else if( match(PLUS) )
     {
-        mainCode << "PUSH " << termOne <<endl;
+        mainCode << "PUSH " << registerManager.getRegName(termOne) <<endl;
         registerManager.deallocReg(termOne);
         advance();
         int termTwo = plusMinusExpression();
         termOne = registerManager.allocReg();
-        mainCode << "POP " << termOne <<endl;
-        mainCode << "ADD " << termOne << " , " << termTwo <<endl;
+        mainCode << "POP " << registerManager.getRegName(termOne) <<endl;
+        mainCode << "ADD " << registerManager.getRegName(termOne) << " , " << registerManager.getRegName(termTwo) <<endl;
+        registerManager.deallocReg(termTwo);
     }
     return termOne;
 }
@@ -252,23 +255,25 @@ int plusMinusExpression(){
     int termOne = term();
     if ( match(MINUS) )
     {
-        mainCode << "PUSH " << termOne <<endl;
+        mainCode << "PUSH " << registerManager.getRegName(termOne) <<endl;
         registerManager.deallocReg(termOne);
         advance();
         int termTwo = plusMinusExpression();
         termOne = registerManager.allocReg();
-        mainCode << "POP " << termOne <<endl;
-        mainCode << "SUB " << termOne << " , " << termTwo <<endl;
+        mainCode << "POP " << registerManager.getRegName(termOne) <<endl;
+        mainCode << "SUB " << registerManager.getRegName(termOne) << " , " << registerManager.getRegName(termTwo) <<endl;
+        registerManager.deallocReg(termTwo);
     }
     else if( match(PLUS) )
     {
-        mainCode << "PUSH " << termOne <<endl;
+        mainCode << "PUSH " << registerManager.getRegName(termOne) <<endl;
         registerManager.deallocReg(termOne);
         advance();
         int termTwo = plusMinusExpression();
         termOne = registerManager.allocReg();
-        mainCode << "POP " << termOne <<endl;
-        mainCode << "ADD " << termOne << " , " << termTwo <<endl;
+        mainCode << "POP " << registerManager.getRegName(termOne) <<endl;
+        mainCode << "ADD " << registerManager.getRegName(termOne) << " , " << registerManager.getRegName(termTwo) <<endl;
+        registerManager.deallocReg(termTwo);
     }
     return termOne;
 }
@@ -284,8 +289,8 @@ int term(){
 int mulTerm(){
     if(match(MUL)){
         advance();
-        mainCode << "POP eax" << endl;
         int termValReg = term();
+        mainCode << "POP eax" << endl;
         mainCode << "MUL " << registerManager.getRegName(termValReg) << endl;
         mainCode << "MOV " << registerManager.getRegName(termValReg) << ",eax" << endl;
         return termValReg;
@@ -303,17 +308,19 @@ int divTerm(){
     //     return -1;
     // }
 
-    mainCode << "POP eax" << endl;
+    
     int reg = registerManager.allocReg();
 
     if(match(DIV)){
         advance();
         int termValReg = term();
+        mainCode << "POP eax" << endl;
         mainCode << "DIV " << registerManager.getRegName(termValReg) << endl;
         registerManager.deallocReg(termValReg);
         mainCode << "MOV " << registerManager.getRegName(reg) << ", eax" << endl;
     }
     else{
+        mainCode << "POP eax" << endl;
         mainCode << "MOV " << registerManager.getRegName(reg) << ", eax" << endl;
     }
     return reg;
@@ -346,6 +353,7 @@ int factor(){
         return reg;
     }
     if(match(LP)){
+        advance();
         int exprValReg = expression();
         if(match(RP)){
             advance();
