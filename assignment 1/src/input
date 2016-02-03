@@ -12,5 +12,5 @@ do
 while x == 21
 do 
 	begin
-		x = x -1;
+		x = x -1;	
 	end

@@ -1,53 +1,43 @@
 org 100h
 
 x DD 900
+y DD 1000
+h DD 1100
  JMP start 
 
 start:
-MOV bx,20
+MOV bx,5
 PUSH bx
 POP ax
 MOV bx, ax
 MOV x , bx
 
+MOV bx , x
+PUSH bx
+POP ax
+MOV bx, ax
+ PUSH bx
+MOV bx,5
+PUSH bx
+POP ax
+MOV bx, ax
+ POP cx
+ CMP cx , bx
+JNZ Label0
+MOV bx, 1
+JMP Label1
 Label0:
-MOV bx , x
-PUSH bx
-POP ax
-MOV bx, ax
- PUSH bx
-MOV bx,15
-PUSH bx
-POP ax
-MOV bx, ax
- POP cx
- CMP cx , bx
-JNG Label1
-MOV bx, 1
-JMP Label2
+MOV bx, 0
 Label1:
-MOV bx, 0
-Label2:
 CMP bx, 1
-JNZ Label3
-MOV bx , x
+
+ JNZ Label2
+MOV bx,20
 PUSH bx
 POP ax
 MOV bx, ax
-PUSH bx
-MOV bx,1
-PUSH bx
-POP ax
-MOV bx, ax
-POP cx
-SUB cx , bx
-MOV x , cx
-JMP Label0
-
-Label3:
-
-Label4:
-MOV bx , x
+MOV y , bx
+MOV bx , y
 PUSH bx
 POP ax
 MOV bx, ax
@@ -58,65 +48,24 @@ POP ax
 MOV bx, ax
  POP cx
  CMP cx , bx
-JNL Label5
+JNG Label3
 MOV bx, 1
-JMP Label6
-Label5:
-MOV bx, 0
-Label6:
-CMP bx, 1
-JNZ Label7
-MOV bx , x
-PUSH bx
-POP ax
-MOV bx, ax
-PUSH bx
-MOV bx,1
-PUSH bx
-POP ax
-MOV bx, ax
-POP cx
-ADD cx , bx
-MOV x , cx
 JMP Label4
-
-Label7:
-
-Label8:
-MOV bx , x
-PUSH bx
-POP ax
-MOV bx, ax
- PUSH bx
-MOV bx,21
-PUSH bx
-POP ax
-MOV bx, ax
- POP cx
- CMP cx , bx
-JNZ Label9
-MOV bx, 1
-JMP Label10
-Label9:
+Label3:
 MOV bx, 0
-Label10:
+Label4:
 CMP bx, 1
-JNZ Label11
-MOV bx , x
-PUSH bx
-POP ax
-MOV bx, ax
-PUSH bx
-MOV bx,1
-PUSH bx
-POP ax
-MOV bx, ax
-POP cx
-SUB cx , bx
-MOV x , cx
-JMP Label8
 
-Label11:
+ JNZ Label5
+MOV bx,20
+PUSH bx
+POP ax
+MOV bx, ax
+MOV h , bx
+
+Label5:
+
+Label2:
 
 
 RET
