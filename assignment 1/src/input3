@@ -1,0 +1,15 @@
+a = 3;
+if(a+2 == 5)
+	begin
+	while(a+2<10)
+		begin
+			a=a+1;
+		end
+	end
+i = 1;
+b = 1;
+while(i<10)
+	begin
+	b=b*i;
+	i=i+1
+	end
