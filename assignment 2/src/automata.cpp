@@ -1,13 +1,7 @@
 #include "inc/automata.h"
 
 class Automata{
-  
-  set<int> states;
-  int startState;
-  set<int> finalStates;
-  transitionType transitions;
-  set<char> language;
-  
+ 
   static char getEpsilon(){
       return '$';
   }
