@@ -63,7 +63,7 @@ variable_declarations:
 variable_definitions:
 	dtype ID {}
 	| variable_definitions COMMA ID {}
-	| variable_definitions error ID { yyerror("Missing comma in definitions list"); }
+	| variable_definitions error ID '\n' { yyerror("Missing comma in definitions list"); }
 
 dtype:
 	DTYPE_INT {}
@@ -78,7 +78,7 @@ argument_list:
 	dtype ID COMMA argument_list {}
 	|dtype ID {}
 	|%empty /*epsilon production*/ {}
-	| dtype ID error argument_list { yyerror("Missing semicolon in argument list"); }
+	| dtype ID error argument_list { yyerror("Missing comma in argument list"); }
 	| dtype error COMMA argument_list { yyerror("Missing identifier in argument list"); }
 
 statement_block: 
@@ -145,7 +145,6 @@ alr_subexpression:
 	| READ OPENPAREN CLOSEPAREN {}
 	| error EQ alr_subexpression { yyerror("Missing identifier name"); }
 	| ID error alr_subexpression { yyerror("Possible missing equalty sign"); }
-	| ID error id_list CLOSEPAREN { yyerror("Possible missing open parenthesis"); }
 	| ID OPENPAREN id_list error { yyerror("Possible missing closing parenthesis"); }
 	| READ OPENPAREN error { yyerror("Possible missing closing parenthesis"); }
 	| READ error CLOSEPAREN { yyerror("Possible missing opening parenthesis"); }
@@ -166,7 +165,7 @@ supported_constant:
 
 void yyerror(const char* err_msg)
 {
-	cout<<"Line "<<yylineno<<": "<<err_msg<<" at "<<string(yytext, yyleng)<<endl;
+	cout<<"Line "<<yylineno<<": "<<err_msg<<" at "<<yylloc<<endl;
 }
 
 int main()

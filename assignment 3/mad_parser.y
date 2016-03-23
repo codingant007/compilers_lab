@@ -63,7 +63,7 @@ variable_declarations:
 variable_definitions:
 	dtype ID {}
 	| variable_definitions COMMA ID {}
-	| variable_definitions error ID { yyerror("Missing comma in definitions list"); }
+	| variable_definitions error ID '\n' { yyerror("Missing comma in definitions list"); }
 
 dtype:
 	DTYPE_INT {}
@@ -78,7 +78,7 @@ argument_list:
 	dtype ID COMMA argument_list {}
 	|dtype ID {}
 	|%empty /*epsilon production*/ {}
-	| dtype ID error argument_list { yyerror("Missing semicolon in argument list"); }
+	| dtype ID error argument_list { yyerror("Missing comma in argument list"); }
 	| dtype error COMMA argument_list { yyerror("Missing identifier in argument list"); }
 
 statement_block: 
@@ -165,7 +165,7 @@ supported_constant:
 
 void yyerror(const char* err_msg)
 {
-	cout<<"Line "<<yylineno<<": "<<err_msg<<" at "<<string(yytext, yyleng)<<endl;
+	cout<<"Line "<<yylineno<<": "<<err_msg<<endl;
 }
 
 int main()
