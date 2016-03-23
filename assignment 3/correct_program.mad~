@@ -1,0 +1,33 @@
+void func_one (int a, int b, bool c)
+{
+	int x, y, z;
+	x = 20 + 5 - ( 4 + 2 );
+	y = x % 10;
+	z = 2*x - y;
+	
+	func_two(x, z);
+}
+
+bool func_two (int parrot, int mango)
+{
+	int local;
+	if ( parrot == mango )
+	{
+		return true;	
+	}
+	
+	if (parrot > 2*mango)
+	{
+		return false;	
+	}
+	else
+	{
+		local = readInteger();
+		for (local=parrot; local < 2*mango; parrot=parrot+1)
+		{
+			parrot = parrot + 2;
+		}
+		print (3*parrot) ;
+		return true;
+	}
+}
