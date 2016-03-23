@@ -95,30 +95,47 @@ supported_statement:
 	| print_statement {}
 	| statement_block {}
 
-IfStmt ::=if (Expr) Stmt ElseStmt
-ElseStmt ::= Epsilon | else Stmt
-WhileStmt ::= while ( Expr )
-ForStmt ::= for (Expr; Expr; Expr) Stmt
-ReturnStmt ::= return; | return Expr;
-PrintStmt ::= print ( ExprList ) ;
-ExprList ::= Expr, ExprList | Expr
+if_statement:
+	IF OPENPAREN alr_subexpression CLOSEPAREN statement_block else_statement {} //CHANGED IF EXPRESSION INTERNAL TO STATEMENT BLOCK
 
-Expr ::= ident=Expr|Constant|ident|ident (Actuals)|(Expr)|Expr+Expr|Expr-Expr
-	|Expr*Expr|Expr/Expr
-	|Expr%Expr|-Expr
-	|Expr<Expr
-	|Expr<=Expr
-	|Expr>Expr
-	|Expr>=Expr
-	|Expr==Expr
-	|Expr!=Expr
-	|Expr&&Expr
-	|Expr||Expr 
-	|!Expr
-	|readInteger()
-	|readBool()
-Actuals ::= ident,Actuals|ident|Epsilon
-Constant ::= intConstant|boolConstant|null|(-intConstant)
+else_statement:
+	%empty {}
+	| ELSE supported_statement {}
+
+while_statement:
+	WHILE OPENPAREN alr_subexpression CLOSEPAREN {}
+for_statement:
+	FOR OPENPAREN alr_subexpression SEMI alr_subexpression SEMI alr_subexpression OPENPAREN statement_block {} //CHANGED FOR EXPRESSION INTERNAL TO STATEMENT BLOCK
+
+return_statement: 
+	RETURN SEMI {}
+	| RETURN alr_subexpression SEMI {}
+
+print_statement:
+	PRINT OPENPAREN alr_subexpression CLOSEPAREN SEMI {}
+
+alr_subexpression:
+	ID EQ alr_subexpression {}
+	| supported_constant {}
+	| ID {}
+	| ID OPENPAREN id_list CLOSEPAREN  {}
+	| OPENPAREN alr_subexpression CLOSEPAREN {}
+	| alr_subexpression ARITH alr_subexpression {}
+	| OPENNEGATE alr_subexpression CLOSEPAREN {}
+	| alr_subexpression RELN alr_subexpression {}
+	| alr_subexpression LOGICAL alr_subexpression {}	
+	| LOGICALNOT alr_subexpression {}
+	| READ OPENPAREN CLOSEPAREN {}
+
+id_list:
+	ID COMMA id_list {}
+	| ID {}
+	| %empty {}
+
+supported_constant:
+	INTCONST {}
+	| BOOLCONST {}
+	| OPENNEGATE INTCONST CLOSEPAREN {}
 
 
 %%

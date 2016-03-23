@@ -1,14 +1,15 @@
 %{
 #include <bits/stdc++.h>
+#include "mad_parser.tab.h"
 %}
 
-%option noyywrap
+%option noyywrap yylineno
 
 %{
 int num_lines = 0, num_chars = 0;
 %}
 
-ID [a-zA-Z][a-zA-Z0-9]*
+ID [a-zA-Z][_a-zA-Z0-9]*
 COMMA (",")
 SEMI (";")
 OPENPAREN "(" 
@@ -34,37 +35,34 @@ BOOLCONST ("true"|"false")
 INTCONST [0-9]+
 
 %%
-{DTYPE} {if (yyleng == 3) return DTYPE_INT; else return DTYPE_BOOL; } //printf( "%s : DTYPE\n", yytext );}
-{VOID} {return VOID; } //printf( "%s : VOID\n", yytext );}
-{IF} {return IF; } //printf( "%s : IF\n", yytext );}
-{ELSE} {return ELSE; } //printf( "%s : ELSE\n", yytext );}
-{WHILE} {return WHILE; } //printf( "%s : WHILE\n", yytext );}
-{FOR} {return FOR; } //printf( "%s : FOR\n", yytext );}
-{RETURN} {return RETURN; } //printf( "%s : RETURN\n", yytext );}
-{PRINT} {return PRINT; } //printf( "%s : PRINT\n", yytext );}
-{READ} {return READ; } //printf( "%s : READ\n", yytext );}
-{COMMA} {return COMMA; } //printf( "%s : COMMA\n", yytext );}
-{SEMI} {return SEMI; } //printf( "%s : SEMI\n", yytext );}
-{OPENPAREN} {return OPENPAREN; } //printf( "%s : OPENPAREN\n", yytext );}
-{CLOSEPAREN} {return CLOSEPAREN; } //printf( "%s : CLOSEPAREN\n", yytext );}
-{OPENCURLY} {return OPENCURLY; } //printf( "%s : OPENCURLY\n", yytext );}
-{CLOSECURLY} {return CLOSECURLY; } //printf( "%s : CLOSECURLY\n", yytext );}
-{OPENNEGATE} {return OPENNEGATE; } //printf( "%s : OPENNEGATE\n", yytext );} //Added token for negation
-{EQ} {return EQ; } //printf( "%s : EQ\n", yytext );}
-{ARITH} {return ARITH; } //printf( "%s : ARITH\n", yytext ); }
-{RELN} {return RELN; } //printf( "%s : RELN\n", yytext );}
-{LOGICAL} {return LOGICAL; } //printf( "%s : LOGICAL\n", yytext );}
-{LOGICALNOT} {return LOGICALNOT; } //printf( "%s : LOGICAL\n", yytext );} //Separated LOGICALNOT from LOGICAL as it is unary
-{BOOLCONST} {return BOOLCONST; } //printf( "%s : BOOLCONST\n", yytext );}
-{INTCONST} {return INTCONST; } //printf( "%s : INTCONST\n", yytext );}
-{ID} {return ID; } //printf( "%s : ID\n", yytext );}
+
+{DTYPE} {if (yyleng == 3) return DTYPE_INT; else return DTYPE_BOOL; }
+{VOID} {return VOID; }
+{IF} {return IF; } 
+{ELSE} {return ELSE; }
+{WHILE} {return WHILE; } 
+{FOR} {return FOR; } 
+{RETURN} {return RETURN; } 
+{PRINT} {return PRINT; }
+{READ} {return READ; }
+{COMMA} {return COMMA; }
+{SEMI} {return SEMI; }
+{OPENPAREN} {return OPENPAREN; }
+{CLOSEPAREN} {return CLOSEPAREN; }
+{OPENCURLY} {return OPENCURLY; }
+{CLOSECURLY} {return CLOSECURLY; }
+{OPENNEGATE} {return OPENNEGATE; } /*Added token for negation*/
+{EQ} {return EQ; } 
+{ARITH} {return ARITH; } 
+{RELN} {return RELN; } 
+{LOGICAL} {return LOGICAL; } 
+{LOGICALNOT} {return LOGICALNOT; } /*Separated LOGICALNOT from LOGICAL as it is unary*/
+{BOOLCONST} {return BOOLCONST; } 
+{INTCONST} {return INTCONST; }
+{ID} {return ID; }
 
 [ \t]+          /* eat up whitespace */
 [\n]+ ++num_lines;
 .          printf( "Unrecognized character: %s\n", yytext );
 %%
 
-int main( int argc, char **argv )
-{
-        yylex();
-}
