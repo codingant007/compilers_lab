@@ -57,7 +57,7 @@ INTCONST [0-9]+
 {LOGICALNOT} {return LOGICALNOT; } //printf( "%s : LOGICAL\n", yytext );} //Separated LOGICALNOT from LOGICAL as it is unary
 {BOOLCONST} {return BOOLCONST; } //printf( "%s : BOOLCONST\n", yytext );}
 {INTCONST} {return INTCONST; } //printf( "%s : INTCONST\n", yytext );}
-{ID} {return ID; } //printf( "%s : ID\n", yytext );}
+{ID} {printf( "%s : ID\n", yytext );}
 
 [ \t]+          /* eat up whitespace */
 [\n]+ ++num_lines;
