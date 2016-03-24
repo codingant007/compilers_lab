@@ -1,6 +1,11 @@
 %{
 #include <bits/stdc++.h>
 
+#define DELIMITER "$"
+#define tok() terminals.push(string(yytext,yyleng))
+#define delim() productions.push(DELIMITER)
+#define ppush(x) productions.push(x)
+
 using namespace std;
 
 extern int yylex();
@@ -9,6 +14,9 @@ extern int yylineno;
 extern char* yytext;
 
 void yyerror(const char*);
+
+stack<string> productions, terminals;
+stack<int> depth;
 %}
 
 %union{
@@ -48,46 +56,46 @@ void yyerror(const char*);
 %%
 
 mad_program:
-	supported_declarations {}
-	| supported_declarations mad_program {}
+	supported_declarations { ppush("[N]supported_declarations"); delim(); }
+	| supported_declarations mad_program {ppush("[N]supported_declarations"); ppush("[N]mad_program"); delim();}
 	| error '\n' { yyerror("Compilation terminating with errors"); }
 
 supported_declarations:
-	variable_declarations {}
-	| function_declarations {}
+	variable_declarations {ppush("[N]variable_declarations"); delim();}
+	| function_declarations {ppush("[N]function_declarations"); delim();}
 
 variable_declarations:
-	variable_definitions SEMI {}
+	variable_definitions SEMI {ppush("[N]variable_definitions"); ppush("[T]SEMI"); delim();}
 	| variable_definitions error { yyerror("Possible missing semicolon in variable declaration list"); }
 
 variable_definitions:
-	dtype ID {}
-	| variable_definitions COMMA ID {}
+	dtype ID {ppush("[N]dtype"); ppush("[V]ID"); delim();}
+	| variable_definitions COMMA ID {ppush("[N]variable_definitions"); ppush("[T]COMMA"); ppush("[V]ID"); delim();}
 	| variable_definitions error ID '\n' { yyerror("Missing comma in definitions list"); }
 
 dtype:
-	DTYPE_INT {}
-	| DTYPE_BOOL {}
+	DTYPE_INT {ppush("[T]DTYPE_INT");delim();}
+	| DTYPE_BOOL {ppush("[T]DTYPE_BOOL"); delim();}
 	| error { yyerror("Unknown type declaration"); }
 
 function_declarations:
-	dtype ID OPENPAREN argument_list CLOSEPAREN statement_block {}
-	| VOID ID OPENPAREN argument_list CLOSEPAREN statement_block {}
+	dtype ID OPENPAREN argument_list CLOSEPAREN statement_block {ppush("[N]dtype"); ppush("[V]ID"); ppush("[T]OPENPAREN"); ppush("[N]argument_list"); ppush("[T]CLOSEPAREN"); ppush("[N]statement_block"); delim();}
+	| VOID ID OPENPAREN argument_list CLOSEPAREN statement_block {ppush("[T]VOID"); ppush("[V]ID"); ppush("[T]OPENPAREN"); ppush("[N]argument_list"); ppush("[T]CLOSEPAREN"); ppush("[N]statement_block"); delim();}
 
 argument_list:
-	dtype ID COMMA argument_list {}
-	|dtype ID {}
+	dtype ID COMMA argument_list {ppush("[N]dtype"); ppush("[V]ID"); ppush("[T]COMMA"); ppush("[N]argument_list"); delim();}
+	|dtype ID {ppush("[N]dtype"); ppush("[V]ID"); delim();}
 	|%empty /*epsilon production*/ {}
 	| dtype ID error argument_list { yyerror("Missing comma in argument list"); }
 	| dtype error COMMA argument_list { yyerror("Missing identifier in argument list"); }
 
 statement_block: 
-	OPENCURLY variable_list statement_list CLOSECURLY {}
+	OPENCURLY variable_list statement_list CLOSECURLY {ppush("[T]OPENCURLY"); ppush("[N]variable_list"); ppush("[N]statement_list"); ppush("[T]CLOSECURLY"); delim();}
 	| OPENCURLY variable_list statement_list error { yyerror("Possible missing semicolon in statement block"); }
 
 variable_list:
-	%empty /*epsilon production*/ {}
-	| variable_declarations variable_list {}
+	%empty /*epsilon production*/ {ppush("[T]EPSILON");delim();}
+	| variable_declarations variable_list {ppush("[N]variable_declarations"); ppush("[N]variable_list"); delim();}
 
 statement_list:
 	%empty
@@ -150,15 +158,15 @@ alr_subexpression:
 	| READ error CLOSEPAREN { yyerror("Possible missing opening parenthesis"); }
 
 id_list:
-	ID COMMA id_list {}
-	| ID {}
-	| %empty {}
+	ID COMMA id_list {ppush("[V]ID"); ppush("[T]COMMA"); ppush("[N]id_list"); delim(); tok();}
+	| ID {ppush("[V]ID"); delim(); tok(); }
+	| %empty { ppush("[T]EPSILON"); delim();}
 	| error COMMA id_list { yyerror("Missing identifier name"); }
 
 supported_constant:
-	INTCONST {}
-	| BOOLCONST {}
-	| OPENNEGATE INTCONST CLOSEPAREN {}
+	INTCONST { ppush("[V]INTCONST"); tok(); }
+	| BOOLCONST { ppush("[V]BOOLCONST"); tok();}
+	| OPENNEGATE INTCONST CLOSEPAREN {ppush("[T]OPENNEGATE"); ppush("[V]INTCONST"); ppush("[T]CLOSEPAREN"); delim(); tok();}
 
 
 %%
@@ -168,8 +176,24 @@ void yyerror(const char* err_msg)
 	cout<<"Line "<<yylineno<<": "<<err_msg<<endl;
 }
 
+void print_tree()
+{
+	queue<string> flip_stack;
+	while(!productions.empty())
+	{
+		for(;!productions.empty() && productions.top() != DELIMITER;productions.pop())
+			flip_stack.push(productions.top());
+		for(;!flip_stack.empty(); flip_stack.pop())
+			cout<<flip_stack.front()<<"\t";			
+		cout<<endl;
+		if(!productions.empty()) productions.pop();
+	}
+}
+
 int main()
 {
 	yydebug = 0;
+		
 	yyparse();
+	print_tree();
 }
