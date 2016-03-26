@@ -83,7 +83,8 @@ void yyerror(const char*);
 stack<string> productions, terminals;
 stack<int> depth;
 
-#line 87 "mad_parser.tab.c" /* yacc.c:339  */
+
+#line 88 "mad_parser.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -151,13 +152,13 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 22 "mad_parser.y" /* yacc.c:355  */
+#line 23 "mad_parser.y" /* yacc.c:355  */
 
 	int dtype_int;
 	bool dtype_bool;
 	int opertype_int;
 
-#line 161 "mad_parser.tab.c" /* yacc.c:355  */
+#line 162 "mad_parser.tab.c" /* yacc.c:355  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -172,7 +173,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 176 "mad_parser.tab.c" /* yacc.c:358  */
+#line 177 "mad_parser.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -472,14 +473,14 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    59,    59,    60,    61,    64,    65,    68,    69,    72,
-      73,    74,    77,    78,    79,    82,    83,    86,    87,    88,
-      89,    90,    93,    94,    97,    98,   101,   102,   105,   106,
-     107,   108,   109,   110,   111,   112,   115,   118,   119,   122,
-     125,   126,   127,   128,   131,   132,   133,   134,   137,   138,
-     139,   140,   143,   144,   145,   146,   147,   148,   149,   150,
-     151,   152,   153,   154,   155,   156,   157,   158,   161,   162,
-     163,   164,   167,   168,   169
+       0,    60,    60,    61,    62,    65,    66,    69,    70,    73,
+      74,    75,    78,    79,    80,    83,    84,    87,    88,    89,
+      90,    91,    94,    95,    98,    99,   102,   103,   106,   107,
+     108,   109,   110,   111,   112,   113,   116,   119,   120,   123,
+     126,   127,   128,   129,   132,   133,   134,   135,   138,   139,
+     140,   141,   144,   145,   146,   147,   148,   149,   150,   151,
+     152,   153,   154,   155,   156,   157,   158,   159,   162,   163,
+     164,   165,   168,   169,   170
 };
 #endif
 
@@ -1367,433 +1368,439 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 59 "mad_parser.y" /* yacc.c:1646  */
+#line 60 "mad_parser.y" /* yacc.c:1646  */
     { ppush("[N]supported_declarations"); delim(); }
-#line 1373 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1374 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 60 "mad_parser.y" /* yacc.c:1646  */
+#line 61 "mad_parser.y" /* yacc.c:1646  */
     {ppush("[N]supported_declarations"); ppush("[N]mad_program"); delim();}
-#line 1379 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1380 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 61 "mad_parser.y" /* yacc.c:1646  */
+#line 62 "mad_parser.y" /* yacc.c:1646  */
     { yyerror("Compilation terminating with errors"); }
-#line 1385 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1386 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 64 "mad_parser.y" /* yacc.c:1646  */
+#line 65 "mad_parser.y" /* yacc.c:1646  */
     {ppush("[N]variable_declarations"); delim();}
-#line 1391 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1392 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 65 "mad_parser.y" /* yacc.c:1646  */
+#line 66 "mad_parser.y" /* yacc.c:1646  */
     {ppush("[N]function_declarations"); delim();}
-#line 1397 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1398 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 68 "mad_parser.y" /* yacc.c:1646  */
+#line 69 "mad_parser.y" /* yacc.c:1646  */
     {ppush("[N]variable_definitions"); ppush("[T]SEMI"); delim();}
-#line 1403 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1404 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 69 "mad_parser.y" /* yacc.c:1646  */
+#line 70 "mad_parser.y" /* yacc.c:1646  */
     { yyerror("Possible missing semicolon in variable declaration list"); }
-#line 1409 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1410 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 72 "mad_parser.y" /* yacc.c:1646  */
+#line 73 "mad_parser.y" /* yacc.c:1646  */
     {ppush("[N]dtype"); ppush("[V]ID"); delim();}
-#line 1415 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1416 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 73 "mad_parser.y" /* yacc.c:1646  */
+#line 74 "mad_parser.y" /* yacc.c:1646  */
     {ppush("[N]variable_definitions"); ppush("[T]COMMA"); ppush("[V]ID"); delim();}
-#line 1421 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1422 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 74 "mad_parser.y" /* yacc.c:1646  */
+#line 75 "mad_parser.y" /* yacc.c:1646  */
     { yyerror("Missing comma in definitions list"); }
-#line 1427 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1428 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 77 "mad_parser.y" /* yacc.c:1646  */
+#line 78 "mad_parser.y" /* yacc.c:1646  */
     {ppush("[T]DTYPE_INT");delim();}
-#line 1433 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1434 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 78 "mad_parser.y" /* yacc.c:1646  */
+#line 79 "mad_parser.y" /* yacc.c:1646  */
     {ppush("[T]DTYPE_BOOL"); delim();}
-#line 1439 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1440 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 79 "mad_parser.y" /* yacc.c:1646  */
+#line 80 "mad_parser.y" /* yacc.c:1646  */
     { yyerror("Unknown type declaration"); }
-#line 1445 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1446 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 82 "mad_parser.y" /* yacc.c:1646  */
+#line 83 "mad_parser.y" /* yacc.c:1646  */
     {ppush("[N]dtype"); ppush("[V]ID"); ppush("[T]OPENPAREN"); ppush("[N]argument_list"); ppush("[T]CLOSEPAREN"); ppush("[N]statement_block"); delim();}
-#line 1451 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1452 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 83 "mad_parser.y" /* yacc.c:1646  */
+#line 84 "mad_parser.y" /* yacc.c:1646  */
     {ppush("[T]VOID"); ppush("[V]ID"); ppush("[T]OPENPAREN"); ppush("[N]argument_list"); ppush("[T]CLOSEPAREN"); ppush("[N]statement_block"); delim();}
-#line 1457 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1458 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 86 "mad_parser.y" /* yacc.c:1646  */
+#line 87 "mad_parser.y" /* yacc.c:1646  */
     {ppush("[N]dtype"); ppush("[V]ID"); ppush("[T]COMMA"); ppush("[N]argument_list"); delim();}
-#line 1463 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1464 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 87 "mad_parser.y" /* yacc.c:1646  */
+#line 88 "mad_parser.y" /* yacc.c:1646  */
     {ppush("[N]dtype"); ppush("[V]ID"); delim();}
-#line 1469 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1470 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 88 "mad_parser.y" /* yacc.c:1646  */
-    {}
-#line 1475 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 89 "mad_parser.y" /* yacc.c:1646  */
+    {ppush("[T]EPSILON");delim();}
+#line 1476 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 89 "mad_parser.y" /* yacc.c:1646  */
+#line 90 "mad_parser.y" /* yacc.c:1646  */
     { yyerror("Missing comma in argument list"); }
-#line 1481 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1482 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 90 "mad_parser.y" /* yacc.c:1646  */
+#line 91 "mad_parser.y" /* yacc.c:1646  */
     { yyerror("Missing identifier in argument list"); }
-#line 1487 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1488 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 93 "mad_parser.y" /* yacc.c:1646  */
+#line 94 "mad_parser.y" /* yacc.c:1646  */
     {ppush("[T]OPENCURLY"); ppush("[N]variable_list"); ppush("[N]statement_list"); ppush("[T]CLOSECURLY"); delim();}
-#line 1493 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1494 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 94 "mad_parser.y" /* yacc.c:1646  */
+#line 95 "mad_parser.y" /* yacc.c:1646  */
     { yyerror("Possible missing semicolon in statement block"); }
-#line 1499 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1500 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 97 "mad_parser.y" /* yacc.c:1646  */
+#line 98 "mad_parser.y" /* yacc.c:1646  */
     {ppush("[T]EPSILON");delim();}
-#line 1505 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1506 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 98 "mad_parser.y" /* yacc.c:1646  */
+#line 99 "mad_parser.y" /* yacc.c:1646  */
     {ppush("[N]variable_declarations"); ppush("[N]variable_list"); delim();}
-#line 1511 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1512 "mad_parser.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 26:
+#line 102 "mad_parser.y" /* yacc.c:1646  */
+    {ppush("[T]EPSILON");delim();}
+#line 1518 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 105 "mad_parser.y" /* yacc.c:1646  */
+#line 106 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1517 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1524 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 106 "mad_parser.y" /* yacc.c:1646  */
+#line 107 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1523 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1530 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 107 "mad_parser.y" /* yacc.c:1646  */
+#line 108 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1529 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1536 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 108 "mad_parser.y" /* yacc.c:1646  */
+#line 109 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1535 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1542 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 109 "mad_parser.y" /* yacc.c:1646  */
+#line 110 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1541 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1548 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 110 "mad_parser.y" /* yacc.c:1646  */
+#line 111 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1547 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1554 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 111 "mad_parser.y" /* yacc.c:1646  */
+#line 112 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1553 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1560 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 112 "mad_parser.y" /* yacc.c:1646  */
+#line 113 "mad_parser.y" /* yacc.c:1646  */
     { yyerror("Possible missing semicolon with alr_subexpression"); }
-#line 1559 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1566 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 115 "mad_parser.y" /* yacc.c:1646  */
+#line 116 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1565 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1572 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 118 "mad_parser.y" /* yacc.c:1646  */
+#line 119 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1571 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1578 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 119 "mad_parser.y" /* yacc.c:1646  */
+#line 120 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1577 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1584 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 122 "mad_parser.y" /* yacc.c:1646  */
+#line 123 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1583 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1590 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 125 "mad_parser.y" /* yacc.c:1646  */
+#line 126 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1589 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1596 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 126 "mad_parser.y" /* yacc.c:1646  */
+#line 127 "mad_parser.y" /* yacc.c:1646  */
     { yyerror("Possible missing semicolon in for"); }
-#line 1595 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1602 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 127 "mad_parser.y" /* yacc.c:1646  */
+#line 128 "mad_parser.y" /* yacc.c:1646  */
     { yyerror("Possible missing semicolon in for"); }
-#line 1601 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1608 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 128 "mad_parser.y" /* yacc.c:1646  */
+#line 129 "mad_parser.y" /* yacc.c:1646  */
     { yyerror("Possible missing closing parenthesis in for"); }
-#line 1607 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1614 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 131 "mad_parser.y" /* yacc.c:1646  */
+#line 132 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1613 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1620 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 132 "mad_parser.y" /* yacc.c:1646  */
+#line 133 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1619 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1626 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 133 "mad_parser.y" /* yacc.c:1646  */
+#line 134 "mad_parser.y" /* yacc.c:1646  */
     { yyerror("Missing semicolon with return"); }
-#line 1625 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1632 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 134 "mad_parser.y" /* yacc.c:1646  */
+#line 135 "mad_parser.y" /* yacc.c:1646  */
     { yyerror("Missing semicolon with return"); }
-#line 1631 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1638 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 137 "mad_parser.y" /* yacc.c:1646  */
+#line 138 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1637 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1644 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 138 "mad_parser.y" /* yacc.c:1646  */
+#line 139 "mad_parser.y" /* yacc.c:1646  */
     { yyerror("Possile missing open parenthesis"); }
-#line 1643 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1650 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 139 "mad_parser.y" /* yacc.c:1646  */
+#line 140 "mad_parser.y" /* yacc.c:1646  */
     { yyerror("Possible missing closing parenthesis"); }
-#line 1649 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1656 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 51:
-#line 140 "mad_parser.y" /* yacc.c:1646  */
+#line 141 "mad_parser.y" /* yacc.c:1646  */
     { yyerror("Missing semicolon with print"); }
-#line 1655 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1662 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 143 "mad_parser.y" /* yacc.c:1646  */
+#line 144 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1661 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1668 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 144 "mad_parser.y" /* yacc.c:1646  */
+#line 145 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1667 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1674 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 145 "mad_parser.y" /* yacc.c:1646  */
+#line 146 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1673 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1680 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 146 "mad_parser.y" /* yacc.c:1646  */
+#line 147 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1679 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1686 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 56:
-#line 147 "mad_parser.y" /* yacc.c:1646  */
+#line 148 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1685 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1692 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 148 "mad_parser.y" /* yacc.c:1646  */
+#line 149 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1691 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1698 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 149 "mad_parser.y" /* yacc.c:1646  */
+#line 150 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1697 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1704 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 59:
-#line 150 "mad_parser.y" /* yacc.c:1646  */
+#line 151 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1703 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1710 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 60:
-#line 151 "mad_parser.y" /* yacc.c:1646  */
+#line 152 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1709 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1716 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 61:
-#line 152 "mad_parser.y" /* yacc.c:1646  */
+#line 153 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1715 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1722 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 62:
-#line 153 "mad_parser.y" /* yacc.c:1646  */
+#line 154 "mad_parser.y" /* yacc.c:1646  */
     {}
-#line 1721 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1728 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 63:
-#line 154 "mad_parser.y" /* yacc.c:1646  */
+#line 155 "mad_parser.y" /* yacc.c:1646  */
     { yyerror("Missing identifier name"); }
-#line 1727 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1734 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 64:
-#line 155 "mad_parser.y" /* yacc.c:1646  */
+#line 156 "mad_parser.y" /* yacc.c:1646  */
     { yyerror("Possible missing equalty sign"); }
-#line 1733 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1740 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 65:
-#line 156 "mad_parser.y" /* yacc.c:1646  */
+#line 157 "mad_parser.y" /* yacc.c:1646  */
     { yyerror("Possible missing closing parenthesis"); }
-#line 1739 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1746 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 66:
-#line 157 "mad_parser.y" /* yacc.c:1646  */
+#line 158 "mad_parser.y" /* yacc.c:1646  */
     { yyerror("Possible missing closing parenthesis"); }
-#line 1745 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1752 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 67:
-#line 158 "mad_parser.y" /* yacc.c:1646  */
+#line 159 "mad_parser.y" /* yacc.c:1646  */
     { yyerror("Possible missing opening parenthesis"); }
-#line 1751 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1758 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 68:
-#line 161 "mad_parser.y" /* yacc.c:1646  */
+#line 162 "mad_parser.y" /* yacc.c:1646  */
     {ppush("[V]ID"); ppush("[T]COMMA"); ppush("[N]id_list"); delim(); tok();}
-#line 1757 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1764 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 69:
-#line 162 "mad_parser.y" /* yacc.c:1646  */
+#line 163 "mad_parser.y" /* yacc.c:1646  */
     {ppush("[V]ID"); delim(); tok(); }
-#line 1763 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1770 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 163 "mad_parser.y" /* yacc.c:1646  */
+#line 164 "mad_parser.y" /* yacc.c:1646  */
     { ppush("[T]EPSILON"); delim();}
-#line 1769 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1776 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 71:
-#line 164 "mad_parser.y" /* yacc.c:1646  */
+#line 165 "mad_parser.y" /* yacc.c:1646  */
     { yyerror("Missing identifier name"); }
-#line 1775 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1782 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 72:
-#line 167 "mad_parser.y" /* yacc.c:1646  */
+#line 168 "mad_parser.y" /* yacc.c:1646  */
     { ppush("[V]INTCONST"); tok(); }
-#line 1781 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1788 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 73:
-#line 168 "mad_parser.y" /* yacc.c:1646  */
+#line 169 "mad_parser.y" /* yacc.c:1646  */
     { ppush("[V]BOOLCONST"); tok();}
-#line 1787 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1794 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 74:
-#line 169 "mad_parser.y" /* yacc.c:1646  */
+#line 170 "mad_parser.y" /* yacc.c:1646  */
     {ppush("[T]OPENNEGATE"); ppush("[V]INTCONST"); ppush("[T]CLOSEPAREN"); delim(); tok();}
-#line 1793 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1800 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1797 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1804 "mad_parser.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2021,7 +2028,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 172 "mad_parser.y" /* yacc.c:1906  */
+#line 173 "mad_parser.y" /* yacc.c:1906  */
 
 
 void yyerror(const char* err_msg)
@@ -2035,9 +2042,7 @@ void print_tree()
 	while(!productions.empty())
 	{
 		for(;!productions.empty() && productions.top() != DELIMITER;productions.pop())
-			flip_stack.push(productions.top());
-		for(;!flip_stack.empty(); flip_stack.pop())
-			cout<<flip_stack.front()<<"\t";			
+			cout<<productions.top()<<"\t";			
 		cout<<endl;
 		if(!productions.empty()) productions.pop();
 	}

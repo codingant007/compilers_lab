@@ -5,6 +5,7 @@
 #define tok() terminals.push(string(yytext,yyleng))
 #define delim() productions.push(DELIMITER)
 #define ppush(x) productions.push(x)
+#define dpush(y) depth.push(y);
 
 using namespace std;
 
@@ -17,6 +18,7 @@ void yyerror(const char*);
 
 stack<string> productions, terminals;
 stack<int> depth;
+
 %}
 
 %union{
@@ -56,49 +58,49 @@ stack<int> depth;
 %%
 
 mad_program:
-	supported_declarations { ppush("[N]supported_declarations"); delim(); }
-	| supported_declarations mad_program {ppush("[N]supported_declarations"); ppush("[N]mad_program"); delim();}
+	supported_declarations { ppush("[N]supported_declarations"); dpush(1); delim(); }
+	| supported_declarations mad_program {ppush("[N]supported_declarations"); ppush("[N]mad_program"); ddpush(2); delim();}
 	| error '\n' { yyerror("Compilation terminating with errors"); }
 
 supported_declarations:
-	variable_declarations {ppush("[N]variable_declarations"); delim();}
-	| function_declarations {ppush("[N]function_declarations"); delim();}
+	variable_declarations {ppush("[N]variable_declarations"); ddpush(1); delim();}
+	| function_declarations {ppush("[N]function_declarations"); ddpush(1); delim();}
 
 variable_declarations:
-	variable_definitions SEMI {ppush("[N]variable_definitions"); ppush("[T]SEMI"); delim();}
+	variable_definitions SEMI {ppush("[N]variable_definitions"); ppush("[T]SEMI"); ddpush(1); delim();}
 	| variable_definitions error { yyerror("Possible missing semicolon in variable declaration list"); }
 
 variable_definitions:
-	dtype ID {ppush("[N]dtype"); ppush("[V]ID"); delim();}
-	| variable_definitions COMMA ID {ppush("[N]variable_definitions"); ppush("[T]COMMA"); ppush("[V]ID"); delim();}
+	dtype ID {ppush("[N]dtype"); ppush("[V]ID"); ddpush(1); delim();}
+	| variable_definitions COMMA ID {ppush("[N]variable_definitions"); ppush("[T]COMMA"); ppush("[V]ID"); ddpush(1); delim();}
 	| variable_definitions error ID '\n' { yyerror("Missing comma in definitions list"); }
 
 dtype:
-	DTYPE_INT {ppush("[T]DTYPE_INT");delim();}
-	| DTYPE_BOOL {ppush("[T]DTYPE_BOOL"); delim();}
+	DTYPE_INT {ppush("[T]DTYPE_INT");ddpush(0); delim();}
+	| DTYPE_BOOL {ppush("[T]DTYPE_BOOL"); ddpush(0); delim();}
 	| error { yyerror("Unknown type declaration"); }
 
 function_declarations:
-	dtype ID OPENPAREN argument_list CLOSEPAREN statement_block {ppush("[N]dtype"); ppush("[V]ID"); ppush("[T]OPENPAREN"); ppush("[N]argument_list"); ppush("[T]CLOSEPAREN"); ppush("[N]statement_block"); delim();}
-	| VOID ID OPENPAREN argument_list CLOSEPAREN statement_block {ppush("[T]VOID"); ppush("[V]ID"); ppush("[T]OPENPAREN"); ppush("[N]argument_list"); ppush("[T]CLOSEPAREN"); ppush("[N]statement_block"); delim();}
+	dtype ID OPENPAREN argument_list CLOSEPAREN statement_block {ppush("[N]dtype"); ppush("[V]ID"); ppush("[T]OPENPAREN"); ppush("[N]argument_list"); ppush("[T]CLOSEPAREN"); ppush("[N]statement_block"); ddpush(3); delim();}
+	| VOID ID OPENPAREN argument_list CLOSEPAREN statement_block {ppush("[T]VOID"); ppush("[V]ID"); ppush("[T]OPENPAREN"); ppush("[N]argument_list"); ppush("[T]CLOSEPAREN"); ppush("[N]statement_block"); ddpush(2); delim();}
 
 argument_list:
-	dtype ID COMMA argument_list {ppush("[N]dtype"); ppush("[V]ID"); ppush("[T]COMMA"); ppush("[N]argument_list"); delim();}
-	|dtype ID {ppush("[N]dtype"); ppush("[V]ID"); delim();}
-	|%empty /*epsilon production*/ {}
+	dtype ID COMMA argument_list {ppush("[N]dtype"); ppush("[V]ID"); ppush("[T]COMMA"); ppush("[N]argument_list"); ddpush(2); delim();}
+	|dtype ID {ppush("[N]dtype"); ppush("[V]ID"); ddpush(1); delim();}
+	|%empty /*epsilon production*/ {ppush("[T]EPSILON");ddpush(0); delim();}
 	| dtype ID error argument_list { yyerror("Missing comma in argument list"); }
 	| dtype error COMMA argument_list { yyerror("Missing identifier in argument list"); }
 
 statement_block: 
-	OPENCURLY variable_list statement_list CLOSECURLY {ppush("[T]OPENCURLY"); ppush("[N]variable_list"); ppush("[N]statement_list"); ppush("[T]CLOSECURLY"); delim();}
+	OPENCURLY variable_list statement_list CLOSECURLY {ppush("[T]OPENCURLY"); ppush("[N]variable_list"); ppush("[N]statement_list"); ppush("[T]CLOSECURLY"); ddpush(2); delim();}
 	| OPENCURLY variable_list statement_list error { yyerror("Possible missing semicolon in statement block"); }
 
 variable_list:
-	%empty /*epsilon production*/ {ppush("[T]EPSILON");delim();}
-	| variable_declarations variable_list {ppush("[N]variable_declarations"); ppush("[N]variable_list"); delim();}
+	%empty /*epsilon production*/ {ppush("[T]EPSILON");ddpush(0); delim();}
+	| variable_declarations variable_list {ppush("[N]variable_declarations"); ppush("[N]variable_list"); ddpush(2); delim();}
 
 statement_list:
-	%empty
+	%empty {ppush("[T]EPSILON");ddpush(2); delim();}
 	| supported_statement statement_list
 
 supported_statement:
@@ -158,15 +160,15 @@ alr_subexpression:
 	| READ error CLOSEPAREN { yyerror("Possible missing opening parenthesis"); }
 
 id_list:
-	ID COMMA id_list {ppush("[V]ID"); ppush("[T]COMMA"); ppush("[N]id_list"); delim(); tok();}
-	| ID {ppush("[V]ID"); delim(); tok(); }
-	| %empty { ppush("[T]EPSILON"); delim();}
+	ID COMMA id_list {ppush("[V]ID"); ppush("[T]COMMA"); ppush("[N]id_list"); ddpush(1); delim(); tok();}
+	| ID {ppush("[V]ID"); ddpush(0); delim(); tok(); }
+	| %empty { ppush("[T]EPSILON"); ddpush(0); delim();}
 	| error COMMA id_list { yyerror("Missing identifier name"); }
 
 supported_constant:
 	INTCONST { ppush("[V]INTCONST"); tok(); }
 	| BOOLCONST { ppush("[V]BOOLCONST"); tok();}
-	| OPENNEGATE INTCONST CLOSEPAREN {ppush("[T]OPENNEGATE"); ppush("[V]INTCONST"); ppush("[T]CLOSEPAREN"); delim(); tok();}
+	| OPENNEGATE INTCONST CLOSEPAREN {ppush("[T]OPENNEGATE"); ppush("[V]INTCONST"); ppush("[T]CLOSEPAREN"); ddpush(0); delim(); tok();}
 
 
 %%
@@ -178,15 +180,22 @@ void yyerror(const char* err_msg)
 
 void print_tree()
 {
-	queue<string> flip_stack;
-	while(!productions.empty())
+	stack<int> tab_stack;	
+	int tab_count=0;
+	for(;!productions.empty();depth.pop(),productions.pop())
 	{
-		for(;!productions.empty() && productions.top() != DELIMITER;productions.pop())
-			flip_stack.push(productions.top());
-		for(;!flip_stack.empty(); flip_stack.pop())
-			cout<<flip_stack.front()<<"\t";			
-		cout<<endl;
-		if(!productions.empty()) productions.pop();
+		for(int j = 0; j < tab_count; j++)
+			cout<<" ";
+		if(depth.top()) cout<<"+"; else cout<<"\\";
+		cout<<production.top();
+		if(depth.top()) tab_count++, tab_stack.push(--depth.top());
+		else
+		{
+			for(;!tab.empty() && !tab_stack.top();tab_stack.pop()) tab_count--;
+			if(!tab_stack.empty()) { int t = tab_stack.top(); tab_stack.pop(); tab_stack.push(--t); }
+		}
+					
+		if(productions.top() == DELIMITER) productions.pop();
 	}
 }
 
