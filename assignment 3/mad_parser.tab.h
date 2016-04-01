@@ -45,6 +45,7 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
+    NONTERMINAL = 0,
     ID = 258,
     COMMA = 259,
     SEMI = 260,
@@ -69,7 +70,9 @@ extern int yydebug;
     PRINT = 279,
     READ = 280,
     BOOLCONST = 281,
-    INTCONST = 282
+    INTCONST = 282,
+    TERMINAL = 1,
+    VALUE = 2
   };
 #endif
 
@@ -78,13 +81,14 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 24 "mad_parser.y" /* yacc.c:1909  */
+#line 32 "mad_parser.y" /* yacc.c:1909  */
 
 	int dtype_int;
 	bool dtype_bool;
 	int opertype_int;
+	node* node_el;
 
-#line 88 "mad_parser.tab.h" /* yacc.c:1909  */
+#line 92 "mad_parser.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

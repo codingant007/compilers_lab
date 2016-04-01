@@ -1,3 +1,9 @@
+Terminals unused in grammar
+
+   TERMINAL
+   VALUE
+
+
 State 15 conflicts: 1 shift/reduce
 State 35 conflicts: 1 shift/reduce
 State 41 conflicts: 1 shift/reduce
@@ -19,7 +25,7 @@ State 118 conflicts: 1 shift/reduce
 
 Grammar
 
-    0 $accept: mad_program $end
+    0 $accept: mad_program NONTERMINAL
 
     1 mad_program: supported_declarations
     2            | supported_declarations mad_program
@@ -117,7 +123,9 @@ Grammar
 
 Terminals, with rules where they appear
 
-$end (0) 0
+NONTERMINAL (0) 0
+TERMINAL (1)
+VALUE (2)
 '\n' (10) 3 10
 error (256) 3 7 10 13 19 20 22 34 40 41 42 45 46 48 49 50 62 63 64
     65 66 70
@@ -150,55 +158,55 @@ INTCONST (282) 71 73
 
 Nonterminals, with rules where they appear
 
-$accept (29)
+$accept (31)
     on left: 0
-mad_program (30)
+mad_program (32)
     on left: 1 2 3, on right: 0 2
-supported_declarations (31)
+supported_declarations (33)
     on left: 4 5, on right: 1 2
-variable_declarations (32)
+variable_declarations (34)
     on left: 6 7, on right: 4 24
-variable_definitions (33)
+variable_definitions (35)
     on left: 8 9 10, on right: 6 7 9 10
-dtype (34)
+dtype (36)
     on left: 11 12 13, on right: 8 14 16 17 19 20
-function_declarations (35)
+function_declarations (37)
     on left: 14 15, on right: 5
-argument_list (36)
+argument_list (38)
     on left: 16 17 18 19 20, on right: 14 15 16 19 20
-statement_block (37)
+statement_block (39)
     on left: 21 22, on right: 14 15 33 35 39 40 41 42
-variable_list (38)
+variable_list (40)
     on left: 23 24, on right: 21 22 24
-statement_list (39)
+statement_list (41)
     on left: 25 26, on right: 21 22 26
-supported_statement (40)
+supported_statement (42)
     on left: 27 28 29 30 31 32 33 34, on right: 26 37
-if_statement (41)
+if_statement (43)
     on left: 35, on right: 28
-else_statement (42)
+else_statement (44)
     on left: 36 37, on right: 35
-while_statement (43)
+while_statement (45)
     on left: 38, on right: 29
-for_statement (44)
+for_statement (46)
     on left: 39 40 41 42, on right: 30
-return_statement (45)
+return_statement (47)
     on left: 43 44 45 46, on right: 31
-print_statement (46)
+print_statement (48)
     on left: 47 48 49 50, on right: 32
-alr_subexpression (47)
+alr_subexpression (49)
     on left: 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66, on right:
     27 34 35 38 39 40 41 42 44 46 47 48 49 50 51 55 56 57 58 59 60
     62 63
-id_list (48)
+id_list (50)
     on left: 67 68 69 70, on right: 54 64 67 70
-supported_constant (49)
+supported_constant (51)
     on left: 71 72 73, on right: 52
 
 
 State 0
 
-    0 $accept: . mad_program $end
+    0 $accept: . mad_program NONTERMINAL
 
     error       shift, and go to state 1
     VOID        shift, and go to state 2
@@ -246,9 +254,9 @@ State 4
 
 State 5
 
-    0 $accept: mad_program . $end
+    0 $accept: mad_program . NONTERMINAL
 
-    $end  shift, and go to state 13
+    NONTERMINAL  shift, and go to state 13
 
 
 State 6
@@ -261,7 +269,7 @@ State 6
     DTYPE_INT   shift, and go to state 3
     DTYPE_BOOL  shift, and go to state 4
 
-    $end  reduce using rule 1 (mad_program)
+    NONTERMINAL  reduce using rule 1 (mad_program)
 
     mad_program             go to state 14
     supported_declarations  go to state 6
@@ -321,7 +329,7 @@ State 12
 
 State 13
 
-    0 $accept: mad_program $end .
+    0 $accept: mad_program NONTERMINAL .
 
     $default  accept
 

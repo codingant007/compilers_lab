@@ -1,11 +1,6 @@
 %{
 #include <bits/stdc++.h>
-
-#define DELIMITER "$"
-#define tok() terminals.push(string(yytext,yyleng))
-#define delim() productions.push(DELIMITER)
-#define ppush(x) productions.push(x)
-#define ddpush(y) depth.push(y);
+#include "node.h"
 
 using namespace std;
 
@@ -16,15 +11,29 @@ extern char* yytext;
 
 void yyerror(const char*);
 
-stack<string> productions, terminals;
-stack<int> depth;
 
+	node::node(string con, node_type t)
+	{	
+		content = con;
+		type = t;
+		child = NULL;
+		sibling = NULL;
+	}
+	node::node(const char* con, int t)
+	{
+		content = (con);
+		if(t == 0) type = NONTERM;
+		else if(t == 1) type = TERM;
+		else if(t == 2) type = VAL;
+	}
+node *root;
 %}
 
 %union{
 	int dtype_int;
 	bool dtype_bool;
 	int opertype_int;
+	node* node_el;
 }
 
 %start mad_program
@@ -55,52 +64,58 @@ stack<int> depth;
 %token <dtype_bool> BOOLCONST
 %token <dtype_int> INTCONST
 
+%token NONTERMINAL 0
+%token TERMINAL 1
+%token VALUE 2
+
+%type <node_el> mad_program supported_declarations variable_declarations function_declarations variable_definitions dtype argument_list statement_block
+%type <node_el> variable_list statement_list supported_statement id_list supported_constant
 %%
 
 mad_program:
-	supported_declarations { ppush("[N]supported_declarations"); ddpush(1); delim(); }
-	| supported_declarations mad_program {ppush("[N]supported_declarations"); ppush("[N]mad_program"); ddpush(2); delim();}
+	supported_declarations { $$ = new node("mad_program", NONTERMINAL); $$->child = $1; root = $$;}
+	| supported_declarations mad_program { $$ = new node("mad_program", NONTERMINAL); $$->child = $1; $1->sibling = $2; root = $$;}
 	| error '\n' { yyerror("Compilation terminating with errors"); }
 
 supported_declarations:
-	variable_declarations {ppush("[N]variable_declarations"); ddpush(1); delim();}
-	| function_declarations {ppush("[N]function_declarations"); ddpush(1); delim();}
+	variable_declarations { $$ = new node("supported_declarations", NONTERMINAL); $$->child = $1; }
+	| function_declarations {$$ = new node("supported_declarations", NONTERMINAL); $$->child = $1;}
 
 variable_declarations:
-	variable_definitions SEMI {ppush("[N]variable_definitions"); ppush("[T]SEMI"); ddpush(1); delim();}
+	variable_definitions SEMI {$$ = new node("variable_declarations", NONTERMINAL); $$->child = $1; $1->sibling = new node("SEMI", TERMINAL);}
 	| variable_definitions error { yyerror("Possible missing semicolon in variable declaration list"); }
 
 variable_definitions:
-	dtype ID {ppush("[N]dtype"); ppush("[V]ID"); ddpush(1); delim();}
-	| variable_definitions COMMA ID {ppush("[N]variable_definitions"); ppush("[T]COMMA"); ppush("[V]ID"); ddpush(1); delim();}
+	dtype ID {$$ = new node("variable_definitions", NONTERMINAL); $$->child = $1; $1->sibling = new node("ID", VALUE);}
+	| variable_definitions COMMA ID {$$ = new node("variable_definitions", NONTERMINAL); $$->child = $1; $1->sibling = new node("COMMA", TERMINAL); $1->sibling->sibling = new node("ID", VALUE);}
 	| variable_definitions error ID '\n' { yyerror("Missing comma in definitions list"); }
 
 dtype:
-	DTYPE_INT {ppush("[T]DTYPE_INT");ddpush(0); delim();}
-	| DTYPE_BOOL {ppush("[T]DTYPE_BOOL"); ddpush(0); delim();}
+	DTYPE_INT {$$ = new node("DTYPE_INT", TERMINAL); /*$$->child = $1;*/} 
+	| DTYPE_BOOL {$$ = new node("DTYPE_BOOL", TERMINAL); /*$$->child = $1;*/}
 	| error { yyerror("Unknown type declaration"); }
 
 function_declarations:
-	dtype ID OPENPAREN argument_list CLOSEPAREN statement_block {ppush("[N]dtype"); ppush("[V]ID"); ppush("[T]OPENPAREN"); ppush("[N]argument_list"); ppush("[T]CLOSEPAREN"); ppush("[N]statement_block"); ddpush(3); delim();}
-	| VOID ID OPENPAREN argument_list CLOSEPAREN statement_block {ppush("[T]VOID"); ppush("[V]ID"); ppush("[T]OPENPAREN"); ppush("[N]argument_list"); ppush("[T]CLOSEPAREN"); ppush("[N]statement_block"); ddpush(2); delim();}
+	dtype ID OPENPAREN argument_list CLOSEPAREN statement_block {$$ = new node("function_declarations", NONTERMINAL); $$->child = $1; node* id = new node("ID", VALUE); $1->sibling = id; node* openparen = new node("OPENPAREN", TERMINAL); id->sibling = openparen; openparen->sibling = $4; node* closeparen = new node("CLOSEPAREN", TERMINAL); $4->sibling = closeparen; closeparen->sibling = $6; }
+	| VOID ID OPENPAREN argument_list CLOSEPAREN statement_block {$$ = new node("function_declarations", NONTERMINAL); $$->child = new node("VOID", TERMINAL); node* id = new node("ID", VALUE); $$->child->sibling = id; node* openparen = new node("OPENPAREN", TERMINAL); id->sibling = openparen; openparen->sibling = $4; node* closeparen = new node("CLOSEPAREN", TERMINAL); $4->sibling = closeparen; closeparen->sibling = $6;}
 
 argument_list:
-	dtype ID COMMA argument_list {ppush("[N]dtype"); ppush("[V]ID"); ppush("[T]COMMA"); ppush("[N]argument_list"); ddpush(2); delim();}
-	|dtype ID {ppush("[N]dtype"); ppush("[V]ID"); ddpush(1); delim();}
-	|%empty /*epsilon production*/ {ppush("[T]EPSILON");ddpush(0); delim();}
+	dtype ID COMMA argument_list {$$ = new node("argument_list", NONTERMINAL); $$->child = $1; node* id = new node("ID", VALUE); $1->sibling = id; node* comma= new node("COMMA", TERMINAL); id->sibling = comma; comma->sibling = $4;} 
+	|dtype ID {$$ = new node("argument_list", NONTERMINAL); $$->child = $1; node* id = new node("ID", VALUE); $1->sibling = id;} 
+	|%empty /*epsilon production*/ {$$ = new node("function_declarations", NONTERMINAL); $$->child = new node("EPSILON", TERMINAL); }
 	| dtype ID error argument_list { yyerror("Missing comma in argument list"); }
 	| dtype error COMMA argument_list { yyerror("Missing identifier in argument list"); }
 
 statement_block: 
-	OPENCURLY variable_list statement_list CLOSECURLY {ppush("[T]OPENCURLY"); ppush("[N]variable_list"); ppush("[N]statement_list"); ppush("[T]CLOSECURLY"); ddpush(2); delim();}
+	OPENCURLY variable_list statement_list CLOSECURLY { $$ = new node("statement_block", NONTERMINAL); $$->child = new node("OPENCURLY", TERMINAL); $$->child->sibling = $2; $2->sibling = $3; $3->sibling = new node("CLOSECURLY", TERMINAL); }
 	| OPENCURLY variable_list statement_list error { yyerror("Possible missing semicolon in statement block"); }
 
 variable_list:
-	%empty /*epsilon production*/ {ppush("[T]EPSILON");ddpush(0); delim();}
-	| variable_declarations variable_list {ppush("[N]variable_declarations"); ppush("[N]variable_list"); ddpush(2); delim();}
+	%empty /*epsilon production*/ {$$ = new node("variable_list", NONTERMINAL); $$->child = new node("EPSILON", TERMINAL); }
+	| variable_declarations variable_list { $$ = new node("variable_list", NONTERMINAL); $$->child = $1; $1->sibling = $2; }
 
 statement_list:
-	%empty {ppush("[T]EPSILON");ddpush(2); delim();}
+	%empty {$$ = new node("statement_list", NONTERMINAL); $$->child = new node("EPSILON", TERMINAL); }
 	| supported_statement statement_list
 
 supported_statement:
@@ -160,15 +175,15 @@ alr_subexpression:
 	| READ error CLOSEPAREN { yyerror("Possible missing opening parenthesis"); }
 
 id_list:
-	ID COMMA id_list {ppush("[V]ID"); ppush("[T]COMMA"); ppush("[N]id_list"); ddpush(1); delim(); tok();}
-	| ID {ppush("[V]ID"); ddpush(0); delim(); tok(); }
-	| %empty { ppush("[T]EPSILON"); ddpush(0); delim();}
+	ID COMMA id_list { $$ = new node("id_list", NONTERMINAL); $$->child = new node("ID", VALUE); node *comma = new node("COMMA", TERMINAL); $$->child->sibling = comma; comma->sibling = $3; }
+	| ID {$$ = new node("id_list", NONTERMINAL); $$->child = new node("ID", VALUE);}
+	| %empty {$$ = new node("id_list", NONTERMINAL); $$->child = new node("EPSILON", TERMINAL); }
 	| error COMMA id_list { yyerror("Missing identifier name"); }
 
 supported_constant:
-	INTCONST { ppush("[V]INTCONST"); tok(); }
-	| BOOLCONST { ppush("[V]BOOLCONST"); tok();}
-	| OPENNEGATE INTCONST CLOSEPAREN {ppush("[T]OPENNEGATE"); ppush("[V]INTCONST"); ppush("[T]CLOSEPAREN"); ddpush(0); delim(); tok();}
+	INTCONST {$$ = new node("supported_constant", NONTERMINAL); $$->child = new node("INTCONST", VALUE); }
+	| BOOLCONST {$$ = new node("supported_constant", NONTERMINAL); $$->child = new node("BOOLCONST", VALUE); }
+	| OPENNEGATE INTCONST CLOSEPAREN {$$ = new node("supported_constant", NONTERMINAL); $$->child = new node("OPENNEGATE", TERMINAL); node* intconst = new node("INTCONST", VALUE); $$->child->sibling = intconst; node* closeparen = new node("CLOSEPAREN", TERMINAL); intconst->sibling = closeparen;}
 
 
 %%
@@ -178,7 +193,7 @@ void yyerror(const char* err_msg)
 	cout<<"Line "<<yylineno<<": "<<err_msg<<endl;
 }
 
-void print_tree()
+/*void print_tree()
 {
 	stack<int> depth_prod;	
 	stack< vector<string> > prod_stack;
@@ -212,7 +227,7 @@ void print_tree()
 			cout<<productions.top()<<"   ";
 		//	ts.push_back(productions.top());
 		}
-}
+}*/
 
 int main()
 {

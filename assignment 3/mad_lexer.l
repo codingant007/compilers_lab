@@ -1,5 +1,6 @@
 %{
 #include <bits/stdc++.h>
+#include "node.h"
 #include "mad_parser.tab.h"
 %}
 

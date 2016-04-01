@@ -528,10 +528,11 @@ char *yytext;
 #line 1 "mad_lexer.l"
 #line 2 "mad_lexer.l"
 #include <bits/stdc++.h>
+#include "node.h"
 #include "mad_parser.tab.h"
-#line 9 "mad_lexer.l"
+#line 10 "mad_lexer.l"
 int num_lines = 0, num_chars = 0;
-#line 535 "mad_flex.cpp"
+#line 536 "mad_flex.cpp"
 
 #define INITIAL 0
 
@@ -713,10 +714,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 37 "mad_lexer.l"
+#line 38 "mad_lexer.l"
 
 
-#line 720 "mad_flex.cpp"
+#line 721 "mad_flex.cpp"
 
 	if ( !(yy_init) )
 		{
@@ -811,146 +812,146 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 39 "mad_lexer.l"
+#line 40 "mad_lexer.l"
 {if (yyleng == 3) return DTYPE_INT; else return DTYPE_BOOL; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 40 "mad_lexer.l"
+#line 41 "mad_lexer.l"
 {return VOID; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 41 "mad_lexer.l"
+#line 42 "mad_lexer.l"
 {return IF; } 
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 42 "mad_lexer.l"
+#line 43 "mad_lexer.l"
 {return ELSE; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 43 "mad_lexer.l"
+#line 44 "mad_lexer.l"
 {return WHILE; } 
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 44 "mad_lexer.l"
+#line 45 "mad_lexer.l"
 {return FOR; } 
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 45 "mad_lexer.l"
+#line 46 "mad_lexer.l"
 {return RETURN; } 
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 46 "mad_lexer.l"
+#line 47 "mad_lexer.l"
 {return PRINT; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 47 "mad_lexer.l"
+#line 48 "mad_lexer.l"
 {return READ; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 48 "mad_lexer.l"
+#line 49 "mad_lexer.l"
 {return COMMA; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 49 "mad_lexer.l"
+#line 50 "mad_lexer.l"
 {return SEMI; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 50 "mad_lexer.l"
+#line 51 "mad_lexer.l"
 {return OPENPAREN; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 51 "mad_lexer.l"
+#line 52 "mad_lexer.l"
 {return CLOSEPAREN; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 52 "mad_lexer.l"
+#line 53 "mad_lexer.l"
 {return OPENCURLY; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 53 "mad_lexer.l"
+#line 54 "mad_lexer.l"
 {return CLOSECURLY; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 54 "mad_lexer.l"
+#line 55 "mad_lexer.l"
 {return OPENNEGATE; } /*Added token for negation*/
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 55 "mad_lexer.l"
+#line 56 "mad_lexer.l"
 {return EQ; } 
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 56 "mad_lexer.l"
+#line 57 "mad_lexer.l"
 {return ARITH; } 
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 57 "mad_lexer.l"
+#line 58 "mad_lexer.l"
 {return RELN; } 
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 58 "mad_lexer.l"
+#line 59 "mad_lexer.l"
 {return LOGICAL; } 
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 59 "mad_lexer.l"
+#line 60 "mad_lexer.l"
 {return LOGICALNOT; } /*Separated LOGICALNOT from LOGICAL as it is unary*/
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 60 "mad_lexer.l"
+#line 61 "mad_lexer.l"
 {return BOOLCONST; } 
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 61 "mad_lexer.l"
+#line 62 "mad_lexer.l"
 {return INTCONST; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 62 "mad_lexer.l"
+#line 63 "mad_lexer.l"
 {return ID; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 64 "mad_lexer.l"
+#line 65 "mad_lexer.l"
 /* eat up whitespace */
 	YY_BREAK
 case 26:
 /* rule 26 can match eol */
 YY_RULE_SETUP
-#line 65 "mad_lexer.l"
+#line 66 "mad_lexer.l"
 ++num_lines;
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 66 "mad_lexer.l"
+#line 67 "mad_lexer.l"
 printf( "Unrecognized character: %s\n", yytext );
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 67 "mad_lexer.l"
+#line 68 "mad_lexer.l"
 ECHO;
 	YY_BREAK
-#line 954 "mad_flex.cpp"
+#line 955 "mad_flex.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1956,7 +1957,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 67 "mad_lexer.l"
+#line 68 "mad_lexer.l"
 
 
 
