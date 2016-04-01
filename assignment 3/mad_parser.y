@@ -5,7 +5,7 @@
 #define tok() terminals.push(string(yytext,yyleng))
 #define delim() productions.push(DELIMITER)
 #define ppush(x) productions.push(x)
-#define dpush(y) depth.push(y);
+#define ddpush(y) depth.push(y);
 
 using namespace std;
 
@@ -58,7 +58,7 @@ stack<int> depth;
 %%
 
 mad_program:
-	supported_declarations { ppush("[N]supported_declarations"); dpush(1); delim(); }
+	supported_declarations { ppush("[N]supported_declarations"); ddpush(1); delim(); }
 	| supported_declarations mad_program {ppush("[N]supported_declarations"); ppush("[N]mad_program"); ddpush(2); delim();}
 	| error '\n' { yyerror("Compilation terminating with errors"); }
 
@@ -180,29 +180,43 @@ void yyerror(const char* err_msg)
 
 void print_tree()
 {
-	stack<int> tab_stack;	
+	stack<int> depth_prod;	
+	stack< vector<string> > prod_stack;
 	int tab_count=0;
-	for(;!productions.empty();depth.pop(),productions.pop())
+	for(;!depth.empty() && !productions.empty();depth.pop(),productions.pop())
 	{
+		//vector<string> ts = new vector<string>();
+		cout<<tab_count<<":("<<depth.top()<<","<<(depth_prod.empty()?1000:depth_prod.top())<<") ";
 		for(int j = 0; j < tab_count; j++)
-			cout<<" ";
-		if(depth.top()) cout<<"+"; else cout<<"\\";
-		cout<<production.top();
-		if(depth.top()) tab_count++, tab_stack.push(--depth.top());
+			cout<<"\t";
+		for(;!productions.empty() && productions.top() != DELIMITER; productions.pop())
+		{
+			cout<<productions.top()<<"   ";
+		//	ts.push_back(productions.top());
+		}
+		cout<<endl;
+		//prod_stack.push(ts);
+		if(!depth.empty() && depth.top())
+		{
+			tab_count++;
+			depth_prod.push(depth.top()-1);
+		}
 		else
 		{
-			for(;!tab.empty() && !tab_stack.top();tab_stack.pop()) tab_count--;
-			if(!tab_stack.empty()) { int t = tab_stack.top(); tab_stack.pop(); tab_stack.push(--t); }
+			for(;!depth_prod.empty() && !depth_prod.top(); depth_prod.pop()) tab_count--;
+			if(!depth_prod.empty()) { int ti = depth_prod.top(); depth_prod.pop(); depth_prod.push(ti-1); }
 		}
-					
-		if(productions.top() == DELIMITER) productions.pop();
 	}
+		for(;!productions.empty() && productions.top() != DELIMITER; productions.pop())
+		{
+			cout<<productions.top()<<"   ";
+		//	ts.push_back(productions.top());
+		}
 }
 
 int main()
 {
 	yydebug = 0;
-		
 	yyparse();
 	print_tree();
 }
