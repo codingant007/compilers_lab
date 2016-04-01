@@ -72,7 +72,8 @@ bool has_error;
 %token VALUE 2
 
 %type <node_el> mad_program supported_declarations variable_declarations function_declarations variable_definitions dtype argument_list statement_block
-%type <node_el> variable_list statement_list supported_statement id_list supported_constant alr_subexpression if_statement else_statement while_statement for_statement return_statement print_statement
+%type <node_el> variable_list statement_list supported_statement id_list supported_constant alr_subexpression 
+%type <node_el> if_statement else_statement while_statement for_statement return_statement print_statement
 
 %%
 
@@ -292,25 +293,40 @@ supported_constant:
 	}
 
 %%
-
+int num_times = 2;
 void yyerror(const char* err_msg)
 {
 	has_error = true;
 	cout<<"Line "<<yylineno<<": "<<err_msg<<endl;
 }
 
-void print_tree(node *cur, int l)
+void print_tree(node *cur, vector<int>& ancestors, int parent)
 {
-        if(!cur) return;
-        for(int i = 0;i < l; i++) cout<<"\t";
-        cout<<cur->content<<endl;
-        print_tree(cur->child, l+1);
-        print_tree(cur->sibling, l);
+	if(!cur) return;
+	//for(int i = 0; i < ancestors.size(); i++) cout<<ancestors[i]<<" "; cout<<endl; 
+	for (int k = 0; k < num_times; k++)
+	{	
+		for(int i = 0, j = 0; j < ancestors.size() && i < parent; i++)
+		{
+			if(i == ancestors[j]) j++, cout<<"|";
+			else cout<<" ";
+		}
+		if(k!=num_times-1) cout<<endl;
+	}
+	if(ancestors.size()) cout<<"--+";
+	cout<<cur->content<<endl;
+
+	ancestors.push_back(parent);
+	print_tree(cur->child, ancestors, parent+4);
+	ancestors.pop_back();
+	print_tree(cur->sibling, ancestors, parent);
 }
 
 int main()
 {
+	vector<int> print_vec;
 	yydebug = 0;
 	yyparse();
-	if(!has_error)	print_tree(root, 0);
+	if(!has_error)	print_tree(root, print_vec, 0);
+	else cout<<"Compilation terminating with errors"<<endl;
 }
