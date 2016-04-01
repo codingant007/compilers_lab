@@ -81,7 +81,7 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 32 "mad_parser.y" /* yacc.c:1909  */
+#line 35 "mad_parser.y" /* yacc.c:1909  */
 
 	int dtype_int;
 	bool dtype_bool;

@@ -72,14 +72,14 @@ bool has_error;
 %token VALUE 2
 
 %type <node_el> mad_program supported_declarations variable_declarations function_declarations variable_definitions dtype argument_list statement_block
-%type <node_el> variable_list statement_list supported_statement id_list supported_constant
+%type <node_el> variable_list statement_list supported_statement id_list supported_constant alr_subexpression if_statement else_statement while_statement for_statement return_statement print_statement
 
 %%
 
 mad_program:
 	supported_declarations { $$ = new node("mad_program", NONTERMINAL); $$->child = $1; root = $$;}
 	| supported_declarations mad_program { $$ = new node("mad_program", NONTERMINAL); $$->child = $1; $1->sibling = $2; root = $$;}
-	| error '\n' { yyerror("Compilation terminating with errors"); }
+	| error '\n' { yyerror("Compilation terminating with errors"); root = NULL;}
 
 supported_declarations:
 	variable_declarations { $$ = new node("supported_declarations", NONTERMINAL); $$->child = $1; }
@@ -87,17 +87,17 @@ supported_declarations:
 
 variable_declarations:
 	variable_definitions SEMI {$$ = new node("variable_declarations", NONTERMINAL); $$->child = $1; $1->sibling = new node("SEMI", TERMINAL);}
-	| variable_definitions error { yyerror("Possible missing semicolon in variable declaration list"); }
+	| variable_definitions error { $$ = new node("error", TERMINAL); yyerror("Possible missing semicolon in variable declaration list"); }
 
 variable_definitions:
 	dtype ID {$$ = new node("variable_definitions", NONTERMINAL); $$->child = $1; $1->sibling = new node("ID", VALUE);}
 	| variable_definitions COMMA ID {$$ = new node("variable_definitions", NONTERMINAL); $$->child = $1; $1->sibling = new node("COMMA", TERMINAL); $1->sibling->sibling = new node("ID", VALUE);}
-	| variable_definitions error ID '\n' { yyerror("Missing comma in definitions list"); }
+	| variable_definitions error ID '\n' { $$ = new node("error", TERMINAL); yyerror("Missing comma in definitions list"); }
 
 dtype:
 	DTYPE_INT {$$ = new node("DTYPE_INT", TERMINAL); /*$$->child = $1;*/} 
 	| DTYPE_BOOL {$$ = new node("DTYPE_BOOL", TERMINAL); /*$$->child = $1;*/}
-	| error { yyerror("Unknown type declaration"); }
+	| error {$$ = new node("error", TERMINAL); yyerror("Unknown type declaration"); }
 
 function_declarations:
 	dtype ID OPENPAREN argument_list CLOSEPAREN statement_block {$$ = new node("function_declarations", NONTERMINAL); $$->child = $1; node* id = new node("ID", VALUE); $1->sibling = id; node* openparen = new node("OPENPAREN", TERMINAL); id->sibling = openparen; openparen->sibling = $4; node* closeparen = new node("CLOSEPAREN", TERMINAL); $4->sibling = closeparen; closeparen->sibling = $6; }
@@ -120,12 +120,12 @@ argument_list:
 	} 
 	|dtype ID {$$ = new node("argument_list", NONTERMINAL); $$->child = $1; node* id = new node("ID", VALUE); $1->sibling = id;} 
 	|%empty /*epsilon production*/ {$$ = new node("function_declarations", NONTERMINAL); $$->child = new node("EPSILON", TERMINAL); }
-	| dtype ID error argument_list { yyerror("Missing comma in argument list"); }
-	| dtype error COMMA argument_list { yyerror("Missing identifier in argument list"); }
+	| dtype ID error argument_list { $$ = new node("error", TERMINAL); yyerror("Missing comma in argument list"); }
+	| dtype error COMMA argument_list { $$ = new node("error", TERMINAL); yyerror("Missing identifier in argument list"); }
 
 statement_block: 
 	OPENCURLY variable_list statement_list CLOSECURLY { $$ = new node("statement_block", NONTERMINAL); $$->child = new node("OPENCURLY", TERMINAL); $$->child->sibling = $2; $2->sibling = $3; $3->sibling = new node("CLOSECURLY", TERMINAL); }
-	| OPENCURLY variable_list statement_list error { yyerror("Possible missing semicolon in statement block"); }
+	| OPENCURLY variable_list statement_list error { $$ = new node("error", TERMINAL); yyerror("Possible missing semicolon in statement block"); }
 
 variable_list:
 	%empty /*epsilon production*/ {$$ = new node("variable_list", NONTERMINAL); $$->child = new node("EPSILON", TERMINAL); }
@@ -188,7 +188,7 @@ for_statement:
 	}
 	| FOR OPENPAREN alr_subexpression error alr_subexpression SEMI alr_subexpression CLOSEPAREN statement_block { $$ = new node("error", TERMINAL);yyerror("Possible missing semicolon in for"); }
 	| FOR OPENPAREN alr_subexpression SEMI alr_subexpression error alr_subexpression CLOSEPAREN statement_block { $$ = new node("error", TERMINAL);yyerror("Possible missing semicolon in for"); }
-	| FOR OPENPAREN alr_subexpression SEMI alr_subexpression SEMI alr_subexpression error statement_block { $$ = new node("error", TERMINAL);yyerror("Possible missing closing parenthesis in for"); }
+	| FOR OPENPAREN alr_subexpression SEMI alr_subexpression SEMI alr_subexpression error statement_block { $$ = new node("error", TERMINAL); yyerror("Possible missing closing parenthesis in for"); }
 
 return_statement: 
 	RETURN SEMI {
@@ -202,8 +202,8 @@ return_statement:
 		$$->child->sibling = $2;
 		node* semi = new node("SEMI", TERMINAL); $2->sibling = semi;
 	}
-	| RETURN error { yyerror("Missing semicolon with return"); }
-	| RETURN alr_subexpression error { yyerror("Missing semicolon with return"); }
+	| RETURN error { $$ = new node("error", TERMINAL);yyerror("Missing semicolon with return"); }
+	| RETURN alr_subexpression error {$$ = new node("error", TERMINAL); yyerror("Missing semicolon with return"); }
 
 print_statement:
 	PRINT OPENPAREN alr_subexpression CLOSEPAREN SEMI {
@@ -214,9 +214,9 @@ print_statement:
 		node* closeparen = new node("CLOSEPAREN", TERMINAL); $3->sibling = closeparen;
 		closeparen->sibling = new node("SEMI", TERMINAL);;
 	}
-	| PRINT error alr_subexpression CLOSEPAREN SEMI { yyerror("Possile missing open parenthesis"); }
-	| PRINT OPENPAREN alr_subexpression error SEMI { yyerror("Possible missing closing parenthesis"); }
-	| PRINT OPENPAREN alr_subexpression CLOSEPAREN error { yyerror("Missing semicolon with print"); }
+	| PRINT error alr_subexpression CLOSEPAREN SEMI { $$ = new node("error", TERMINAL);yyerror("Possile missing open parenthesis"); }
+	| PRINT OPENPAREN alr_subexpression error SEMI { $$ = new node("error", TERMINAL);yyerror("Possible missing closing parenthesis"); }
+	| PRINT OPENPAREN alr_subexpression CLOSEPAREN error { $$ = new node("error", TERMINAL);yyerror("Missing semicolon with print"); }
 
 alr_subexpression:
 	ID EQ alr_subexpression {
@@ -270,17 +270,17 @@ alr_subexpression:
 		node* intconst = new node("OPENPAREN", VALUE); $$->child->sibling = intconst;
 		node* closeparen = new node("CLOSEPAREN", TERMINAL); intconst->sibling = closeparen;
 	}
-	| error EQ alr_subexpression { yyerror("Missing identifier name"); }
-	| ID error alr_subexpression { yyerror("Possible missing equalty sign"); }
-	| ID OPENPAREN id_list error { yyerror("Possible missing closing parenthesis"); }
-	| READ OPENPAREN error { yyerror("Possible missing closing parenthesis"); }
-	| READ error CLOSEPAREN { yyerror("Possible missing opening parenthesis"); }
+	| error EQ alr_subexpression { $$ = new node("error", TERMINAL);yyerror("Missing identifier name"); }
+	| ID error alr_subexpression { $$ = new node("error", TERMINAL);yyerror("Possible missing equalty sign"); }
+	| ID OPENPAREN id_list error { $$ = new node("error", TERMINAL);yyerror("Possible missing closing parenthesis"); }
+	| READ OPENPAREN error { $$ = new node("error", TERMINAL);yyerror("Possible missing closing parenthesis"); }
+	| READ error CLOSEPAREN { $$ = new node("error", TERMINAL);yyerror("Possible missing opening parenthesis"); }
 
 id_list:
 	ID COMMA id_list { $$ = new node("id_list", NONTERMINAL); $$->child = new node("ID", VALUE); node *comma = new node("COMMA", TERMINAL); $$->child->sibling = comma; comma->sibling = $3; }
 	| ID {$$ = new node("id_list", NONTERMINAL); $$->child = new node("ID", VALUE);}
 	| %empty {$$ = new node("id_list", NONTERMINAL); $$->child = new node("EPSILON", TERMINAL); }
-	| error COMMA id_list { yyerror("Missing identifier name"); }
+	| error COMMA id_list { $$ = new node("error", TERMINAL); yyerror("Missing identifier name"); }
 
 supported_constant:
 	INTCONST {$$ = new node("supported_constant", NONTERMINAL); $$->child = new node("INTCONST", VALUE); }
