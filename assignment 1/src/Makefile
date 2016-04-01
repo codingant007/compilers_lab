@@ -16,6 +16,9 @@ SOURCES= lex.cpp basic_parser.cpp modified_parser.cpp main.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=trial_compiler
 
+all:
+	g++ -I include lex.cpp managers.cpp modified_parser.cpp main.cpp
+
 $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(CFLAGS) $(ODIR)/$(OBJECTS) -o $@
 

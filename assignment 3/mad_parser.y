@@ -12,21 +12,24 @@ extern char* yytext;
 void yyerror(const char*);
 
 
-	node::node(string con, node_type t)
-	{	
-		content = con;
-		type = t;
-		child = NULL;
-		sibling = NULL;
-	}
-	node::node(const char* con, int t)
-	{
-		content = (con);
-		if(t == 0) type = NONTERM;
-		else if(t == 1) type = TERM;
-		else if(t == 2) type = VAL;
-	}
+node::node(string con, node_type t)
+{	
+	content = con;
+	type = t;
+	child = NULL;
+	sibling = NULL;
+}
+node::node(const char* con, int t)
+{
+	content = (con);
+	if(t == 0) type = NONTERM;
+	else if(t == 1) type = TERM;
+	else if(t == 2) type = VAL;
+}
+
 node *root;
+bool has_error;
+
 %}
 
 %union{
@@ -70,6 +73,7 @@ node *root;
 
 %type <node_el> mad_program supported_declarations variable_declarations function_declarations variable_definitions dtype argument_list statement_block
 %type <node_el> variable_list statement_list supported_statement id_list supported_constant
+
 %%
 
 mad_program:
@@ -97,10 +101,23 @@ dtype:
 
 function_declarations:
 	dtype ID OPENPAREN argument_list CLOSEPAREN statement_block {$$ = new node("function_declarations", NONTERMINAL); $$->child = $1; node* id = new node("ID", VALUE); $1->sibling = id; node* openparen = new node("OPENPAREN", TERMINAL); id->sibling = openparen; openparen->sibling = $4; node* closeparen = new node("CLOSEPAREN", TERMINAL); $4->sibling = closeparen; closeparen->sibling = $6; }
-	| VOID ID OPENPAREN argument_list CLOSEPAREN statement_block {$$ = new node("function_declarations", NONTERMINAL); $$->child = new node("VOID", TERMINAL); node* id = new node("ID", VALUE); $$->child->sibling = id; node* openparen = new node("OPENPAREN", TERMINAL); id->sibling = openparen; openparen->sibling = $4; node* closeparen = new node("CLOSEPAREN", TERMINAL); $4->sibling = closeparen; closeparen->sibling = $6;}
+	| VOID ID OPENPAREN argument_list CLOSEPAREN statement_block {
+		$$ = new node("function_declarations", NONTERMINAL);
+		$$->child = new node("VOID", TERMINAL);
+		node* id = new node("ID", VALUE); $$->child->sibling = id;
+		node* openparen = new node("OPENPAREN", TERMINAL); id->sibling = openparen;
+		openparen->sibling = $4;
+		node* closeparen = new node("CLOSEPAREN", TERMINAL); $4->sibling = closeparen;
+		closeparen->sibling = $6;
+	}
 
 argument_list:
-	dtype ID COMMA argument_list {$$ = new node("argument_list", NONTERMINAL); $$->child = $1; node* id = new node("ID", VALUE); $1->sibling = id; node* comma= new node("COMMA", TERMINAL); id->sibling = comma; comma->sibling = $4;} 
+	dtype ID COMMA argument_list {
+		$$ = new node("argument_list", NONTERMINAL); $$->child = $1;
+		node* id = new node("ID", VALUE); $1->sibling = id;
+		node* comma= new node("COMMA", TERMINAL); id->sibling = comma;
+		comma->sibling = $4;
+	} 
 	|dtype ID {$$ = new node("argument_list", NONTERMINAL); $$->child = $1; node* id = new node("ID", VALUE); $1->sibling = id;} 
 	|%empty /*epsilon production*/ {$$ = new node("function_declarations", NONTERMINAL); $$->child = new node("EPSILON", TERMINAL); }
 	| dtype ID error argument_list { yyerror("Missing comma in argument list"); }
@@ -116,58 +133,143 @@ variable_list:
 
 statement_list:
 	%empty {$$ = new node("statement_list", NONTERMINAL); $$->child = new node("EPSILON", TERMINAL); }
-	| supported_statement statement_list
+	| supported_statement statement_list {$$ = new node("statement_list", NONTERMINAL); $$->child = $1; $1->sibling = $2;}
 
 supported_statement:
-	alr_subexpression SEMI {}
-	| if_statement {}
-	| while_statement {}
-	| for_statement {}
-	| return_statement {}
-	| print_statement {}
-	| statement_block {}
-	| alr_subexpression error { yyerror("Possible missing semicolon with alr_subexpression"); }
+	alr_subexpression SEMI {$$ = new node("supported_statement", NONTERMINAL); $$->child = $1; $1->sibling = new node("SEMI", TERMINAL);}
+	| if_statement { $$ = new node("supported_statement", NONTERMINAL); $$->child = $1; }
+	| while_statement { $$ = new node("supported_statement", NONTERMINAL); $$->child = $1; }
+	| for_statement { $$ = new node("supported_statement", NONTERMINAL); $$->child = $1; }
+	| return_statement { $$ = new node("supported_statement", NONTERMINAL); $$->child = $1; }
+	| print_statement { $$ = new node("supported_statement", NONTERMINAL); $$->child = $1; }
+	| statement_block { $$ = new node("supported_statement", NONTERMINAL); $$->child = $1; }
+	| alr_subexpression error { yyerror("Possible missing semicolon with alr_subexpression"); $$ = new node("error", TERMINAL); }
 
 if_statement:
-	IF OPENPAREN alr_subexpression CLOSEPAREN statement_block else_statement {} //CHANGED IF EXPRESSION INTERNAL TO STATEMENT BLOCK
+	IF OPENPAREN alr_subexpression CLOSEPAREN statement_block else_statement { //CHANGED IF EXPRESSION INTERNAL TO STATEMENT BLOCK
+		$$ = new node("if_statement", NONTERMINAL);
+		$$->child = new node("IF", TERMINAL);
+		node* openparen = new node("OPENPAREN", TERMINAL); $$->child->sibling = openparen;
+		openparen->sibling = $3;
+		node* closeparen = new node("CLOSEPAREN", TERMINAL); $3->sibling = closeparen;
+		closeparen->sibling = $5;
+		$5->sibling = $6;
+	}
 
 else_statement:
-	%empty {}
-	| ELSE supported_statement {}
+	%empty {$$ = new node("else_statement", NONTERMINAL); $$->child = new node("EPSILON", TERMINAL); }
+	| ELSE supported_statement {
+		$$ = new node("else_statement", NONTERMINAL); 
+		$$->child = new node("ELSE", TERMINAL); 
+		$$->child->sibling = $2;
+	} 
 
 while_statement:
-	WHILE OPENPAREN alr_subexpression CLOSEPAREN {}
+	WHILE OPENPAREN alr_subexpression CLOSEPAREN {
+		$$ = new node("while_statement", NONTERMINAL);
+		$$->child = new node("WHILE", TERMINAL);
+		node* openparen = new node("OPENPAREN", TERMINAL); $$->child->sibling = openparen;
+		openparen->sibling = $3;
+		node* closeparen = new node("CLOSEPAREN", TERMINAL); $3->sibling = closeparen;
+	}
 
 for_statement:
-	FOR OPENPAREN alr_subexpression SEMI alr_subexpression SEMI alr_subexpression CLOSEPAREN statement_block {} //CHANGED FOR EXPRESSION INTERNAL TO STATEMENT BLOCK
-	| FOR OPENPAREN alr_subexpression error alr_subexpression SEMI alr_subexpression CLOSEPAREN statement_block { yyerror("Possible missing semicolon in for"); }
-	| FOR OPENPAREN alr_subexpression SEMI alr_subexpression error alr_subexpression CLOSEPAREN statement_block { yyerror("Possible missing semicolon in for"); }
-	| FOR OPENPAREN alr_subexpression SEMI alr_subexpression SEMI alr_subexpression error statement_block { yyerror("Possible missing closing parenthesis in for"); }
+	FOR OPENPAREN alr_subexpression SEMI alr_subexpression SEMI alr_subexpression CLOSEPAREN statement_block { //CHANGED FOR EXPRESSION INTERNAL TO STATEMENT BLOCK
+		$$ = new node("for_statement", NONTERMINAL);
+		$$->child = new node("FOR", TERMINAL);
+		node* openparen = new node("OPENPAREN", TERMINAL); $$->child->sibling = openparen;
+		openparen->sibling = $3;
+		$3->sibling = new node("SEMI", TERMINAL);
+		$3->sibling->sibling = $5;
+		$5->sibling = new node("SEMI", TERMINAL);
+		$5->sibling->sibling = $7;
+		node* closeparen = new node("CLOSEPAREN", TERMINAL); $7->sibling = closeparen;
+		closeparen->sibling = $9;		
+	}
+	| FOR OPENPAREN alr_subexpression error alr_subexpression SEMI alr_subexpression CLOSEPAREN statement_block { $$ = new node("error", TERMINAL);yyerror("Possible missing semicolon in for"); }
+	| FOR OPENPAREN alr_subexpression SEMI alr_subexpression error alr_subexpression CLOSEPAREN statement_block { $$ = new node("error", TERMINAL);yyerror("Possible missing semicolon in for"); }
+	| FOR OPENPAREN alr_subexpression SEMI alr_subexpression SEMI alr_subexpression error statement_block { $$ = new node("error", TERMINAL);yyerror("Possible missing closing parenthesis in for"); }
 
 return_statement: 
-	RETURN SEMI {}
-	| RETURN alr_subexpression SEMI {}
+	RETURN SEMI {
+		$$ = new node("return_statement", NONTERMINAL);
+		$$->child = new node("RETURN", TERMINAL);
+		node* semi = new node("SEMI", TERMINAL); $$->child->sibling = semi;
+	}
+	| RETURN alr_subexpression SEMI {
+		$$ = new node("return_statement", NONTERMINAL);
+		$$->child = new node("RETURN", TERMINAL);		
+		$$->child->sibling = $2;
+		node* semi = new node("SEMI", TERMINAL); $2->sibling = semi;
+	}
 	| RETURN error { yyerror("Missing semicolon with return"); }
 	| RETURN alr_subexpression error { yyerror("Missing semicolon with return"); }
 
 print_statement:
-	PRINT OPENPAREN alr_subexpression CLOSEPAREN SEMI {}
+	PRINT OPENPAREN alr_subexpression CLOSEPAREN SEMI {
+		$$ = new node("print_statement", NONTERMINAL);
+		$$->child = new node("PRINT", TERMINAL);
+		node* openparen = new node("OPENPAREN", TERMINAL); $$->child->sibling = openparen;
+		openparen->sibling = $3;
+		node* closeparen = new node("CLOSEPAREN", TERMINAL); $3->sibling = closeparen;
+		closeparen->sibling = new node("SEMI", TERMINAL);;
+	}
 	| PRINT error alr_subexpression CLOSEPAREN SEMI { yyerror("Possile missing open parenthesis"); }
 	| PRINT OPENPAREN alr_subexpression error SEMI { yyerror("Possible missing closing parenthesis"); }
 	| PRINT OPENPAREN alr_subexpression CLOSEPAREN error { yyerror("Missing semicolon with print"); }
 
 alr_subexpression:
-	ID EQ alr_subexpression {}	
-	| supported_constant {}
-	| ID {}
-	| ID OPENPAREN id_list CLOSEPAREN  {}
-	| OPENPAREN alr_subexpression CLOSEPAREN {}
+	ID EQ alr_subexpression {
+		$$ = new node("alr_subexpression", NONTERMINAL);
+		$$->child = new node("ID", VALUE);
+		node* openparen = new node("EQ", TERMINAL); $$->child->sibling = openparen;
+		openparen->sibling = $3;
+	}	
+	| supported_constant {$$ = new node("alr_subexpression", NONTERMINAL); $$->child = $1;}
+	| ID {$$ = new node("alr_subexpression", NONTERMINAL); $$->child = new node("ID", VALUE);}
+	| ID OPENPAREN id_list CLOSEPAREN  {
+		$$ = new node("alr_subexpression", NONTERMINAL);
+		$$->child = new node("ID", VALUE);
+		node* openparen = new node("OPENPAREN", TERMINAL); $$->child->sibling = openparen;
+		openparen->sibling = $3;
+		node* closeparen = new node("CLOSEPAREN", TERMINAL); $3->sibling = closeparen;
+	}
+	| OPENPAREN alr_subexpression CLOSEPAREN {
+		$$ = new node("alr_subexpression", NONTERMINAL);
+		$$->child = new node("OPENPAREN", TERMINAL);
+		$$->child->sibling = $2;
+		node* closeparen = new node("CLOSEPAREN", TERMINAL); $2->sibling = closeparen;
+	}
 	| alr_subexpression ARITH alr_subexpression {}
-	| OPENNEGATE alr_subexpression CLOSEPAREN {}
-	| alr_subexpression RELN alr_subexpression {}
-	| alr_subexpression LOGICAL alr_subexpression {}	
-	| LOGICALNOT alr_subexpression {}
-	| READ OPENPAREN CLOSEPAREN {}
+	| OPENNEGATE alr_subexpression CLOSEPAREN {
+		$$ = new node("alr_subexpression", NONTERMINAL);
+		$$->child = new node("OPENNEGATE", TERMINAL);
+		$$->child->sibling = $2;
+		node* closeparen = new node("CLOSEPAREN", TERMINAL); $2->sibling = closeparen;
+	}
+	| alr_subexpression RELN alr_subexpression {
+		$$ = new node("alr_subexpression", NONTERMINAL);
+		$$->child = $1;
+		node* reln = new node("RELN", TERMINAL); $1->sibling = reln;
+		reln->sibling = $3;
+	}
+	| alr_subexpression LOGICAL alr_subexpression {
+		$$ = new node("alr_subexpression", NONTERMINAL);
+		$$->child = $1;
+		node* reln = new node("LOGICAL", TERMINAL); $1->sibling = reln;
+		reln->sibling = $3;
+	}	
+	| LOGICALNOT alr_subexpression {
+		$$ = new node("alr_subexpression", NONTERMINAL);
+		$$->child = new node("LOGICALNOT", TERMINAL);
+		$$->child->sibling = $2;
+	}
+	| READ OPENPAREN CLOSEPAREN {
+		$$ = new node("alr_subexpression", NONTERMINAL); 
+		$$->child = new node("READ", TERMINAL);
+		node* intconst = new node("OPENPAREN", VALUE); $$->child->sibling = intconst;
+		node* closeparen = new node("CLOSEPAREN", TERMINAL); intconst->sibling = closeparen;
+	}
 	| error EQ alr_subexpression { yyerror("Missing identifier name"); }
 	| ID error alr_subexpression { yyerror("Possible missing equalty sign"); }
 	| ID OPENPAREN id_list error { yyerror("Possible missing closing parenthesis"); }
@@ -183,55 +285,32 @@ id_list:
 supported_constant:
 	INTCONST {$$ = new node("supported_constant", NONTERMINAL); $$->child = new node("INTCONST", VALUE); }
 	| BOOLCONST {$$ = new node("supported_constant", NONTERMINAL); $$->child = new node("BOOLCONST", VALUE); }
-	| OPENNEGATE INTCONST CLOSEPAREN {$$ = new node("supported_constant", NONTERMINAL); $$->child = new node("OPENNEGATE", TERMINAL); node* intconst = new node("INTCONST", VALUE); $$->child->sibling = intconst; node* closeparen = new node("CLOSEPAREN", TERMINAL); intconst->sibling = closeparen;}
-
+	| OPENNEGATE INTCONST CLOSEPAREN {
+		$$ = new node("supported_constant", NONTERMINAL); $$->child = new node("OPENNEGATE", TERMINAL);
+		node* intconst = new node("INTCONST", VALUE); $$->child->sibling = intconst;
+		node* closeparen = new node("CLOSEPAREN", TERMINAL); intconst->sibling = closeparen;
+	}
 
 %%
 
 void yyerror(const char* err_msg)
 {
+	has_error = true;
 	cout<<"Line "<<yylineno<<": "<<err_msg<<endl;
 }
 
-/*void print_tree()
+void print_tree(node *cur, int l)
 {
-	stack<int> depth_prod;	
-	stack< vector<string> > prod_stack;
-	int tab_count=0;
-	for(;!depth.empty() && !productions.empty();depth.pop(),productions.pop())
-	{
-		//vector<string> ts = new vector<string>();
-		cout<<tab_count<<":("<<depth.top()<<","<<(depth_prod.empty()?1000:depth_prod.top())<<") ";
-		for(int j = 0; j < tab_count; j++)
-			cout<<"\t";
-		for(;!productions.empty() && productions.top() != DELIMITER; productions.pop())
-		{
-			cout<<productions.top()<<"   ";
-		//	ts.push_back(productions.top());
-		}
-		cout<<endl;
-		//prod_stack.push(ts);
-		if(!depth.empty() && depth.top())
-		{
-			tab_count++;
-			depth_prod.push(depth.top()-1);
-		}
-		else
-		{
-			for(;!depth_prod.empty() && !depth_prod.top(); depth_prod.pop()) tab_count--;
-			if(!depth_prod.empty()) { int ti = depth_prod.top(); depth_prod.pop(); depth_prod.push(ti-1); }
-		}
-	}
-		for(;!productions.empty() && productions.top() != DELIMITER; productions.pop())
-		{
-			cout<<productions.top()<<"   ";
-		//	ts.push_back(productions.top());
-		}
-}*/
+        if(!cur) return;
+        for(int i = 0;i < l; i++) cout<<"\t";
+        cout<<cur->content<<endl;
+        print_tree(cur->child, l+1);
+        print_tree(cur->sibling, l);
+}
 
 int main()
 {
 	yydebug = 0;
 	yyparse();
-	print_tree();
+	if(!has_error)	print_tree(root, 0);
 }
