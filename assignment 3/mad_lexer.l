@@ -54,13 +54,13 @@ INTCONST [0-9]+
 {CLOSECURLY} {return CLOSECURLY; }
 {OPENNEGATE} {return OPENNEGATE; } /*Added token for negation*/
 {EQ} {return EQ; } 
-{ARITH} {return ARITH; } 
-{RELN} {return RELN; } 
-{LOGICAL} {return LOGICAL; } 
+{ARITH} {yylval.node_con=strdup(yytext);return ARITH; } 
+{RELN} {yylval.node_con=strdup(yytext);return RELN; } 
+{LOGICAL} {yylval.node_con=strdup(yytext);return LOGICAL; } 
 {LOGICALNOT} {return LOGICALNOT; } /*Separated LOGICALNOT from LOGICAL as it is unary*/
-{BOOLCONST} {return BOOLCONST; } 
-{INTCONST} {return INTCONST; }
-{ID} {return ID; }
+{BOOLCONST} {yylval.node_con=strdup(yytext);return BOOLCONST; } 
+{INTCONST} {yylval.node_con=strdup(yytext);return INTCONST; }
+{ID} {yylval.node_con=strdup(yytext); return ID; }
 
 [ \t]+          /* eat up whitespace */
 [\n]+ ++num_lines;

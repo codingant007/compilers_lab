@@ -898,17 +898,17 @@ YY_RULE_SETUP
 case 18:
 YY_RULE_SETUP
 #line 57 "mad_lexer.l"
-{return ARITH; } 
+{yylval.node_con=strdup(yytext);return ARITH; } 
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
 #line 58 "mad_lexer.l"
-{return RELN; } 
+{yylval.node_con=strdup(yytext);return RELN; } 
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
 #line 59 "mad_lexer.l"
-{return LOGICAL; } 
+{yylval.node_con=strdup(yytext);return LOGICAL; } 
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
@@ -918,17 +918,17 @@ YY_RULE_SETUP
 case 22:
 YY_RULE_SETUP
 #line 61 "mad_lexer.l"
-{return BOOLCONST; } 
+{yylval.node_con=strdup(yytext);return BOOLCONST; } 
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 62 "mad_lexer.l"
-{return INTCONST; }
+{yylval.node_con=strdup(yytext);return INTCONST; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 63 "mad_lexer.l"
-{return ID; }
+{yylval.node_con=strdup(yytext); return ID; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP

@@ -81,14 +81,15 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 35 "mad_parser.y" /* yacc.c:1909  */
+#line 37 "mad_parser.y" /* yacc.c:1909  */
 
 	int dtype_int;
 	bool dtype_bool;
 	int opertype_int;
 	node* node_el;
+	char* node_con;
 
-#line 92 "mad_parser.tab.h" /* yacc.c:1909  */
+#line 93 "mad_parser.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

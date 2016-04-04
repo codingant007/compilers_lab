@@ -18,6 +18,7 @@ node::node(string con, node_type t)
 	type = t;
 	child = NULL;
 	sibling = NULL;
+	info = "";
 }
 node::node(const char* con, int t)
 {
@@ -25,6 +26,7 @@ node::node(const char* con, int t)
 	if(t == 0) type = NONTERM;
 	else if(t == 1) type = TERM;
 	else if(t == 2) type = VAL;
+	info = "";
 }
 
 node *root;
@@ -37,11 +39,12 @@ bool has_error;
 	bool dtype_bool;
 	int opertype_int;
 	node* node_el;
+	char* node_con;
 }
 
 %start mad_program
 
-%token ID
+%token <node_con> ID
 %token COMMA
 %token SEMI
 %token OPENPAREN
@@ -52,11 +55,11 @@ bool has_error;
 %token VOID
 %token DTYPE_INT
 %token DTYPE_BOOL
-%token <opertype_int> EQ
-%token <opertype_int> ARITH
-%token <opertype_int> RELN
-%token <opertype_int> LOGICAL
-%token <opertype_int> LOGICALNOT
+%token <node_con> EQ
+%token <node_con> ARITH
+%token <node_con> RELN
+%token <node_con> LOGICAL
+%token <node_con> LOGICALNOT
 %token IF
 %token ELSE
 %token WHILE
@@ -64,8 +67,8 @@ bool has_error;
 %token RETURN
 %token PRINT
 %token READ
-%token <dtype_bool> BOOLCONST
-%token <dtype_int> INTCONST
+%token <node_con> BOOLCONST
+%token <node_con> INTCONST
 
 %token NONTERMINAL 0
 %token TERMINAL 1
@@ -91,8 +94,8 @@ variable_declarations:
 	| variable_definitions error { $$ = new node("error", TERMINAL); yyerror("Possible missing semicolon in variable declaration list"); }
 
 variable_definitions:
-	dtype ID {$$ = new node("variable_definitions", NONTERMINAL); $$->child = $1; $1->sibling = new node("ID", VALUE);}
-	| variable_definitions COMMA ID {$$ = new node("variable_definitions", NONTERMINAL); $$->child = $1; $1->sibling = new node("COMMA", TERMINAL); $1->sibling->sibling = new node("ID", VALUE);}
+	dtype ID {$$ = new node("variable_definitions", NONTERMINAL); $$->child = $1; $1->sibling = new node("ID", VALUE); $1->sibling->info = $2;}
+	| variable_definitions COMMA ID {$$ = new node("variable_definitions", NONTERMINAL); $$->child = $1; $1->sibling = new node("COMMA", TERMINAL); $1->sibling->sibling = new node("ID", VALUE); $1->sibling->sibling->info = $3; }
 	| variable_definitions error ID '\n' { $$ = new node("error", TERMINAL); yyerror("Missing comma in definitions list"); }
 
 dtype:
@@ -101,11 +104,11 @@ dtype:
 	| error {$$ = new node("error", TERMINAL); yyerror("Unknown type declaration"); }
 
 function_declarations:
-	dtype ID OPENPAREN argument_list CLOSEPAREN statement_block {$$ = new node("function_declarations", NONTERMINAL); $$->child = $1; node* id = new node("ID", VALUE); $1->sibling = id; node* openparen = new node("OPENPAREN", TERMINAL); id->sibling = openparen; openparen->sibling = $4; node* closeparen = new node("CLOSEPAREN", TERMINAL); $4->sibling = closeparen; closeparen->sibling = $6; }
+	dtype ID OPENPAREN argument_list CLOSEPAREN statement_block {$$ = new node("function_declarations", NONTERMINAL); $$->child = $1; node* id = new node("ID", VALUE); id->info = $2; $1->sibling = id; node* openparen = new node("OPENPAREN", TERMINAL); id->sibling = openparen; openparen->sibling = $4; node* closeparen = new node("CLOSEPAREN", TERMINAL); $4->sibling = closeparen; closeparen->sibling = $6; } 
 	| VOID ID OPENPAREN argument_list CLOSEPAREN statement_block {
 		$$ = new node("function_declarations", NONTERMINAL);
 		$$->child = new node("VOID", TERMINAL);
-		node* id = new node("ID", VALUE); $$->child->sibling = id;
+		node* id = new node("ID", VALUE); id->info = $2; $$->child->sibling = id;
 		node* openparen = new node("OPENPAREN", TERMINAL); id->sibling = openparen;
 		openparen->sibling = $4;
 		node* closeparen = new node("CLOSEPAREN", TERMINAL); $4->sibling = closeparen;
@@ -115,11 +118,11 @@ function_declarations:
 argument_list:
 	dtype ID COMMA argument_list {
 		$$ = new node("argument_list", NONTERMINAL); $$->child = $1;
-		node* id = new node("ID", VALUE); $1->sibling = id;
+		node* id = new node("ID", VALUE); id->info = $2; $1->sibling = id;
 		node* comma= new node("COMMA", TERMINAL); id->sibling = comma;
 		comma->sibling = $4;
 	} 
-	|dtype ID {$$ = new node("argument_list", NONTERMINAL); $$->child = $1; node* id = new node("ID", VALUE); $1->sibling = id;} 
+	|dtype ID {$$ = new node("argument_list", NONTERMINAL); $$->child = $1; node* id = new node("ID", VALUE); id->info = $2; $1->sibling = id;} 
 	|%empty /*epsilon production*/ {$$ = new node("function_declarations", NONTERMINAL); $$->child = new node("EPSILON", TERMINAL); }
 	| dtype ID error argument_list { $$ = new node("error", TERMINAL); yyerror("Missing comma in argument list"); }
 	| dtype error COMMA argument_list { $$ = new node("error", TERMINAL); yyerror("Missing identifier in argument list"); }
@@ -222,15 +225,15 @@ print_statement:
 alr_subexpression:
 	ID EQ alr_subexpression {
 		$$ = new node("alr_subexpression", NONTERMINAL);
-		$$->child = new node("ID", VALUE);
+		$$->child = new node("ID", VALUE); $$->child->info = $1;
 		node* openparen = new node("EQ", TERMINAL); $$->child->sibling = openparen;
 		openparen->sibling = $3;
 	}	
 	| supported_constant {$$ = new node("alr_subexpression", NONTERMINAL); $$->child = $1;}
-	| ID {$$ = new node("alr_subexpression", NONTERMINAL); $$->child = new node("ID", VALUE);}
+	| ID {$$ = new node("alr_subexpression", NONTERMINAL); $$->child = new node("ID", VALUE); $$->child->info = $1;}
 	| ID OPENPAREN id_list CLOSEPAREN  {
 		$$ = new node("alr_subexpression", NONTERMINAL);
-		$$->child = new node("ID", VALUE);
+		$$->child = new node("ID", VALUE);$$->child->info = $1;
 		node* openparen = new node("OPENPAREN", TERMINAL); $$->child->sibling = openparen;
 		openparen->sibling = $3;
 		node* closeparen = new node("CLOSEPAREN", TERMINAL); $3->sibling = closeparen;
@@ -241,7 +244,7 @@ alr_subexpression:
 		$$->child->sibling = $2;
 		node* closeparen = new node("CLOSEPAREN", TERMINAL); $2->sibling = closeparen;
 	}
-	| alr_subexpression ARITH alr_subexpression {}
+	| alr_subexpression ARITH alr_subexpression {$$ = new node("alr_subexpression", NONTERMINAL); $$->child = $1; $1->sibling= new node("ARITH", VALUE); $1->sibling->info = $2; $1->sibling->sibling = $3;}
 	| OPENNEGATE alr_subexpression CLOSEPAREN {
 		$$ = new node("alr_subexpression", NONTERMINAL);
 		$$->child = new node("OPENNEGATE", TERMINAL);
@@ -251,18 +254,18 @@ alr_subexpression:
 	| alr_subexpression RELN alr_subexpression {
 		$$ = new node("alr_subexpression", NONTERMINAL);
 		$$->child = $1;
-		node* reln = new node("RELN", TERMINAL); $1->sibling = reln;
+		node* reln = new node("RELN", VALUE); reln->info = $2;$1->sibling = reln;
 		reln->sibling = $3;
 	}
 	| alr_subexpression LOGICAL alr_subexpression {
 		$$ = new node("alr_subexpression", NONTERMINAL);
 		$$->child = $1;
-		node* reln = new node("LOGICAL", TERMINAL); $1->sibling = reln;
+		node* reln = new node("LOGICAL", VALUE);reln->info=$2; $1->sibling = reln;
 		reln->sibling = $3;
 	}	
 	| LOGICALNOT alr_subexpression {
 		$$ = new node("alr_subexpression", NONTERMINAL);
-		$$->child = new node("LOGICALNOT", TERMINAL);
+		$$->child = new node("LOGICALNOT", VALUE); $$->child->info = "!";
 		$$->child->sibling = $2;
 	}
 	| READ OPENPAREN CLOSEPAREN {
@@ -278,17 +281,17 @@ alr_subexpression:
 	| READ error CLOSEPAREN { $$ = new node("error", TERMINAL);yyerror("Possible missing opening parenthesis"); }
 
 id_list:
-	ID COMMA id_list { $$ = new node("id_list", NONTERMINAL); $$->child = new node("ID", VALUE); node *comma = new node("COMMA", TERMINAL); $$->child->sibling = comma; comma->sibling = $3; }
-	| ID {$$ = new node("id_list", NONTERMINAL); $$->child = new node("ID", VALUE);}
+	ID COMMA id_list { $$ = new node("id_list", NONTERMINAL); $$->child = new node("ID", VALUE);$$->child->info = $1; node *comma = new node("COMMA", TERMINAL); $$->child->sibling = comma; comma->sibling = $3; }
+	| ID {$$ = new node("id_list", NONTERMINAL); $$->child = new node("ID", VALUE);$$->child->info = $1;}
 	| %empty {$$ = new node("id_list", NONTERMINAL); $$->child = new node("EPSILON", TERMINAL); }
 	| error COMMA id_list { $$ = new node("error", TERMINAL); yyerror("Missing identifier name"); }
 
 supported_constant:
-	INTCONST {$$ = new node("supported_constant", NONTERMINAL); $$->child = new node("INTCONST", VALUE); }
-	| BOOLCONST {$$ = new node("supported_constant", NONTERMINAL); $$->child = new node("BOOLCONST", VALUE); }
+	INTCONST {$$ = new node("supported_constant", NONTERMINAL); $$->child = new node("INTCONST", VALUE); $$->child->info = $1;}
+	| BOOLCONST {$$ = new node("supported_constant", NONTERMINAL); $$->child = new node("BOOLCONST", VALUE); $$->child->info = $1;}
 	| OPENNEGATE INTCONST CLOSEPAREN {
 		$$ = new node("supported_constant", NONTERMINAL); $$->child = new node("OPENNEGATE", TERMINAL);
-		node* intconst = new node("INTCONST", VALUE); $$->child->sibling = intconst;
+		node* intconst = new node("INTCONST", VALUE); $$->child->sibling = intconst;intconst->info = $2;
 		node* closeparen = new node("CLOSEPAREN", TERMINAL); intconst->sibling = closeparen;
 	}
 
@@ -314,7 +317,9 @@ void print_tree(node *cur, vector<int>& ancestors, int parent)
 		if(k!=num_times-1) cout<<endl;
 	}
 	if(ancestors.size()) cout<<"--+";
-	cout<<cur->content<<endl;
+	cout<<cur->content;
+	if(cur->type == VAL) cout<<" [`"<<cur->info<<"']";
+	cout<<endl;
 
 	ancestors.push_back(parent);
 	print_tree(cur->child, ancestors, parent+4);

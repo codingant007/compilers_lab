@@ -3,7 +3,7 @@ using namespace std;
 enum node_type {NONTERM, TERM, VAL}; 
 struct node
 {
-	string content;
+	string content, info;
 	node_type type;
 	node *child, *sibling;
 

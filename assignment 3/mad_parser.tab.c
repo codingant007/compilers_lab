@@ -83,6 +83,7 @@ node::node(string con, node_type t)
 	type = t;
 	child = NULL;
 	sibling = NULL;
+	info = "";
 }
 node::node(const char* con, int t)
 {
@@ -90,13 +91,14 @@ node::node(const char* con, int t)
 	if(t == 0) type = NONTERM;
 	else if(t == 1) type = TERM;
 	else if(t == 2) type = VAL;
+	info = "";
 }
 
 node *root;
 bool has_error;
 
 
-#line 100 "mad_parser.tab.c" /* yacc.c:339  */
+#line 102 "mad_parser.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -167,14 +169,15 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 35 "mad_parser.y" /* yacc.c:355  */
+#line 37 "mad_parser.y" /* yacc.c:355  */
 
 	int dtype_int;
 	bool dtype_bool;
 	int opertype_int;
 	node* node_el;
+	char* node_con;
 
-#line 178 "mad_parser.tab.c" /* yacc.c:355  */
+#line 181 "mad_parser.tab.c" /* yacc.c:355  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -189,7 +192,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 193 "mad_parser.tab.c" /* yacc.c:358  */
+#line 196 "mad_parser.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -489,14 +492,14 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    81,    81,    82,    83,    86,    87,    90,    91,    94,
-      95,    96,    99,   100,   101,   104,   105,   116,   122,   123,
-     124,   125,   128,   129,   132,   133,   136,   137,   140,   141,
-     142,   143,   144,   145,   146,   147,   150,   161,   162,   169,
-     178,   190,   191,   192,   195,   200,   206,   207,   210,   218,
-     219,   220,   223,   229,   230,   231,   238,   244,   245,   251,
-     257,   263,   268,   274,   275,   276,   277,   278,   281,   282,
-     283,   284,   287,   288,   289
+       0,    84,    84,    85,    86,    89,    90,    93,    94,    97,
+      98,    99,   102,   103,   104,   107,   108,   119,   125,   126,
+     127,   128,   131,   132,   135,   136,   139,   140,   143,   144,
+     145,   146,   147,   148,   149,   150,   153,   164,   165,   172,
+     181,   193,   194,   195,   198,   203,   209,   210,   213,   221,
+     222,   223,   226,   232,   233,   234,   241,   247,   248,   254,
+     260,   266,   271,   277,   278,   279,   280,   281,   284,   285,
+     286,   287,   290,   291,   292
 };
 #endif
 
@@ -1385,224 +1388,224 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 81 "mad_parser.y" /* yacc.c:1646  */
+#line 84 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("mad_program", NONTERMINAL); (yyval.node_el)->child = (yyvsp[0].node_el); root = (yyval.node_el);}
-#line 1391 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1394 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 82 "mad_parser.y" /* yacc.c:1646  */
+#line 85 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("mad_program", NONTERMINAL); (yyval.node_el)->child = (yyvsp[-1].node_el); (yyvsp[-1].node_el)->sibling = (yyvsp[0].node_el); root = (yyval.node_el);}
-#line 1397 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1400 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 83 "mad_parser.y" /* yacc.c:1646  */
+#line 86 "mad_parser.y" /* yacc.c:1646  */
     { yyerror("Compilation terminating with errors"); root = NULL;}
-#line 1403 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1406 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 86 "mad_parser.y" /* yacc.c:1646  */
+#line 89 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("supported_declarations", NONTERMINAL); (yyval.node_el)->child = (yyvsp[0].node_el); }
-#line 1409 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1412 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 87 "mad_parser.y" /* yacc.c:1646  */
+#line 90 "mad_parser.y" /* yacc.c:1646  */
     {(yyval.node_el) = new node("supported_declarations", NONTERMINAL); (yyval.node_el)->child = (yyvsp[0].node_el);}
-#line 1415 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1418 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 90 "mad_parser.y" /* yacc.c:1646  */
+#line 93 "mad_parser.y" /* yacc.c:1646  */
     {(yyval.node_el) = new node("variable_declarations", NONTERMINAL); (yyval.node_el)->child = (yyvsp[-1].node_el); (yyvsp[-1].node_el)->sibling = new node("SEMI", TERMINAL);}
-#line 1421 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1424 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 91 "mad_parser.y" /* yacc.c:1646  */
+#line 94 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("error", TERMINAL); yyerror("Possible missing semicolon in variable declaration list"); }
-#line 1427 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1430 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 94 "mad_parser.y" /* yacc.c:1646  */
-    {(yyval.node_el) = new node("variable_definitions", NONTERMINAL); (yyval.node_el)->child = (yyvsp[-1].node_el); (yyvsp[-1].node_el)->sibling = new node("ID", VALUE);}
-#line 1433 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 97 "mad_parser.y" /* yacc.c:1646  */
+    {(yyval.node_el) = new node("variable_definitions", NONTERMINAL); (yyval.node_el)->child = (yyvsp[-1].node_el); (yyvsp[-1].node_el)->sibling = new node("ID", VALUE); (yyvsp[-1].node_el)->sibling->info = (yyvsp[0].node_con);}
+#line 1436 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 95 "mad_parser.y" /* yacc.c:1646  */
-    {(yyval.node_el) = new node("variable_definitions", NONTERMINAL); (yyval.node_el)->child = (yyvsp[-2].node_el); (yyvsp[-2].node_el)->sibling = new node("COMMA", TERMINAL); (yyvsp[-2].node_el)->sibling->sibling = new node("ID", VALUE);}
-#line 1439 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 98 "mad_parser.y" /* yacc.c:1646  */
+    {(yyval.node_el) = new node("variable_definitions", NONTERMINAL); (yyval.node_el)->child = (yyvsp[-2].node_el); (yyvsp[-2].node_el)->sibling = new node("COMMA", TERMINAL); (yyvsp[-2].node_el)->sibling->sibling = new node("ID", VALUE); (yyvsp[-2].node_el)->sibling->sibling->info = (yyvsp[0].node_con); }
+#line 1442 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 96 "mad_parser.y" /* yacc.c:1646  */
+#line 99 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("error", TERMINAL); yyerror("Missing comma in definitions list"); }
-#line 1445 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1448 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 99 "mad_parser.y" /* yacc.c:1646  */
+#line 102 "mad_parser.y" /* yacc.c:1646  */
     {(yyval.node_el) = new node("DTYPE_INT", TERMINAL); /*$$->child = $1;*/}
-#line 1451 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1454 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 100 "mad_parser.y" /* yacc.c:1646  */
+#line 103 "mad_parser.y" /* yacc.c:1646  */
     {(yyval.node_el) = new node("DTYPE_BOOL", TERMINAL); /*$$->child = $1;*/}
-#line 1457 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1460 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 101 "mad_parser.y" /* yacc.c:1646  */
+#line 104 "mad_parser.y" /* yacc.c:1646  */
     {(yyval.node_el) = new node("error", TERMINAL); yyerror("Unknown type declaration"); }
-#line 1463 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1466 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 104 "mad_parser.y" /* yacc.c:1646  */
-    {(yyval.node_el) = new node("function_declarations", NONTERMINAL); (yyval.node_el)->child = (yyvsp[-5].node_el); node* id = new node("ID", VALUE); (yyvsp[-5].node_el)->sibling = id; node* openparen = new node("OPENPAREN", TERMINAL); id->sibling = openparen; openparen->sibling = (yyvsp[-2].node_el); node* closeparen = new node("CLOSEPAREN", TERMINAL); (yyvsp[-2].node_el)->sibling = closeparen; closeparen->sibling = (yyvsp[0].node_el); }
-#line 1469 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 107 "mad_parser.y" /* yacc.c:1646  */
+    {(yyval.node_el) = new node("function_declarations", NONTERMINAL); (yyval.node_el)->child = (yyvsp[-5].node_el); node* id = new node("ID", VALUE); id->info = (yyvsp[-4].node_con); (yyvsp[-5].node_el)->sibling = id; node* openparen = new node("OPENPAREN", TERMINAL); id->sibling = openparen; openparen->sibling = (yyvsp[-2].node_el); node* closeparen = new node("CLOSEPAREN", TERMINAL); (yyvsp[-2].node_el)->sibling = closeparen; closeparen->sibling = (yyvsp[0].node_el); }
+#line 1472 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 105 "mad_parser.y" /* yacc.c:1646  */
+#line 108 "mad_parser.y" /* yacc.c:1646  */
     {
 		(yyval.node_el) = new node("function_declarations", NONTERMINAL);
 		(yyval.node_el)->child = new node("VOID", TERMINAL);
-		node* id = new node("ID", VALUE); (yyval.node_el)->child->sibling = id;
+		node* id = new node("ID", VALUE); id->info = (yyvsp[-4].node_con); (yyval.node_el)->child->sibling = id;
 		node* openparen = new node("OPENPAREN", TERMINAL); id->sibling = openparen;
 		openparen->sibling = (yyvsp[-2].node_el);
 		node* closeparen = new node("CLOSEPAREN", TERMINAL); (yyvsp[-2].node_el)->sibling = closeparen;
 		closeparen->sibling = (yyvsp[0].node_el);
 	}
-#line 1483 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1486 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 116 "mad_parser.y" /* yacc.c:1646  */
+#line 119 "mad_parser.y" /* yacc.c:1646  */
     {
 		(yyval.node_el) = new node("argument_list", NONTERMINAL); (yyval.node_el)->child = (yyvsp[-3].node_el);
-		node* id = new node("ID", VALUE); (yyvsp[-3].node_el)->sibling = id;
+		node* id = new node("ID", VALUE); id->info = (yyvsp[-2].node_con); (yyvsp[-3].node_el)->sibling = id;
 		node* comma= new node("COMMA", TERMINAL); id->sibling = comma;
 		comma->sibling = (yyvsp[0].node_el);
 	}
-#line 1494 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1497 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 122 "mad_parser.y" /* yacc.c:1646  */
-    {(yyval.node_el) = new node("argument_list", NONTERMINAL); (yyval.node_el)->child = (yyvsp[-1].node_el); node* id = new node("ID", VALUE); (yyvsp[-1].node_el)->sibling = id;}
-#line 1500 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 125 "mad_parser.y" /* yacc.c:1646  */
+    {(yyval.node_el) = new node("argument_list", NONTERMINAL); (yyval.node_el)->child = (yyvsp[-1].node_el); node* id = new node("ID", VALUE); id->info = (yyvsp[0].node_con); (yyvsp[-1].node_el)->sibling = id;}
+#line 1503 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 123 "mad_parser.y" /* yacc.c:1646  */
+#line 126 "mad_parser.y" /* yacc.c:1646  */
     {(yyval.node_el) = new node("function_declarations", NONTERMINAL); (yyval.node_el)->child = new node("EPSILON", TERMINAL); }
-#line 1506 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1509 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 124 "mad_parser.y" /* yacc.c:1646  */
+#line 127 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("error", TERMINAL); yyerror("Missing comma in argument list"); }
-#line 1512 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1515 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 125 "mad_parser.y" /* yacc.c:1646  */
+#line 128 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("error", TERMINAL); yyerror("Missing identifier in argument list"); }
-#line 1518 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1521 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 128 "mad_parser.y" /* yacc.c:1646  */
+#line 131 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("statement_block", NONTERMINAL); (yyval.node_el)->child = new node("OPENCURLY", TERMINAL); (yyval.node_el)->child->sibling = (yyvsp[-2].node_el); (yyvsp[-2].node_el)->sibling = (yyvsp[-1].node_el); (yyvsp[-1].node_el)->sibling = new node("CLOSECURLY", TERMINAL); }
-#line 1524 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1527 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 129 "mad_parser.y" /* yacc.c:1646  */
+#line 132 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("error", TERMINAL); yyerror("Possible missing semicolon in statement block"); }
-#line 1530 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1533 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 132 "mad_parser.y" /* yacc.c:1646  */
+#line 135 "mad_parser.y" /* yacc.c:1646  */
     {(yyval.node_el) = new node("variable_list", NONTERMINAL); (yyval.node_el)->child = new node("EPSILON", TERMINAL); }
-#line 1536 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1539 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 133 "mad_parser.y" /* yacc.c:1646  */
+#line 136 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("variable_list", NONTERMINAL); (yyval.node_el)->child = (yyvsp[-1].node_el); (yyvsp[-1].node_el)->sibling = (yyvsp[0].node_el); }
-#line 1542 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1545 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 136 "mad_parser.y" /* yacc.c:1646  */
+#line 139 "mad_parser.y" /* yacc.c:1646  */
     {(yyval.node_el) = new node("statement_list", NONTERMINAL); (yyval.node_el)->child = new node("EPSILON", TERMINAL); }
-#line 1548 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1551 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 137 "mad_parser.y" /* yacc.c:1646  */
+#line 140 "mad_parser.y" /* yacc.c:1646  */
     {(yyval.node_el) = new node("statement_list", NONTERMINAL); (yyval.node_el)->child = (yyvsp[-1].node_el); (yyvsp[-1].node_el)->sibling = (yyvsp[0].node_el);}
-#line 1554 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1557 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 140 "mad_parser.y" /* yacc.c:1646  */
+#line 143 "mad_parser.y" /* yacc.c:1646  */
     {(yyval.node_el) = new node("supported_statement", NONTERMINAL); (yyval.node_el)->child = (yyvsp[-1].node_el); (yyvsp[-1].node_el)->sibling = new node("SEMI", TERMINAL);}
-#line 1560 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1563 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 141 "mad_parser.y" /* yacc.c:1646  */
+#line 144 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("supported_statement", NONTERMINAL); (yyval.node_el)->child = (yyvsp[0].node_el); }
-#line 1566 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1569 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 142 "mad_parser.y" /* yacc.c:1646  */
+#line 145 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("supported_statement", NONTERMINAL); (yyval.node_el)->child = (yyvsp[0].node_el); }
-#line 1572 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1575 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 143 "mad_parser.y" /* yacc.c:1646  */
+#line 146 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("supported_statement", NONTERMINAL); (yyval.node_el)->child = (yyvsp[0].node_el); }
-#line 1578 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1581 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 144 "mad_parser.y" /* yacc.c:1646  */
+#line 147 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("supported_statement", NONTERMINAL); (yyval.node_el)->child = (yyvsp[0].node_el); }
-#line 1584 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1587 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 145 "mad_parser.y" /* yacc.c:1646  */
+#line 148 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("supported_statement", NONTERMINAL); (yyval.node_el)->child = (yyvsp[0].node_el); }
-#line 1590 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1593 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 146 "mad_parser.y" /* yacc.c:1646  */
+#line 149 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("supported_statement", NONTERMINAL); (yyval.node_el)->child = (yyvsp[0].node_el); }
-#line 1596 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1599 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 147 "mad_parser.y" /* yacc.c:1646  */
+#line 150 "mad_parser.y" /* yacc.c:1646  */
     { yyerror("Possible missing semicolon with alr_subexpression"); (yyval.node_el) = new node("error", TERMINAL); }
-#line 1602 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1605 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 150 "mad_parser.y" /* yacc.c:1646  */
+#line 153 "mad_parser.y" /* yacc.c:1646  */
     { //CHANGED IF EXPRESSION INTERNAL TO STATEMENT BLOCK
 		(yyval.node_el) = new node("if_statement", NONTERMINAL);
 		(yyval.node_el)->child = new node("IF", TERMINAL);
@@ -1612,27 +1615,27 @@ yyreduce:
 		closeparen->sibling = (yyvsp[-1].node_el);
 		(yyvsp[-1].node_el)->sibling = (yyvsp[0].node_el);
 	}
-#line 1616 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1619 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 161 "mad_parser.y" /* yacc.c:1646  */
+#line 164 "mad_parser.y" /* yacc.c:1646  */
     {(yyval.node_el) = new node("else_statement", NONTERMINAL); (yyval.node_el)->child = new node("EPSILON", TERMINAL); }
-#line 1622 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1625 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 162 "mad_parser.y" /* yacc.c:1646  */
+#line 165 "mad_parser.y" /* yacc.c:1646  */
     {
 		(yyval.node_el) = new node("else_statement", NONTERMINAL); 
 		(yyval.node_el)->child = new node("ELSE", TERMINAL); 
 		(yyval.node_el)->child->sibling = (yyvsp[0].node_el);
 	}
-#line 1632 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1635 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 169 "mad_parser.y" /* yacc.c:1646  */
+#line 172 "mad_parser.y" /* yacc.c:1646  */
     {
 		(yyval.node_el) = new node("while_statement", NONTERMINAL);
 		(yyval.node_el)->child = new node("WHILE", TERMINAL);
@@ -1640,11 +1643,11 @@ yyreduce:
 		openparen->sibling = (yyvsp[-1].node_el);
 		node* closeparen = new node("CLOSEPAREN", TERMINAL); (yyvsp[-1].node_el)->sibling = closeparen;
 	}
-#line 1644 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1647 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 178 "mad_parser.y" /* yacc.c:1646  */
+#line 181 "mad_parser.y" /* yacc.c:1646  */
     { //CHANGED FOR EXPRESSION INTERNAL TO STATEMENT BLOCK
 		(yyval.node_el) = new node("for_statement", NONTERMINAL);
 		(yyval.node_el)->child = new node("FOR", TERMINAL);
@@ -1657,62 +1660,62 @@ yyreduce:
 		node* closeparen = new node("CLOSEPAREN", TERMINAL); (yyvsp[-2].node_el)->sibling = closeparen;
 		closeparen->sibling = (yyvsp[0].node_el);		
 	}
-#line 1661 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1664 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 190 "mad_parser.y" /* yacc.c:1646  */
+#line 193 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("error", TERMINAL);yyerror("Possible missing semicolon in for"); }
-#line 1667 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1670 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 191 "mad_parser.y" /* yacc.c:1646  */
+#line 194 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("error", TERMINAL);yyerror("Possible missing semicolon in for"); }
-#line 1673 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1676 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 192 "mad_parser.y" /* yacc.c:1646  */
+#line 195 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("error", TERMINAL); yyerror("Possible missing closing parenthesis in for"); }
-#line 1679 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1682 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 195 "mad_parser.y" /* yacc.c:1646  */
+#line 198 "mad_parser.y" /* yacc.c:1646  */
     {
 		(yyval.node_el) = new node("return_statement", NONTERMINAL);
 		(yyval.node_el)->child = new node("RETURN", TERMINAL);
 		node* semi = new node("SEMI", TERMINAL); (yyval.node_el)->child->sibling = semi;
 	}
-#line 1689 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1692 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 200 "mad_parser.y" /* yacc.c:1646  */
+#line 203 "mad_parser.y" /* yacc.c:1646  */
     {
 		(yyval.node_el) = new node("return_statement", NONTERMINAL);
 		(yyval.node_el)->child = new node("RETURN", TERMINAL);		
 		(yyval.node_el)->child->sibling = (yyvsp[-1].node_el);
 		node* semi = new node("SEMI", TERMINAL); (yyvsp[-1].node_el)->sibling = semi;
 	}
-#line 1700 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1703 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 206 "mad_parser.y" /* yacc.c:1646  */
+#line 209 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("error", TERMINAL);yyerror("Missing semicolon with return"); }
-#line 1706 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1709 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 207 "mad_parser.y" /* yacc.c:1646  */
+#line 210 "mad_parser.y" /* yacc.c:1646  */
     {(yyval.node_el) = new node("error", TERMINAL); yyerror("Missing semicolon with return"); }
-#line 1712 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1715 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 210 "mad_parser.y" /* yacc.c:1646  */
+#line 213 "mad_parser.y" /* yacc.c:1646  */
     {
 		(yyval.node_el) = new node("print_statement", NONTERMINAL);
 		(yyval.node_el)->child = new node("PRINT", TERMINAL);
@@ -1721,211 +1724,211 @@ yyreduce:
 		node* closeparen = new node("CLOSEPAREN", TERMINAL); (yyvsp[-2].node_el)->sibling = closeparen;
 		closeparen->sibling = new node("SEMI", TERMINAL);;
 	}
-#line 1725 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1728 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 218 "mad_parser.y" /* yacc.c:1646  */
+#line 221 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("error", TERMINAL);yyerror("Possile missing open parenthesis"); }
-#line 1731 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1734 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 219 "mad_parser.y" /* yacc.c:1646  */
+#line 222 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("error", TERMINAL);yyerror("Possible missing closing parenthesis"); }
-#line 1737 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1740 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 51:
-#line 220 "mad_parser.y" /* yacc.c:1646  */
+#line 223 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("error", TERMINAL);yyerror("Missing semicolon with print"); }
-#line 1743 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1746 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 223 "mad_parser.y" /* yacc.c:1646  */
+#line 226 "mad_parser.y" /* yacc.c:1646  */
     {
 		(yyval.node_el) = new node("alr_subexpression", NONTERMINAL);
-		(yyval.node_el)->child = new node("ID", VALUE);
+		(yyval.node_el)->child = new node("ID", VALUE); (yyval.node_el)->child->info = (yyvsp[-2].node_con);
 		node* openparen = new node("EQ", TERMINAL); (yyval.node_el)->child->sibling = openparen;
 		openparen->sibling = (yyvsp[0].node_el);
 	}
-#line 1754 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1757 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 229 "mad_parser.y" /* yacc.c:1646  */
+#line 232 "mad_parser.y" /* yacc.c:1646  */
     {(yyval.node_el) = new node("alr_subexpression", NONTERMINAL); (yyval.node_el)->child = (yyvsp[0].node_el);}
-#line 1760 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1763 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 230 "mad_parser.y" /* yacc.c:1646  */
-    {(yyval.node_el) = new node("alr_subexpression", NONTERMINAL); (yyval.node_el)->child = new node("ID", VALUE);}
-#line 1766 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 233 "mad_parser.y" /* yacc.c:1646  */
+    {(yyval.node_el) = new node("alr_subexpression", NONTERMINAL); (yyval.node_el)->child = new node("ID", VALUE); (yyval.node_el)->child->info = (yyvsp[0].node_con);}
+#line 1769 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 231 "mad_parser.y" /* yacc.c:1646  */
+#line 234 "mad_parser.y" /* yacc.c:1646  */
     {
 		(yyval.node_el) = new node("alr_subexpression", NONTERMINAL);
-		(yyval.node_el)->child = new node("ID", VALUE);
+		(yyval.node_el)->child = new node("ID", VALUE);(yyval.node_el)->child->info = (yyvsp[-3].node_con);
 		node* openparen = new node("OPENPAREN", TERMINAL); (yyval.node_el)->child->sibling = openparen;
 		openparen->sibling = (yyvsp[-1].node_el);
 		node* closeparen = new node("CLOSEPAREN", TERMINAL); (yyvsp[-1].node_el)->sibling = closeparen;
 	}
-#line 1778 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1781 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 56:
-#line 238 "mad_parser.y" /* yacc.c:1646  */
+#line 241 "mad_parser.y" /* yacc.c:1646  */
     {
 		(yyval.node_el) = new node("alr_subexpression", NONTERMINAL);
 		(yyval.node_el)->child = new node("OPENPAREN", TERMINAL);
 		(yyval.node_el)->child->sibling = (yyvsp[-1].node_el);
 		node* closeparen = new node("CLOSEPAREN", TERMINAL); (yyvsp[-1].node_el)->sibling = closeparen;
 	}
-#line 1789 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1792 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 244 "mad_parser.y" /* yacc.c:1646  */
-    {}
-#line 1795 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 247 "mad_parser.y" /* yacc.c:1646  */
+    {(yyval.node_el) = new node("alr_subexpression", NONTERMINAL); (yyval.node_el)->child = (yyvsp[-2].node_el); (yyvsp[-2].node_el)->sibling= new node("ARITH", VALUE); (yyvsp[-2].node_el)->sibling->info = (yyvsp[-1].node_con); (yyvsp[-2].node_el)->sibling->sibling = (yyvsp[0].node_el);}
+#line 1798 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 245 "mad_parser.y" /* yacc.c:1646  */
+#line 248 "mad_parser.y" /* yacc.c:1646  */
     {
 		(yyval.node_el) = new node("alr_subexpression", NONTERMINAL);
 		(yyval.node_el)->child = new node("OPENNEGATE", TERMINAL);
 		(yyval.node_el)->child->sibling = (yyvsp[-1].node_el);
 		node* closeparen = new node("CLOSEPAREN", TERMINAL); (yyvsp[-1].node_el)->sibling = closeparen;
 	}
-#line 1806 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1809 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 59:
-#line 251 "mad_parser.y" /* yacc.c:1646  */
+#line 254 "mad_parser.y" /* yacc.c:1646  */
     {
 		(yyval.node_el) = new node("alr_subexpression", NONTERMINAL);
 		(yyval.node_el)->child = (yyvsp[-2].node_el);
-		node* reln = new node("RELN", TERMINAL); (yyvsp[-2].node_el)->sibling = reln;
+		node* reln = new node("RELN", VALUE); reln->info = (yyvsp[-1].node_con);(yyvsp[-2].node_el)->sibling = reln;
 		reln->sibling = (yyvsp[0].node_el);
 	}
-#line 1817 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1820 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 60:
-#line 257 "mad_parser.y" /* yacc.c:1646  */
+#line 260 "mad_parser.y" /* yacc.c:1646  */
     {
 		(yyval.node_el) = new node("alr_subexpression", NONTERMINAL);
 		(yyval.node_el)->child = (yyvsp[-2].node_el);
-		node* reln = new node("LOGICAL", TERMINAL); (yyvsp[-2].node_el)->sibling = reln;
+		node* reln = new node("LOGICAL", VALUE);reln->info=(yyvsp[-1].node_con); (yyvsp[-2].node_el)->sibling = reln;
 		reln->sibling = (yyvsp[0].node_el);
 	}
-#line 1828 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1831 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 61:
-#line 263 "mad_parser.y" /* yacc.c:1646  */
+#line 266 "mad_parser.y" /* yacc.c:1646  */
     {
 		(yyval.node_el) = new node("alr_subexpression", NONTERMINAL);
-		(yyval.node_el)->child = new node("LOGICALNOT", TERMINAL);
+		(yyval.node_el)->child = new node("LOGICALNOT", VALUE); (yyval.node_el)->child->info = "!";
 		(yyval.node_el)->child->sibling = (yyvsp[0].node_el);
 	}
-#line 1838 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1841 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 62:
-#line 268 "mad_parser.y" /* yacc.c:1646  */
+#line 271 "mad_parser.y" /* yacc.c:1646  */
     {
 		(yyval.node_el) = new node("alr_subexpression", NONTERMINAL); 
 		(yyval.node_el)->child = new node("READ", TERMINAL);
 		node* intconst = new node("OPENPAREN", VALUE); (yyval.node_el)->child->sibling = intconst;
 		node* closeparen = new node("CLOSEPAREN", TERMINAL); intconst->sibling = closeparen;
 	}
-#line 1849 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1852 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 63:
-#line 274 "mad_parser.y" /* yacc.c:1646  */
+#line 277 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("error", TERMINAL);yyerror("Missing identifier name"); }
-#line 1855 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1858 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 64:
-#line 275 "mad_parser.y" /* yacc.c:1646  */
+#line 278 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("error", TERMINAL);yyerror("Possible missing equalty sign"); }
-#line 1861 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1864 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 65:
-#line 276 "mad_parser.y" /* yacc.c:1646  */
+#line 279 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("error", TERMINAL);yyerror("Possible missing closing parenthesis"); }
-#line 1867 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1870 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 66:
-#line 277 "mad_parser.y" /* yacc.c:1646  */
+#line 280 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("error", TERMINAL);yyerror("Possible missing closing parenthesis"); }
-#line 1873 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1876 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 67:
-#line 278 "mad_parser.y" /* yacc.c:1646  */
+#line 281 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("error", TERMINAL);yyerror("Possible missing opening parenthesis"); }
-#line 1879 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1882 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 68:
-#line 281 "mad_parser.y" /* yacc.c:1646  */
-    { (yyval.node_el) = new node("id_list", NONTERMINAL); (yyval.node_el)->child = new node("ID", VALUE); node *comma = new node("COMMA", TERMINAL); (yyval.node_el)->child->sibling = comma; comma->sibling = (yyvsp[0].node_el); }
-#line 1885 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 284 "mad_parser.y" /* yacc.c:1646  */
+    { (yyval.node_el) = new node("id_list", NONTERMINAL); (yyval.node_el)->child = new node("ID", VALUE);(yyval.node_el)->child->info = (yyvsp[-2].node_con); node *comma = new node("COMMA", TERMINAL); (yyval.node_el)->child->sibling = comma; comma->sibling = (yyvsp[0].node_el); }
+#line 1888 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 69:
-#line 282 "mad_parser.y" /* yacc.c:1646  */
-    {(yyval.node_el) = new node("id_list", NONTERMINAL); (yyval.node_el)->child = new node("ID", VALUE);}
-#line 1891 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 285 "mad_parser.y" /* yacc.c:1646  */
+    {(yyval.node_el) = new node("id_list", NONTERMINAL); (yyval.node_el)->child = new node("ID", VALUE);(yyval.node_el)->child->info = (yyvsp[0].node_con);}
+#line 1894 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 283 "mad_parser.y" /* yacc.c:1646  */
+#line 286 "mad_parser.y" /* yacc.c:1646  */
     {(yyval.node_el) = new node("id_list", NONTERMINAL); (yyval.node_el)->child = new node("EPSILON", TERMINAL); }
-#line 1897 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1900 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 71:
-#line 284 "mad_parser.y" /* yacc.c:1646  */
+#line 287 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.node_el) = new node("error", TERMINAL); yyerror("Missing identifier name"); }
-#line 1903 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1906 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 72:
-#line 287 "mad_parser.y" /* yacc.c:1646  */
-    {(yyval.node_el) = new node("supported_constant", NONTERMINAL); (yyval.node_el)->child = new node("INTCONST", VALUE); }
-#line 1909 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 290 "mad_parser.y" /* yacc.c:1646  */
+    {(yyval.node_el) = new node("supported_constant", NONTERMINAL); (yyval.node_el)->child = new node("INTCONST", VALUE); (yyval.node_el)->child->info = (yyvsp[0].node_con);}
+#line 1912 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 73:
-#line 288 "mad_parser.y" /* yacc.c:1646  */
-    {(yyval.node_el) = new node("supported_constant", NONTERMINAL); (yyval.node_el)->child = new node("BOOLCONST", VALUE); }
-#line 1915 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 291 "mad_parser.y" /* yacc.c:1646  */
+    {(yyval.node_el) = new node("supported_constant", NONTERMINAL); (yyval.node_el)->child = new node("BOOLCONST", VALUE); (yyval.node_el)->child->info = (yyvsp[0].node_con);}
+#line 1918 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 74:
-#line 289 "mad_parser.y" /* yacc.c:1646  */
+#line 292 "mad_parser.y" /* yacc.c:1646  */
     {
 		(yyval.node_el) = new node("supported_constant", NONTERMINAL); (yyval.node_el)->child = new node("OPENNEGATE", TERMINAL);
-		node* intconst = new node("INTCONST", VALUE); (yyval.node_el)->child->sibling = intconst;
+		node* intconst = new node("INTCONST", VALUE); (yyval.node_el)->child->sibling = intconst;intconst->info = (yyvsp[-1].node_con);
 		node* closeparen = new node("CLOSEPAREN", TERMINAL); intconst->sibling = closeparen;
 	}
-#line 1925 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1928 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1929 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1932 "mad_parser.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2153,7 +2156,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 295 "mad_parser.y" /* yacc.c:1906  */
+#line 298 "mad_parser.y" /* yacc.c:1906  */
 
 int num_times = 2;
 void yyerror(const char* err_msg)
@@ -2176,7 +2179,9 @@ void print_tree(node *cur, vector<int>& ancestors, int parent)
 		if(k!=num_times-1) cout<<endl;
 	}
 	if(ancestors.size()) cout<<"--+";
-	cout<<cur->content<<endl;
+	cout<<cur->content;
+	if(cur->type == VAL) cout<<" [`"<<cur->info<<"']";
+	cout<<endl;
 
 	ancestors.push_back(parent);
 	print_tree(cur->child, ancestors, parent+4);
