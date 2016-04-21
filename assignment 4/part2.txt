@@ -1,0 +1,135 @@
+%{
+#include <bits/stdc++.h>
+
+/*
+MAD GRAMMAR:
+
+Program::= Decl | Decl Program
+Decl::= VariableDecl | FunctionDecl
+VariableDecl ::= Variable;
+Variable::= Type ident | Variable, ident
+Type::=int|bool
+FunctionDecl ::= Type ident (Formals) StmtBlock|void ident (Formals) StmtBlock
+Formals ::= Type ident,Formals|Type ident|Epsilon
+
+StmtBlock ::={VariableList StatementList}
+VariableList ::= Epsilon| VariableDecl VariableList
+StatementList ::= Epsilon | Stmt StatementList
+Stmt ::= Expr;|IfStmt|WhileStmt|ForStmt|ReturnStmt|PrintStmt|StmtBlock
+
+IfStmt ::=if (Expr) Stmt ElseStmt
+ElseStmt ::= Epsilon | else Stmt
+WhileStmt ::= while ( Expr )
+ForStmt ::= for (Expr; Expr; Expr) Stmt
+ReturnStmt ::= return; | return Expr;
+PrintStmt ::= print ( ExprList ) ;
+ExprList ::= Expr, ExprList | Expr
+
+Expr ::= ident=Expr|Constant|ident|ident (Actuals)|(Expr)|Expr+Expr|Expr-Expr
+	|Expr*Expr|Expr/Expr
+	|Expr%Expr|-Expr
+	|Expr<Expr
+	|Expr<=Expr
+	|Expr>Expr
+	|Expr>=Expr
+	|Expr==Expr
+	|Expr!=Expr
+	|Expr&&Expr
+	|Expr||Expr 
+	|!Expr
+	|readInteger()
+	|readBool()
+Actuals ::= ident,Actuals|ident|Epsilon
+Constant ::= intConstant|boolConstant|null|(-intConstant)
+
+MAD TOKENS:
+
+ID : ident [a-zA-Z][a-zA-Z0-9]*
+COMMA : ,
+SEMI : ; 
+OPENPAREN : ( 
+CLOSEPAREN: )
+OPENCURLY : {
+CLOSECURLY : }
+EQ : =
+ARITH : + - * / % 
+RELN : == > < >= <= !=
+LOGICAL : && || !
+DTYPE : int bool
+VOID : void
+IF : if
+ELSE : else
+WHILE : while
+FOR : for
+RETURN : return
+PRINT : print
+READ : readInteger readBool
+BOOLCONST : true false
+INTCONST : [0-9]+
+*/
+
+
+%}
+
+%option noyywrap
+
+%{
+int num_lines = 0, num_chars = 0;
+%}
+
+ID [a-zA-Z][a-zA-Z0-9]*
+COMMA (",")
+SEMI (";")
+OPENPAREN "(" 
+CLOSEPAREN ")"
+OPENCURLY "{"
+CLOSECURLY "}"
+VOID ("void")
+DTYPE ("int"|"bool")
+EQ ("=")
+ARITH [-+*/%] 
+RELN ("=="|"<"|">"|"<="|">="|"!=")
+LOGICAL ("&&"|"||"|"!")
+IF ("if")
+ELSE ("else")
+WHILE ("while")
+FOR ("for")
+RETURN ("return")
+PRINT ("print")
+READ ("readInteger"|"readBool")
+BOOLCONST ("true"|"false")
+INTCONST [0-9]+
+
+%%
+{DTYPE} {printf( "%s : DTYPE\n", yytext );}
+{VOID} {printf( "%s : VOID\n", yytext );}
+{IF} {printf( "%s : IF\n", yytext );}
+{ELSE} {printf( "%s : ELSE\n", yytext );}
+{WHILE} {printf( "%s : WHILE\n", yytext );}
+{FOR} {printf( "%s : FOR\n", yytext );}
+{RETURN} {printf( "%s : RETURN\n", yytext );}
+{PRINT} {printf( "%s : PRINT\n", yytext );}
+{READ} {printf( "%s : READ\n", yytext );}
+{COMMA} {printf( "%s : COMMA\n", yytext );}
+{SEMI} {printf( "%s : SEMI\n", yytext );}
+{OPENPAREN} {printf( "%s : OPENPAREN\n", yytext );}
+{CLOSEPAREN} {printf( "%s : CLOSEPAREN\n", yytext );}
+{OPENCURLY} {printf( "%s : OPENCURLY\n", yytext );}
+{CLOSECURLY} {printf( "%s : CLOSECURLY\n", yytext );}
+{EQ} {printf( "%s : EQ\n", yytext );}
+{ARITH} {printf( "%s : ARITH\n", yytext ); }
+{RELN} {printf( "%s : RELN\n", yytext );}
+{LOGICAL} {printf( "%s : LOGICAL\n", yytext );}
+{BOOLCONST} {printf( "%s : BOOLCONST\n", yytext );}
+{INTCONST} {printf( "%s : INTCONST\n", yytext );}
+{ID} {printf( "%s : ID\n", yytext );}
+
+[ \t]+          /* eat up whitespace */
+[\n]+ ++num_lines;
+.          printf( "Unrecognized character: %s\n", yytext );
+%%
+
+int main( int argc, char **argv )
+{
+        yylex();
+}
