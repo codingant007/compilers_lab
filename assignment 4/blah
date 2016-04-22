@@ -1,14 +1,14 @@
-mad_parser.y:92.61-73: warning: symbol for_statement is used, but is not defined as a token and has no rules [-Wother]
+mad_parser.y:94.61-73: warning: symbol for_statement is used, but is not defined as a token and has no rules [-Wother]
  %type <node_el> if_statement else_statement while_statement for_statement return_statement print_statement
                                                              ^^^^^^^^^^^^^
-mad_parser.y:92.92-106: warning: symbol print_statement is used, but is not defined as a token and has no rules [-Wother]
+mad_parser.y:94.92-106: warning: symbol print_statement is used, but is not defined as a token and has no rules [-Wother]
  %type <node_el> if_statement else_statement while_statement for_statement return_statement print_statement
                                                                                             ^^^^^^^^^^^^^^^
 mad_parser.y: warning: 2 nonterminals useless in grammar [-Wother]
-mad_parser.y:92.61-73: warning: nonterminal useless in grammar: for_statement [-Wother]
+mad_parser.y:94.61-73: warning: nonterminal useless in grammar: for_statement [-Wother]
  %type <node_el> if_statement else_statement while_statement for_statement return_statement print_statement
                                                              ^^^^^^^^^^^^^
-mad_parser.y:92.92-106: warning: nonterminal useless in grammar: print_statement [-Wother]
+mad_parser.y:94.92-106: warning: nonterminal useless in grammar: print_statement [-Wother]
  %type <node_el> if_statement else_statement while_statement for_statement return_statement print_statement
                                                                                             ^^^^^^^^^^^^^^^
 mad_parser.y: warning: 31 shift/reduce conflicts [-Wconflicts-sr]

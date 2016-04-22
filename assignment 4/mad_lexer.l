@@ -17,6 +17,8 @@ OPENPAREN "("
 CLOSEPAREN ")"
 OPENCURLY "{"
 CLOSECURLY "}"
+OPENSQUARE "["
+CLOSESQUARE "]"
 OPENNEGATE "-("
 VOID ("void")
 DTYPE ("char"|"int"|"float"|"bool")
@@ -46,6 +48,8 @@ INTCONST [0-9]+
 {CLOSEPAREN} {return CLOSEPAREN; }
 {OPENCURLY} {return OPENCURLY; }
 {CLOSECURLY} {return CLOSECURLY; }
+{OPENSQUARE} {return OPENSQUARE; }
+{CLOSESQUARE} {return CLOSESQUARE; }
 {OPENNEGATE} {return OPENNEGATE; } /*Added token for negation*/
 {EQ} {return EQ; } 
 {ARITH} {yylval.node_con=strdup(yytext);return ARITH; } 

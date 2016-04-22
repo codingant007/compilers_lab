@@ -53,26 +53,28 @@ extern int yydebug;
     CLOSEPAREN = 262,
     OPENCURLY = 263,
     CLOSECURLY = 264,
-    OPENNEGATE = 265,
-    VOID = 266,
-    DTYPE_INT = 267,
-    DTYPE_BOOL = 268,
-    DTYPE_FLOAT = 269,
-    DTYPE_CHAR = 270,
-    EQ = 271,
-    ARITH = 272,
-    RELN = 273,
-    LOGICAL = 274,
-    LOGICALNOT = 275,
-    IF = 276,
-    ELSE = 277,
-    WHILE = 278,
-    FOR = 279,
-    RETURN = 280,
-    PRINT = 281,
-    READ = 282,
-    BOOLCONST = 283,
-    INTCONST = 284,
+    OPENSQUARE = 265,
+    CLOSESQUARE = 266,
+    OPENNEGATE = 267,
+    VOID = 268,
+    DTYPE_INT = 269,
+    DTYPE_BOOL = 270,
+    DTYPE_FLOAT = 271,
+    DTYPE_CHAR = 272,
+    EQ = 273,
+    ARITH = 274,
+    RELN = 275,
+    LOGICAL = 276,
+    LOGICALNOT = 277,
+    IF = 278,
+    ELSE = 279,
+    WHILE = 280,
+    FOR = 281,
+    RETURN = 282,
+    PRINT = 283,
+    READ = 284,
+    BOOLCONST = 285,
+    INTCONST = 286,
     TERMINAL = 1,
     VALUE = 2
   };
@@ -91,7 +93,7 @@ union YYSTYPE
 	node* node_el;
 	char* node_con;
 
-#line 95 "mad_parser.tab.h" /* yacc.c:1909  */
+#line 97 "mad_parser.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

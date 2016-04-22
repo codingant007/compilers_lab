@@ -1,0 +1,23 @@
+SYMTAB
+
+global variables: 
+
+scope -> int
+var_record -> struct: name - string, type - int, scope - int, var_type - int, dim - int
+func_record -> struct : return_type - int, param_list - var_record
+func_table -> map[string, func_record] 
+sym_table -> map[int, map[string, var_record]]
+
+functions:
+
+var_record* get_record (string name);
+string get_mips_name (var_record*);
+
+//Global variables (of code) in sym_table with scope of 0
+
+ATTR
+
+
+
+SEM
+

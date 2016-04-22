@@ -62,6 +62,8 @@ bool has_error;
 %token CLOSEPAREN
 %token OPENCURLY
 %token CLOSECURLY
+%token OPENSQUARE
+%token CLOSESQUARE
 %token OPENNEGATE
 %token VOID
 %token DTYPE_INT
