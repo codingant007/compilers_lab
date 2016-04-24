@@ -84,6 +84,7 @@ bool has_error;
 %token READ
 %token <node_con> BOOLCONST
 %token <node_con> INTCONST
+%token <node_con> CHARCONST
 
 %token NONTERMINAL 0
 %token TERMINAL 1
@@ -266,6 +267,7 @@ var_use:
 	| ID OPENSQUARE INTCONST CLOSESQUARE {$$ = as_tree_n("use_ID[arr]", NONTERMINAL); $$->info = "use_ID[arr]";}
 supported_constant:
 	INTCONST {$$ = as_tree_n("supported_constant", NONTERMINAL); $$->child = as_tree_n("INTCONST", VALUE); $$->child->info = $1;}
+	| CHARCONST {$$ = as_tree_n("supported_constant", NONTERMINAL); $$->child = as_tree_n("CHARCONST", VALUE); $$->child->info = $1;}
 	| BOOLCONST {$$ = as_tree_n("supported_constant", NONTERMINAL); $$->child = as_tree_n("BOOLCONST", VALUE); $$->child->info = $1;}
 	| OPENNEGATE INTCONST CLOSEPAREN {
 		$$ = as_tree_n("supported_constant", NONTERMINAL); $$->child = as_tree_n("OPENNEGATE", TERMINAL);

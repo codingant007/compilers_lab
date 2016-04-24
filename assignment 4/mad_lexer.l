@@ -21,7 +21,7 @@ OPENSQUARE "["
 CLOSESQUARE "]"
 OPENNEGATE "-("
 VOID ("void")
-DTYPE ("char"|"int"|"float"|"bool")
+DTYPE ("char"|"int"|"bool")
 EQ ("=")
 ARITH [-+*/] 
 RELN ("=="|"<"|">"|"<="|">="|"!=")
@@ -33,6 +33,7 @@ WHILE ("while")
 RETURN ("return")
 BOOLCONST ("true"|"false")
 INTCONST [0-9]+
+CHARCONST "@"[a-zA-Z]	
 
 %%
 
@@ -58,6 +59,7 @@ INTCONST [0-9]+
 {LOGICALNOT} {return LOGICALNOT; } /*Separated LOGICALNOT from LOGICAL as it is unary*/
 {BOOLCONST} {yylval.node_con=strdup(yytext);return BOOLCONST; } 
 {INTCONST} {yylval.node_con=strdup(yytext);return INTCONST; }
+{CHARCONST} {yylval.node_con=strdup(yytext+1);return CHARCONST;}
 {ID} {yylval.node_con=strdup(yytext); return ID; }
 
 [ \t]+          /* eat up whitespace */
