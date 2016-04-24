@@ -733,8 +733,8 @@ static const yytype_uint16 yyrline[] =
      379,   380,   381,   382,   385,   396,   397,   404,   413,   418,
      424,   425,   428,   474,   484,   495,   536,   550,   549,   596,
      613,   612,   671,   670,   725,   750,   751,   752,   755,   766,
-     776,   784,   790,   819,   857,   892,   920,   952,   994,  1007,
-    1019,  1035
+     776,   784,   790,   819,   857,   892,   920,   953,   995,  1005,
+    1017,  1033
 };
 #endif
 
@@ -2507,6 +2507,7 @@ yyreduce:
 	    }
 	    else
 	    {
+        cout << (yyvsp[0].node_con) << id_rec->type <<endl;
 	        (yyval.attr_el)->type = id_rec->type;
 	        (yyval.attr_el)->ival = -1;
 	    }
@@ -2520,11 +2521,11 @@ yyreduce:
 	    //Tree-related stuff
 	    // $$ = as_tree_n("use_ID", NONTERMINAL); $$->info = "use_ID";
 	}
-#line 2524 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2525 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 67:
-#line 952 "mad_parser.y" /* yacc.c:1646  */
+#line 953 "mad_parser.y" /* yacc.c:1646  */
     {
 
         //Semantic Analyses
@@ -2565,11 +2566,11 @@ yyreduce:
         //Tree-related stuff
 	    // $$ = as_tree_n("use_ID[arr]", NONTERMINAL); $$->info = "use_ID[arr]";
 	}
-#line 2569 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2570 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 68:
-#line 994 "mad_parser.y" /* yacc.c:1646  */
+#line 995 "mad_parser.y" /* yacc.c:1646  */
     {
 
 	    //Semantic Analyses
@@ -2579,15 +2580,12 @@ yyreduce:
 
 	    //CodeGen
 	    //No codegen assoc with this production
-
-	    //Tree-related stuff
-	    // $$ = as_tree_n("supported_constant", NONTERMINAL); $$->child = as_tree_n("INTCONST", VALUE); $$->child->info = $1;
-	}
-#line 2587 "mad_parser.tab.c" /* yacc.c:1646  */
+    }
+#line 2585 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 69:
-#line 1007 "mad_parser.y" /* yacc.c:1646  */
+#line 1005 "mad_parser.y" /* yacc.c:1646  */
     {
 	    //Semantic Analyses
         (yyval.attr_el) = new attr();
@@ -2600,11 +2598,11 @@ yyreduce:
 	    //Tree-related stuff
 	    // $$ = as_tree_n("supported_constant", NONTERMINAL); $$->child = as_tree_n("INTCONST", VALUE); $$->child->info = $1;
 	}
-#line 2604 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2602 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 1019 "mad_parser.y" /* yacc.c:1646  */
+#line 1017 "mad_parser.y" /* yacc.c:1646  */
     {
 	    //Semantic Analyses
       (yyval.attr_el) = new attr();
@@ -2621,11 +2619,11 @@ yyreduce:
 	    //Tree-related stuff
 	    // $$ = as_tree_n("supported_constant", NONTERMINAL); $$->child = as_tree_n("BOOLCONST", VALUE); $$->child->info = $1;
 	}
-#line 2625 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2623 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 71:
-#line 1035 "mad_parser.y" /* yacc.c:1646  */
+#line 1033 "mad_parser.y" /* yacc.c:1646  */
     {
 
 	    //Semantic Analyses
@@ -2642,11 +2640,11 @@ yyreduce:
 // 		node* intconst = as_tree_n("INTCONST", VALUE); $$->child->sibling = intconst;intconst->info = $2;
 // 		node* closeparen = as_tree_n("CLOSEPAREN", TERMINAL); intconst->sibling = closeparen;
 	}
-#line 2646 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2644 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 2650 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2648 "mad_parser.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2874,7 +2872,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 1051 "mad_parser.y" /* yacc.c:1906  */
+#line 1049 "mad_parser.y" /* yacc.c:1906  */
 
 int num_times = 2;
 void pretty_print_error(const char* err_msg)
