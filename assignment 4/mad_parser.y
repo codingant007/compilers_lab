@@ -91,7 +91,7 @@ bool has_error;
 
 %type <node_el> mad_program supported_declarations variable_declarations function_declarations variable_definitions dtype argument_list statement_block
 %type <node_el> variable_list statement_list supported_statement id_list supported_constant alr_subexpression
-%type <node_el> if_statement else_statement while_statement for_statement return_statement print_statement
+%type <node_el> if_statement else_statement while_statement return_statement var_decl var_use
 
 %%
 
@@ -109,9 +109,9 @@ variable_declarations:
 	| variable_definitions error { $$ = as_tree_n("error", TERMINAL); pretty_print_error(semicolon_error); }
 
 variable_definitions:
-	dtype ID {$$ = as_tree_n("variable_definitions", NONTERMINAL); $$->child = $1; $1->sibling = as_tree_n("ID", VALUE); $1->sibling->info = $2;}
-	| variable_definitions COMMA ID {$$ = as_tree_n("variable_definitions", NONTERMINAL); $$->child = $1; $1->sibling = as_tree_n("COMMA", TERMINAL); $1->sibling->sibling = as_tree_n("ID", VALUE); $1->sibling->sibling->info = $3; }
-	| variable_definitions error ID '\n' { $$ = as_tree_n("error", TERMINAL); pretty_print_error("Missing comma in definitions list"); }
+	dtype var_decl {$$ = as_tree_n("variable_definitions", NONTERMINAL); $$->child = $1; $1->sibling = $2;}
+	| variable_definitions COMMA var_decl {$$ = as_tree_n("variable_definitions", NONTERMINAL); $$->child = $1; $1->sibling = as_tree_n("COMMA", TERMINAL); $1->sibling->sibling = $3; }
+	| variable_definitions error var_decl '\n' { $$ = as_tree_n("error", TERMINAL); pretty_print_error("Missing comma in definitions list"); }
 
 dtype:
 	DTYPE_INT {$$ = as_tree_n("DTYPE_INT", TERMINAL); /*$$->child = $1;*/}
@@ -133,10 +133,10 @@ function_declarations:
 	}
 
 argument_list:
-	dtype ID COMMA argument_list {
+	dtype var_decl COMMA argument_list {
 		$$ = as_tree_n("argument_list", NONTERMINAL); $$->child = $1;
-		node* id = as_tree_n("ID", VALUE); id->info = $2; $1->sibling = id;
-		node* comma= as_tree_n("COMMA", TERMINAL); id->sibling = comma; comma->sibling = $4; } |dtype ID {$$ = as_tree_n("argument_list", NONTERMINAL); $$->child = $1; node* id = as_tree_n("ID", VALUE); id->info = $2; $1->sibling = id;} |%empty /*epsilon production*/ {$$ = as_tree_n("function_declarations", NONTERMINAL); $$->child = as_tree_n("EPSILON", TERMINAL); }
+		 $1->sibling = $2; //node* id = as_tree_n("ID", VALUE); id->info = $2;
+		node* comma= as_tree_n("COMMA", TERMINAL); $2->sibling = comma; comma->sibling = $4; } |dtype ID {$$ = as_tree_n("argument_list", NONTERMINAL); $$->child = $1; node* id = as_tree_n("ID", VALUE); id->info = $2; $1->sibling = id;} |%empty /*epsilon production*/ {$$ = as_tree_n("function_declarations", NONTERMINAL); $$->child = as_tree_n("EPSILON", TERMINAL); }
 	| dtype ID error argument_list { $$ = as_tree_n("error", TERMINAL); pretty_print_error(comma_error); }
 	| dtype error COMMA argument_list { $$ = as_tree_n("error", TERMINAL); pretty_print_error(identifier_error); }
 
@@ -204,14 +204,14 @@ return_statement:
 	| RETURN alr_subexpression error {$$ = as_tree_n("error", TERMINAL); pretty_print_error(semicolon_error_return); }
 
 alr_subexpression:
-	ID EQ alr_subexpression {
+	var_use EQ alr_subexpression {
 		$$ = as_tree_n("alr_subexpression", NONTERMINAL);
-		$$->child = as_tree_n("ID", VALUE); $$->child->info = $1;
+		$$->child = $1;
 		node* openparen = as_tree_n("EQ", TERMINAL); $$->child->sibling = openparen;
 		openparen->sibling = $3;
 	}
 	| supported_constant {$$ = as_tree_n("alr_subexpression", NONTERMINAL); $$->child = $1;}
-	| ID {$$ = as_tree_n("alr_subexpression", NONTERMINAL); $$->child = as_tree_n("ID", VALUE); $$->child->info = $1;}
+	| var_use {$$ = as_tree_n("alr_subexpression", NONTERMINAL); $$->child = $1;}
 	| ID OPENPAREN id_list CLOSEPAREN  {
 		$$ = as_tree_n("alr_subexpression", NONTERMINAL);
 		$$->child = as_tree_n("ID", VALUE);$$->child->info = $1;
@@ -250,15 +250,20 @@ alr_subexpression:
 		$$->child->sibling = $2;
 	}
 	| error EQ alr_subexpression { $$ = as_tree_n("error", TERMINAL);pretty_print_error("Missing identifier name"); }
-	| ID error alr_subexpression { $$ = as_tree_n("error", TERMINAL);pretty_print_error("Possible missing equalty sign"); }
-	| ID OPENPAREN id_list error { $$ = as_tree_n("error", TERMINAL);pretty_print_error("Possible missing closing parenthesis"); }
+	| var_use error alr_subexpression { $$ = as_tree_n("error", TERMINAL);pretty_print_error("Possible missing equalty sign"); }
+	| var_use OPENPAREN id_list error { $$ = as_tree_n("error", TERMINAL);pretty_print_error("Possible missing closing parenthesis"); }
 
 id_list:
-	ID COMMA id_list { $$ = as_tree_n("id_list", NONTERMINAL); $$->child = as_tree_n("ID", VALUE);$$->child->info = $1; node *comma = as_tree_n("COMMA", TERMINAL); $$->child->sibling = comma; comma->sibling = $3; }
-	| ID {$$ = as_tree_n("id_list", NONTERMINAL); $$->child = as_tree_n("ID", VALUE);$$->child->info = $1;}
+	var_use COMMA id_list { $$ = as_tree_n("id_list", NONTERMINAL); $$->child = $1; node *comma = as_tree_n("COMMA", TERMINAL); $$->child->sibling = comma; comma->sibling = $3; }
+	| var_use {$$ = as_tree_n("id_list", NONTERMINAL); $$->child = $1;}
 	| %empty {$$ = as_tree_n("id_list", NONTERMINAL); $$->child = as_tree_n("EPSILON", TERMINAL); }
 	| error COMMA id_list { $$ = as_tree_n("error", TERMINAL); pretty_print_error("Missing identifier name"); }
-
+var_decl:
+	ID {$$ = as_tree_n("decl_ID", NONTERMINAL); $$->info = "decl_ID";}
+	| ID OPENSQUARE INTCONST CLOSESQUARE {$$ = as_tree_n("decl_ID[arr]", NONTERMINAL); $$->info = "decl_ID[arr]";}
+var_use:
+	ID {$$ = as_tree_n("use_ID", NONTERMINAL); $$->info = "use_ID";}
+	| ID OPENSQUARE INTCONST CLOSESQUARE {$$ = as_tree_n("use_ID[arr]", NONTERMINAL); $$->info = "use_ID[arr]";}
 supported_constant:
 	INTCONST {$$ = as_tree_n("supported_constant", NONTERMINAL); $$->child = as_tree_n("INTCONST", VALUE); $$->child->info = $1;}
 	| BOOLCONST {$$ = as_tree_n("supported_constant", NONTERMINAL); $$->child = as_tree_n("BOOLCONST", VALUE); $$->child->info = $1;}
