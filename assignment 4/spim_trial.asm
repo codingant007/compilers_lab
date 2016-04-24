@@ -1,1 +1,11 @@
-li $t2, 2
+	.data
+
+	.globl	main
+	
+	.text
+main:
+
+	# initialize 
+	li	$s0, 9
+	
+	jr $ra

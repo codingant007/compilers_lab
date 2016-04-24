@@ -3,7 +3,7 @@ SYMTAB
 global variables:
 
 scope -> int
-var_record -> struct: name - string, type - int, scope - int, var_type - int, dim - int
+var_record -> struct: name - string, type - int, scope - int, var_type - int, dim - int, offset - int
 func_record -> struct : return_type - int, param_list - var_record
 func_table -> map[string, func_record]
 sym_table -> map[int, map[string, var_record]]
@@ -14,15 +14,15 @@ var_record* get_record (string name);
 string get_mips_name (var_record*);
 string get_mips_name_array(var_record*, int offset);
 int cast (int typeA, int typeB,int is_up); //is_up = 0 for checking for upCast
-// Return type: 0-> no casting possible 1-> typeA can be casted 2-> typeB can be casted
+// Return type: 0-> Same Type 1-> typeA can be casted 2-> typeB can be casted -1-> No Casting
 
-int <> float
 int < char
-int < bool
+int <> bool
 
 
 bool comparable (int typeA, int typeB);
 int <> Float
+int <> bool
 
 set <string> mips_name;
 string data;
@@ -30,8 +30,6 @@ string data;
 //Global variables (of code) in sym_table with scope of 0
 
 ATTR
-
-
 
 struct attr
 {
@@ -47,4 +45,12 @@ struct attr
 
 }
 
-SEM
+CODEGEN
+
+string load_mips_array(var_record* varRecord, int offSet);
+string store_mips_array(var_record* varRecord, int offSet);
+string load_mips_id(var_record* varRecord);
+string store_mips_id(var_record* varRecord);
+
+Points to be noted:
+$t0 is our accumulator
