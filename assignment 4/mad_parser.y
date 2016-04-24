@@ -992,6 +992,7 @@ var_use:
 	}
 
 supported_constant:
+<<<<<<< HEAD
 	INTCONST {
 
 	    //Semantic Analyses
@@ -1004,6 +1005,15 @@ supported_constant:
 
 	    //Tree-related stuff
 	    // $$ = as_tree_n("supported_constant", NONTERMINAL); $$->child = as_tree_n("INTCONST", VALUE); $$->child->info = $1;
+=======
+	INTCONST {$$ = as_tree_n("supported_constant", NONTERMINAL); $$->child = as_tree_n("INTCONST", VALUE); $$->child->info = $1;}
+	| CHARCONST {$$ = as_tree_n("supported_constant", NONTERMINAL); $$->child = as_tree_n("CHARCONST", VALUE); $$->child->info = $1;}
+	| BOOLCONST {$$ = as_tree_n("supported_constant", NONTERMINAL); $$->child = as_tree_n("BOOLCONST", VALUE); $$->child->info = $1;}
+	| OPENNEGATE INTCONST CLOSEPAREN {
+		$$ = as_tree_n("supported_constant", NONTERMINAL); $$->child = as_tree_n("OPENNEGATE", TERMINAL);
+		node* intconst = as_tree_n("INTCONST", VALUE); $$->child->sibling = intconst;intconst->info = $2;
+		node* closeparen = as_tree_n("CLOSEPAREN", TERMINAL); intconst->sibling = closeparen;
+>>>>>>> 6198c678c8bf261b975b9b3d9c8028944fad926b
 	}
 	| CHARCONST {
 	    //Semantic Analyses
