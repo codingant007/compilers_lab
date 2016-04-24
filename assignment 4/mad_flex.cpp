@@ -9,7 +9,7 @@
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
 #define YY_FLEX_MINOR_VERSION 5
-#define YY_FLEX_SUBMINOR_VERSION 37
+#define YY_FLEX_SUBMINOR_VERSION 39
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
@@ -142,7 +142,15 @@ typedef unsigned int flex_uint32_t;
 
 /* Size of default input buffer. */
 #ifndef YY_BUF_SIZE
+#ifdef __ia64__
+/* On IA-64, the buffer size is 16k, not 8k.
+ * Moreover, YY_BUF_SIZE is 2*YY_READ_BUF_SIZE in the general case.
+ * Ditto for the __ia64__ case accordingly.
+ */
+#define YY_BUF_SIZE 32768
+#else
 #define YY_BUF_SIZE 16384
+#endif /* __ia64__ */
 #endif
 
 /* The state buf must be large enough to hold one state per character in the main buffer.
@@ -179,6 +187,13 @@ extern FILE *yyin, *yyout;
                 int yyl;\
                 for ( yyl = n; yyl < yyleng; ++yyl )\
                     if ( yytext[yyl] == '\n' )\
+                        --yylineno;\
+            }while(0)
+    #define YY_LINENO_REWIND_TO(dst) \
+            do {\
+                const char *p;\
+                for ( p = yy_cp-1; p >= (dst); --p)\
+                    if ( *p == '\n' )\
                         --yylineno;\
             }while(0)
     
@@ -386,16 +401,15 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static yyconst flex_int16_t yy_accept[73] =
+static yyconst flex_int16_t yy_accept[70] =
     {   0,
         0,    0,   28,   26,   24,   25,   20,   26,    9,   10,
        17,    7,   17,   22,    8,   18,   16,   18,   23,   13,
        14,   23,   23,   23,   23,   23,   23,   23,   23,   23,
        11,   26,   12,   24,   25,   18,   19,   15,   22,   23,
-       23,   23,   23,   23,   23,    3,   23,   23,   23,   23,
-       23,   23,   23,   23,   23,   23,    1,   23,   23,   23,
-       23,    4,   23,   23,   23,   21,    2,   23,   23,    5,
-        6,    0
+       23,   23,   23,   23,    3,   23,   23,   23,   23,   23,
+       23,   23,   23,   23,    1,   23,   23,   23,   23,    4,
+       23,   23,   21,    2,   23,   23,    5,    6,    0
     } ;
 
 static yyconst flex_int32_t yy_ec[256] =
@@ -438,64 +452,62 @@ static yyconst flex_int32_t yy_meta[40] =
         2,    2,    2,    2,    2,    2,    1,    1,    1
     } ;
 
-static yyconst flex_int16_t yy_base[74] =
+static yyconst flex_int16_t yy_base[71] =
     {   0,
-        0,    0,   89,   90,   86,   84,   72,   80,   90,   90,
-       90,   90,   78,   72,   90,   68,   67,   66,    0,   90,
-       90,   49,   52,   49,   20,   16,   52,   44,   44,   47,
-       90,   34,   90,   69,   67,   90,   90,   90,   58,    0,
-       38,   47,   34,   37,   34,    0,   30,   29,   27,   33,
-       32,   30,   26,   32,   23,   34,    0,   19,   28,   28,
-       22,    0,   25,   14,   15,    0,    0,   20,   14,    0,
-        0,   90,   40
+        0,    0,   85,   86,   82,   80,   68,   76,   86,   86,
+       86,   86,   74,   68,   86,   64,   63,   62,    0,   86,
+       86,   45,   48,   45,   52,   15,   47,   39,   39,   42,
+       86,   29,   86,   64,   62,   86,   86,   86,   53,    0,
+       33,   42,   29,   32,    0,   26,   25,   23,   29,   28,
+       26,   22,   28,   19,    0,   16,   25,   25,   19,    0,
+       22,   14,    0,    0,   19,   13,    0,    0,   86,   39
     } ;
 
-static yyconst flex_int16_t yy_def[74] =
+static yyconst flex_int16_t yy_def[71] =
     {   0,
-       72,    1,   72,   72,   72,   72,   72,   72,   72,   72,
-       72,   72,   72,   72,   72,   72,   72,   72,   73,   72,
-       72,   73,   73,   73,   73,   73,   73,   73,   73,   73,
-       72,   72,   72,   72,   72,   72,   72,   72,   72,   73,
-       73,   73,   73,   73,   73,   73,   73,   73,   73,   73,
-       73,   73,   73,   73,   73,   73,   73,   73,   73,   73,
-       73,   73,   73,   73,   73,   73,   73,   73,   73,   73,
-       73,    0,   72
+       69,    1,   69,   69,   69,   69,   69,   69,   69,   69,
+       69,   69,   69,   69,   69,   69,   69,   69,   70,   69,
+       69,   70,   70,   70,   70,   70,   70,   70,   70,   70,
+       69,   69,   69,   69,   69,   69,   69,   69,   69,   70,
+       70,   70,   70,   70,   70,   70,   70,   70,   70,   70,
+       70,   70,   70,   70,   70,   70,   70,   70,   70,   70,
+       70,   70,   70,   70,   70,   70,   70,   70,    0,   69
     } ;
 
-static yyconst flex_int16_t yy_nxt[130] =
+static yyconst flex_int16_t yy_nxt[126] =
     {   0,
         4,    5,    6,    7,    8,    9,   10,   11,   12,   13,
        14,   15,   16,   17,   18,   19,   20,   21,    4,   19,
        22,   23,   19,   24,   25,   19,   26,   19,   19,   19,
-       27,   19,   28,   19,   29,   30,   31,   32,   33,   44,
-       46,   40,   71,   70,   47,   69,   57,   45,   66,   68,
-       67,   66,   65,   64,   63,   62,   57,   57,   61,   60,
-       59,   58,   57,   56,   55,   54,   53,   52,   39,   35,
-       34,   37,   51,   50,   49,   48,   43,   42,   41,   36,
-       36,   36,   39,   38,   37,   36,   35,   34,   72,    3,
-       72,   72,   72,   72,   72,   72,   72,   72,   72,   72,
+       27,   19,   28,   19,   29,   30,   31,   32,   33,   45,
+       40,   68,   67,   46,   66,   63,   65,   64,   63,   62,
+       61,   60,   55,   55,   59,   58,   57,   56,   55,   54,
+       53,   52,   51,   39,   35,   34,   37,   50,   49,   48,
+       47,   44,   43,   42,   41,   36,   36,   36,   39,   38,
+       37,   36,   35,   34,   69,    3,   69,   69,   69,   69,
+       69,   69,   69,   69,   69,   69,   69,   69,   69,   69,
 
-       72,   72,   72,   72,   72,   72,   72,   72,   72,   72,
-       72,   72,   72,   72,   72,   72,   72,   72,   72,   72,
-       72,   72,   72,   72,   72,   72,   72,   72,   72
+       69,   69,   69,   69,   69,   69,   69,   69,   69,   69,
+       69,   69,   69,   69,   69,   69,   69,   69,   69,   69,
+       69,   69,   69,   69,   69
     } ;
 
-static yyconst flex_int16_t yy_chk[130] =
+static yyconst flex_int16_t yy_chk[126] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,   25,
-       26,   73,   69,   68,   26,   65,   64,   25,   63,   61,
-       60,   59,   58,   56,   55,   54,   53,   52,   51,   50,
-       49,   48,   47,   45,   44,   43,   42,   41,   39,   35,
-       34,   32,   30,   29,   28,   27,   24,   23,   22,   18,
-       17,   16,   14,   13,    8,    7,    6,    5,    3,   72,
-       72,   72,   72,   72,   72,   72,   72,   72,   72,   72,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,   26,
+       70,   66,   65,   26,   62,   61,   59,   58,   57,   56,
+       54,   53,   52,   51,   50,   49,   48,   47,   46,   44,
+       43,   42,   41,   39,   35,   34,   32,   30,   29,   28,
+       27,   25,   24,   23,   22,   18,   17,   16,   14,   13,
+        8,    7,    6,    5,    3,   69,   69,   69,   69,   69,
+       69,   69,   69,   69,   69,   69,   69,   69,   69,   69,
 
-       72,   72,   72,   72,   72,   72,   72,   72,   72,   72,
-       72,   72,   72,   72,   72,   72,   72,   72,   72,   72,
-       72,   72,   72,   72,   72,   72,   72,   72,   72
+       69,   69,   69,   69,   69,   69,   69,   69,   69,   69,
+       69,   69,   69,   69,   69,   69,   69,   69,   69,   69,
+       69,   69,   69,   69,   69
     } ;
 
 /* Table of booleans, true if rule could match eol. */
@@ -525,7 +537,7 @@ char *yytext;
 #include "mad_parser.tab.h"
 #line 10 "mad_lexer.l"
 int num_lines = 0, num_chars = 0;
-#line 529 "mad_flex.cpp"
+#line 541 "mad_flex.cpp"
 
 #define INITIAL 0
 
@@ -606,7 +618,12 @@ static int input (void );
 
 /* Amount of stuff to slurp up with each read. */
 #ifndef YY_READ_BUF_SIZE
+#ifdef __ia64__
+/* On IA-64, the buffer size is 16k, not 8k */
+#define YY_READ_BUF_SIZE 16384
+#else
 #define YY_READ_BUF_SIZE 8192
+#endif /* __ia64__ */
 #endif
 
 /* Copy whatever the last rule matched to the standard output. */
@@ -707,11 +724,6 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 37 "mad_lexer.l"
-
-
-#line 714 "mad_flex.cpp"
-
 	if ( !(yy_init) )
 		{
 		(yy_init) = 1;
@@ -738,6 +750,12 @@ YY_DECL
 		yy_load_buffer_state( );
 		}
 
+	{
+#line 37 "mad_lexer.l"
+
+
+#line 758 "mad_flex.cpp"
+
 	while ( 1 )		/* loops until end-of-file is reached */
 		{
 		yy_cp = (yy_c_buf_p);
@@ -754,7 +772,7 @@ YY_DECL
 yy_match:
 		do
 			{
-			register YY_CHAR yy_c = yy_ec[YY_SC_TO_UI(*yy_cp)];
+			register YY_CHAR yy_c = yy_ec[YY_SC_TO_UI(*yy_cp)] ;
 			if ( yy_accept[yy_current_state] )
 				{
 				(yy_last_accepting_state) = yy_current_state;
@@ -763,13 +781,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 73 )
+				if ( yy_current_state >= 70 )
 					yy_c = yy_meta[(unsigned int) yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 90 );
+		while ( yy_base[yy_current_state] != 86 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -806,7 +824,7 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 YY_RULE_SETUP
 #line 39 "mad_lexer.l"
-{if (yyleng == 3) return DTYPE_INT; else if (yyleng == 4)return DTYPE_BOOL; else if (yyleng == 5) return DTYPE_FLOAT; }
+{if (yyleng == 3) return DTYPE_INT; else if (yyleng == 4){ if(strcmp("char", yytext)) return DTYPE_BOOL; else return DTYPE_CHAR; } }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
@@ -816,7 +834,7 @@ YY_RULE_SETUP
 case 3:
 YY_RULE_SETUP
 #line 41 "mad_lexer.l"
-{return IF; } 
+{return IF; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
@@ -826,12 +844,12 @@ YY_RULE_SETUP
 case 5:
 YY_RULE_SETUP
 #line 43 "mad_lexer.l"
-{return WHILE; } 
+{return WHILE; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 44 "mad_lexer.l"
-{return RETURN; } 
+{return RETURN; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
@@ -881,22 +899,22 @@ YY_RULE_SETUP
 case 16:
 YY_RULE_SETUP
 #line 54 "mad_lexer.l"
-{return EQ; } 
+{return EQ; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
 #line 55 "mad_lexer.l"
-{yylval.node_con=strdup(yytext);return ARITH; } 
+{yylval.node_con=strdup(yytext);return ARITH; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
 #line 56 "mad_lexer.l"
-{yylval.node_con=strdup(yytext);return RELN; } 
+{yylval.node_con=strdup(yytext);return RELN; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
 #line 57 "mad_lexer.l"
-{yylval.node_con=strdup(yytext);return LOGICAL; } 
+{yylval.node_con=strdup(yytext);return LOGICAL; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
@@ -906,7 +924,7 @@ YY_RULE_SETUP
 case 21:
 YY_RULE_SETUP
 #line 59 "mad_lexer.l"
-{yylval.node_con=strdup(yytext);return BOOLCONST; } 
+{yylval.node_con=strdup(yytext);return BOOLCONST; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
@@ -939,7 +957,7 @@ YY_RULE_SETUP
 #line 66 "mad_lexer.l"
 ECHO;
 	YY_BREAK
-#line 943 "mad_flex.cpp"
+#line 961 "mad_flex.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1070,6 +1088,7 @@ case YY_STATE_EOF(INITIAL):
 			"fatal flex scanner internal error--no action found" );
 	} /* end of action switch */
 		} /* end of scanning one token */
+	} /* end of user's declarations */
 } /* end of yylex */
 
 /* yy_get_next_buffer - try to read in a new buffer
@@ -1231,7 +1250,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 73 )
+			if ( yy_current_state >= 70 )
 				yy_c = yy_meta[(unsigned int) yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
@@ -1259,11 +1278,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 73 )
+		if ( yy_current_state >= 70 )
 			yy_c = yy_meta[(unsigned int) yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
-	yy_is_jam = (yy_current_state == 72);
+	yy_is_jam = (yy_current_state == 69);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1945,8 +1964,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 66 "mad_lexer.l"
-
+#line 65 "mad_lexer.l"
 
 
 

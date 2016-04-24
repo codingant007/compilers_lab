@@ -59,22 +59,22 @@ extern int yydebug;
     VOID = 268,
     DTYPE_INT = 269,
     DTYPE_BOOL = 270,
-    DTYPE_FLOAT = 271,
-    DTYPE_CHAR = 272,
-    EQ = 273,
-    ARITH = 274,
-    RELN = 275,
-    LOGICAL = 276,
-    LOGICALNOT = 277,
-    IF = 278,
-    ELSE = 279,
-    WHILE = 280,
-    FOR = 281,
-    RETURN = 282,
-    PRINT = 283,
-    READ = 284,
-    BOOLCONST = 285,
-    INTCONST = 286,
+    DTYPE_CHAR = 271,
+    EQ = 272,
+    ARITH = 273,
+    RELN = 274,
+    LOGICAL = 275,
+    LOGICALNOT = 276,
+    IF = 277,
+    ELSE = 278,
+    WHILE = 279,
+    FOR = 280,
+    RETURN = 281,
+    PRINT = 282,
+    READ = 283,
+    BOOLCONST = 284,
+    INTCONST = 285,
+    CHARCONST = 286,
     TERMINAL = 1,
     VALUE = 2
   };
@@ -85,15 +85,13 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 48 "mad_parser.y" /* yacc.c:1909  */
+#line 270 "mad_parser.y" /* yacc.c:1909  */
 
-	int dtype_int;
-	bool dtype_bool;
-	int opertype_int;
+	struct attr* attr_el;
 	node* node_el;
 	char* node_con;
 
-#line 97 "mad_parser.tab.h" /* yacc.c:1909  */
+#line 95 "mad_parser.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

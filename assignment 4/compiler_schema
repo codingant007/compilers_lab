@@ -7,6 +7,7 @@ var_record -> struct: name - string, type - int, scope - int, var_type - int, di
 func_record -> struct : return_type - int, param_list - var_record
 func_table -> map[string, func_record]
 sym_table -> map[int, map[string, var_record]]
+labelNumber -> int;
 
 functions:
 
@@ -26,6 +27,12 @@ int <> bool
 
 set <string> mips_name;
 string data;
+
+string get_label();
+
+
+//For downcasting bool to int
+string intToBool();
 
 //Global variables (of code) in sym_table with scope of 0
 
@@ -54,3 +61,4 @@ string store_mips_id(var_record* varRecord);
 
 Points to be noted:
 $t0 is our accumulator
+$t1 is temporary register

@@ -1,6 +1,9 @@
 int main()
 {
-	int y[10], x;
-	y[5] = 10;
-	x = y[1];
+		char z;
+		int x,a;
+		bool f;
+		int t[10];
+		
+		f = a;
 }
