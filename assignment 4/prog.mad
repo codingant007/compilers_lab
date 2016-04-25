@@ -1,25 +1,23 @@
 
-int fib (int x,)
-{
-	if (x <= 1)
-	{
-		return 1;
-	}
-	else
-	{
-			int z,f,g;
-			f = x-2;
-			g = x-1;
-			z = fib(f) + fib(g);
-			return z;
-	}
-
-}
-
 int main()
 {
-	int x,z;
+	int x,y,z,a,b,c;
+	a = 1;
 	x = 5;
-	z = fib(x);
+	{
+		int a,b,c;
+		a = 2;
+		{
+			int a ;
+			a = 3;
+			z = a;
+		}
+		{
+			char a;
+			a = @a;
+			z = a;
+		}
+	}
+	y = z;
 
 }

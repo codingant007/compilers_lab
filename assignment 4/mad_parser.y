@@ -97,35 +97,39 @@ void copy_attr( struct attr* A,struct attr* B){
 }
 
 
-
-
 string get_data_string(){
     stringstream data_string;
     data_string << '\n';
+    set <string> temp_mips_name;
     for(int i=0;i<mips_name.size();i++){
         var_record rec = mips_name[i];
-        // Name
-        data_string << get_mips_name(&rec) << ": ";
-        if(rec.var_type == SIMPLE){
-            if(rec.type == INT){
-                data_string << ".word ";
-                data_string << "0";
-            }
-            else{
-                data_string << ".byte ";
-                data_string << "0x41";
-            }
+        if (temp_mips_name.count( get_mips_name(&mips_name[i])) ==0)
+        {
+          // Name
+          temp_mips_name.insert(get_mips_name(&mips_name[i]));
+          data_string << get_mips_name(&rec) << ": ";
+          if(rec.var_type == SIMPLE){
+              if(rec.type == INT){
+                  data_string << ".word ";
+                  data_string << "0";
+              }
+              else{
+                  data_string << ".byte ";
+                  data_string << "0x41";
+              }
+          }
+          else{
+              data_string << ".space ";
+              if(rec.type == INT){
+                  data_string << (rec.dim)*4;
+              }
+              else{
+                  data_string << rec.dim;
+              }
+          }
+          data_string << "\n";
         }
-        else{
-            data_string << ".space ";
-            if(rec.type == INT){
-                data_string << (rec.dim)*4;
-            }
-            else{
-                data_string << rec.dim;
-            }
-        }
-        data_string << "\n";
+
     }
     return data_string.str();
 }
@@ -1058,8 +1062,11 @@ alr_subexpression:
   | lhs EQ alr_subexpression {
         $$= new attr();
         //Semantic
-        //cout << $1->type <<" \t " << $3->type <<endl;
-        if ( cast($1->type, $3->type, 0) <  0)
+        // if ($1->type == INT && $3->type == CHAR){
+        //   cout << "pahuch gaya."<<endl;
+        // }
+        // cout << $1->type <<" \t " << $3->type <<endl;
+        if ( ($1->type == CHAR && $3->type != CHAR) || ($1->type == BOOL && $3->type == CHAR ) )
         {
           $$->type = ERR;
 	        $$->ival = -1;
