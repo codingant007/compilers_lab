@@ -83,6 +83,20 @@ int cast (TYPE typeA, TYPE typeB, int is_up); // Return type: 0-> no casting pos
 
 //Function Declarations
 
+void copy_attr( struct attr* A,struct attr* B){
+  A->type = B->type;
+  A->ival = B->ival;   //For storing values of constants
+  A->cval = B->cval;
+  A->fval = B->fval;
+  A->bval = B->bval;
+
+  A->code = B->code; //Code gen by diff non-terminals
+  A->label = B->label; // Useful for if-else-operation
+
+}
+
+
+
 var_record* get_record(string name)
 {
     for(int i=scope;i>=2;i--)
@@ -317,31 +331,33 @@ node::node(const char* con, int t)
 
 %type <attr_el> mad_program supported_declarations variable_declarations function_declarations variable_definitions dtype argument_list statement_block
 %type <attr_el> variable_list statement_list supported_statement if_statement else_statement while_statement return_statement
-%type <attr_el> var_decl var_use id_list supported_constant alr_subexpression lhs func_name
+%type <attr_el> var_decl var_use id_list supported_constant alr_subexpression lhs func_name comma_rule
 
 %%
 
 mad_program:
 	supported_declarations {
-  	$$ = $1;
+  	$$ = new attr(); copy_attr($$,$1);
+    cout << $$->code;
   }
 	| supported_declarations mad_program {
-  	$$ = $1;
+  	$$ = new attr(); copy_attr($$,$1);
     $$->code += $2->code;
+    cout << $$->code;
   }
 	| error '\n' { pretty_print_error("Compilation terminating with errors"); root = NULL;}
 
 supported_declarations:
 	variable_declarations {
-  	$$ = $1;
+  	$$ = new attr(); copy_attr($$,$1);
   }
 	| function_declarations {
-  	$$ = $1;
+  	$$ = new attr(); copy_attr($$,$1);
   }
 
 variable_declarations:
 	variable_definitions SEMI {
-    $$ = $1;
+    $$ = new attr(); copy_attr($$,$1);
   }
 //	| variable_definitions error { $$ = new attr(); $$->type = ERR; pretty_print_error(semicolon_error); }
 
@@ -357,10 +373,11 @@ variable_definitions:
     {
     	$$->code = $2->code;
       $$->type = $1->type;
+
     }
 
 }
-	| variable_definitions COMMA {$<attr_el>$ = new attr(); $<attr_el>$->type = ($<attr_el>-1)->type; } var_decl {
+	| variable_definitions comma_rule var_decl {
     $$ = new attr();
   	if (has_error)
     {
@@ -369,10 +386,15 @@ variable_definitions:
     }
   	else
     {
-    	$$->code = $1->code + $4->code;
+      $3->type = $2->type;
+    	$$->code = $1->code + $3->code;
+      $$->type = $2->type;
     }
   	}
 	| variable_definitions error var_decl '\n' { $$ = new attr(); $$->type = ERR; pretty_print_error("Missing comma in definitions list"); }
+
+comma_rule:
+  COMMA {$$ = new attr(); $$->type = ($<attr_el>0)->type; }
 
 dtype:
 	DTYPE_INT {
@@ -494,6 +516,7 @@ func_name:
       func_table[$1] = f_temp;
       //Setting active_func_ptr
       active_func_ptr = &func_table[$1];
+      active_func_ptr -> name = $1;
     }
     $$->type = VOIDF;
     $$->label = $1;
@@ -605,23 +628,23 @@ statement_list:
 supported_statement:
 	alr_subexpression SEMI {
     //Nothing to do
-    $$ = $1;
+    $$ = new attr(); copy_attr($$,$1);
   }
 	| if_statement {
     //Nothing to do
-    $$ = $1;
+    $$ = new attr(); copy_attr($$,$1);
   }
 	| while_statement {
     //Nothing to do
-    $$ = $1;
+    $$ = new attr(); copy_attr($$,$1);
   }
 	| return_statement {
     //Nothing to do
-    $$ = $1;
+    $$ = new attr(); copy_attr($$,$1);
   }
 	| statement_block {
     //Nothing to do
-    $$ = $1;
+    $$ = new attr(); copy_attr($$,$1);
   }
 	| alr_subexpression error { $$ = new attr(); $$->type = ERR; has_error = true; pretty_print_error("Possible missing semicolon with alr_subexpression"); }
 
@@ -662,7 +685,6 @@ else_statement:
     //Semantic Analyses - no check
 		//Code Generation
 		$$->code = $2->code;
-
 
 	}
 
@@ -735,53 +757,10 @@ return_statement:
 	| RETURN alr_subexpression error {  $$ = new attr(); $$->type = ERR; pretty_print_error(semicolon_error_return); }
 
 alr_subexpression:
-	lhs EQ alr_subexpression {
-        $$= new attr();
-        //Semantic
-        if ( cast($1->type, $3->type, 0) <  0)
-        {
-          $$->type = ERR;
-	        $$->ival = -1;
-	        pretty_print_error("Semantic Error: Incompatible types in equality assignment");
-	        has_error = true;
-        }
-
-        //Code Generation
-        if (!has_error)
-        {
-            var_record *lhsRecord = get_record($1->code);
-            $$ -> code = $3->code;
-
-
-            if ( cast($1->type, $3->type, 0) == 2)
-            {
-                //CodeGen - no other casting test needed because only allowed downcast is from int to bool
-                $$->code += "#Casting of RHS";
-                $$->code += intToBool();
-            }
-            if ( $1->type != ERR && $1->code == "$" )
-            {
-                lhsRecord = &active_func_ptr->param_list[$1->ival];
-                stringstream s;
-                s << lhsRecord->offset;
-                $$->code += "sw " + s.str() + "($fp) $t0\n";
-            }
-
-            if ($1->ival == -1 && $1->type != ERR ){
-                  //ID
-                  $$->code += store_mips_id(lhsRecord);
-
-              }
-              else if ($1->type != ERR){
-                  //ID[const]
-                  $$->code += store_mips_array(lhsRecord,$1->ival);
-              }
-        }
-	}
-	| supported_constant {
-        $$= new attr();
+	 supported_constant {
+        // $$= new attr();
 	   //Semantic analyses - Nothing to check
-	   $$ = $1;
+	   $$ = new attr(); copy_attr($$,$1);
 
 	   //CodeGen
 
@@ -790,10 +769,10 @@ alr_subexpression:
 	}
 	| var_use
     {
-        $$= new attr();
+      //  $$= new attr();
 
 	   //Semantic analyses - Nothing to check
-	   $$ = $1;
+	   $$ = new attr(); copy_attr($$,$1);
 
 	   //CodeGen - Nothing to do
 
@@ -885,7 +864,9 @@ alr_subexpression:
 
 	    ARITH alr_subexpression {
         $$ = new attr();
+        // cout<< $1->type << " " << $4->type <<endl;
 	    //Semantic Analyses
+      //cout << $1->type << "\t"<< $1->code <<endl;
 	    if (cast($1->type, $4->type, 1) < 0)
 	    {
 	        has_error = 1;
@@ -1039,6 +1020,50 @@ alr_subexpression:
 		    $$->code += "xori $t0 $t0 0x1\n";
 		}
 	}
+  | lhs EQ alr_subexpression {
+        $$= new attr();
+        //Semantic
+
+        if ( cast($1->type, $3->type, 0) <  0)
+        {
+          $$->type = ERR;
+	        $$->ival = -1;
+	        pretty_print_error("Semantic Error: Incompatible types in equality assignment");
+	        has_error = true;
+        }
+
+        //Code Generation
+        if (!has_error)
+        {
+            var_record *lhsRecord = get_record($1->code);
+            $$ -> code = $3->code;
+
+
+            if ( cast($1->type, $3->type, 0) == 2)
+            {
+                //CodeGen - no other casting test needed because only allowed downcast is from int to bool
+                $$->code += "#Casting of RHS";
+                $$->code += intToBool();
+            }
+            if ( $1->type != ERR && $1->code == "$" )
+            {
+                lhsRecord = &active_func_ptr->param_list[$1->ival];
+                stringstream s;
+                s << lhsRecord->offset;
+                $$->code += "sw " + s.str() + "($fp) $t0\n";
+            }
+
+            if ($1->ival == -1 && $1->type != ERR ){
+                  //ID
+                  $$->code += store_mips_id(lhsRecord);
+
+              }
+              else if ($1->type != ERR){
+                  //ID[const]
+                  $$->code += store_mips_array(lhsRecord,$1->ival);
+              }
+        }
+	}
 
 	| error EQ alr_subexpression { $$ = new attr(); $$->type = ERR; pretty_print_error("Missing identifier name"); }
 	//| var_use error alr_subexpression {$$ = new attr(); $$->type = ERR; pretty_print_error("Possible missing equalty sign"); }
@@ -1048,7 +1073,7 @@ id_list:
 	id_list COMMA var_use {
 	   //Semantic Analyses
      $$ = new attr();
-	   $$ = $1;
+	   $$ = new attr(); copy_attr($$,$1);
 	   if ( $3->type != ERR )
      {
     		if ($3->bval)
@@ -1069,7 +1094,7 @@ id_list:
 	| var_use {
       $$ = new attr();
 	   //Semantic Analyses
-	   $$ = $1;
+	   $$ = new attr(); copy_attr($$,$1);
 	   $$->types.push_back($1->type);
 
 	   //CodeGen
@@ -1213,6 +1238,7 @@ var_decl:
                 sym_table[scope][$1] = id_rec;
               }
          			$$->ival = -1;
+              //cout << id_rec.type <<"\t"<<id_rec.name<<"\n";
               // cout << $1 << " inserted." << endl;
        }
 
@@ -1287,6 +1313,7 @@ var_use:
 	    }
 	    else
 	    {
+
 	        $$->type = id_rec->type;
         	$$->bval = false;        	//Indicates normal variable
 	        $$->ival = -1;
