@@ -177,7 +177,7 @@ string get_data_string(){
                 data_string << "0";
             }
             else{
-                data_string << ".byte";
+                data_string << ".byte ";
                 data_string << "0x41";
             }
         }
@@ -220,10 +220,11 @@ string get_mips_name (var_record* varRecord)
     mips_name += varRecord-> name;
 
     stringstream s;
-    s << "_" << varRecord->type << "_" << scope ;
+    s << "_" << varRecord->type << "_" << varRecord->scope ;
     mips_name += s.str();
     return mips_name;
 }
+
 
 string get_label()
 {
@@ -254,10 +255,12 @@ string load_mips_array(var_record* varRecord, int offSet)
     stringstream s,s1;
     s << offSet;
     s1 << eleSize;
-    loadCode = "mul $t1 " + s.str() + " " + s1.str() + "\n";
-    loadCode += "la $t2 " + get_mips_name(varRecord) + "\n";
-    loadCode += "add $t3 $t1 $t2 \n";
-    loadCode += loadType + " $t0 ($t3) \n";
+    loadCode = "li $t1 " + s.str() + "\n" ;
+    loadCode += "li $t2 " + s1.str() + "\n";
+    loadCode += "mul $t2 $t1 $t2\n" ;
+    loadCode += "la $t1 " + get_mips_name(varRecord) + "\n";
+    loadCode += "add $t1 $t1 $t2 \n";
+    loadCode += loadType + " $t0 ($t1) \n";
     return loadCode;
 }
 
@@ -280,10 +283,12 @@ string store_mips_array(var_record* varRecord, int offSet)
     stringstream s,s1;
     s << offSet;
     s1 << eleSize;
-    storeCode = "mul $t1 " + s.str() + " " + s1.str() + "\n";
-    storeCode += "la $t2 " + get_mips_name(varRecord) + "\n";
-    storeCode += "add $t3 $t1 $t2 \n";
-    storeCode +=  storeType + " $t0 ($t3)\n";
+    storeCode = "li $t1 " + s.str() + "\n" ;
+    storeCode += "li $t2 " + s1.str() + "\n";
+    storeCode += "mul $t2 $t1 $t2\n" ;
+    storeCode += "la $t1 " + get_mips_name(varRecord) + "\n";
+    storeCode += "add $t1 $t1 $t2 \n";
+    storeCode +=  storeType + " $t0 ($t1)\n";
     return storeCode;
 }
 
@@ -323,11 +328,10 @@ string store_mips_id (var_record* varRecord)
 
 string intToBool()
 {
-    string boolCode = "srl $t0 0x1F\n";
-    boolCode += "andi $t1 $t0 0x1\n";
-    boolCode += "addi $t0 $t1 0x1\n";
-    boolCode += "andi $t1 $t0 0x1\n";
-    boolCode += "ori $t0 $t1 0x0\n";
+    string boolCode = "srl $t0 $t0 0x1F\n";
+    boolCode += "andi $t0 $t0 0x1\n";
+    boolCode += "addi $t0 $t0 0x1\n";
+    boolCode += "andi $t0 $t0 0x1\n";
     return boolCode;
 }
 
@@ -384,7 +388,7 @@ node::node(const char* con, int t)
 }
 
 
-#line 388 "mad_parser.tab.c" /* yacc.c:339  */
+#line 392 "mad_parser.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -459,13 +463,13 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 323 "mad_parser.y" /* yacc.c:355  */
+#line 327 "mad_parser.y" /* yacc.c:355  */
 
 	struct attr* attr_el;
 	node* node_el;
 	char* node_con;
 
-#line 469 "mad_parser.tab.c" /* yacc.c:355  */
+#line 473 "mad_parser.tab.c" /* yacc.c:355  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -480,7 +484,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 484 "mad_parser.tab.c" /* yacc.c:358  */
+#line 488 "mad_parser.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -720,18 +724,18 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  15
+#define YYFINAL  16
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   161
+#define YYLAST   160
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  35
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  27
+#define YYNNTS  28
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  67
+#define YYNRULES  68
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  128
+#define YYNSTATES  129
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
@@ -780,13 +784,13 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   372,   372,   376,   381,   384,   387,   392,   398,   413,
-     427,   430,   433,   438,   443,   456,   456,   494,   494,   539,
-     558,   572,   578,   584,   592,   617,   620,   626,   641,   647,
-     662,   666,   670,   674,   678,   682,   685,   710,   716,   725,
-     755,   769,   789,   790,   793,   803,   815,   881,   886,   923,
-     932,   974,  1010,  1028,  1073,  1078,  1099,  1109,  1123,  1166,
-    1204,  1257,  1286,  1346,  1387,  1399,  1414,  1436
+       0,   376,   376,   384,   387,   391,   394,   397,   402,   408,
+     423,   437,   440,   443,   448,   453,   466,   466,   510,   510,
+     555,   575,   591,   597,   603,   611,   636,   639,   645,   660,
+     666,   681,   685,   689,   693,   697,   701,   704,   732,   738,
+     747,   777,   791,   813,   814,   817,   827,   839,   909,   915,
+     952,   961,  1003,  1039,  1058,  1103,  1108,  1129,  1149,  1163,
+    1206,  1244,  1297,  1326,  1387,  1428,  1440,  1455,  1477
 };
 #endif
 
@@ -801,13 +805,13 @@ static const char *const yytname[] =
   "DTYPE_CHAR", "EQ", "ARITH", "RELN", "LOGICAL", "LOGICALNOT", "IF",
   "ELSE", "WHILE", "FOR", "RETURN", "PRINT", "READ", "BOOLCONST",
   "INTCONST", "CHARCONST", "TERMINAL", "VALUE", "'\\n'", "$accept",
-  "mad_program", "supported_declarations", "variable_declarations",
-  "variable_definitions", "comma_rule", "dtype", "function_declarations",
-  "$@1", "$@2", "func_name", "argument_list", "statement_block",
-  "opencurly", "variable_list", "statement_list", "supported_statement",
-  "if_statement", "else_statement", "while_statement", "return_statement",
-  "alr_subexpression", "id_list", "lhs", "var_decl", "var_use",
-  "supported_constant", YY_NULLPTR
+  "start_mad_program", "mad_program", "supported_declarations",
+  "variable_declarations", "variable_definitions", "comma_rule", "dtype",
+  "function_declarations", "$@1", "$@2", "func_name", "argument_list",
+  "statement_block", "opencurly", "variable_list", "statement_list",
+  "supported_statement", "if_statement", "else_statement",
+  "while_statement", "return_statement", "alr_subexpression", "id_list",
+  "lhs", "var_decl", "var_use", "supported_constant", YY_NULLPTR
 };
 #endif
 
@@ -823,12 +827,12 @@ static const yytype_uint16 yytoknum[] =
 };
 # endif
 
-#define YYPACT_NINF -74
+#define YYPACT_NINF -75
 
 #define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-74)))
+  (!!((Yystate) == (-75)))
 
-#define YYTABLE_NINF -61
+#define YYTABLE_NINF -62
 
 #define yytable_value_is_error(Yytable_value) \
   0
@@ -837,19 +841,19 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-      80,   -13,    33,   -74,   -74,   -74,    27,    98,   -74,   120,
-      34,   -74,   -74,   -74,   -74,   -74,   -74,    46,   -74,   -74,
-      46,    50,    52,   -74,    56,    53,    38,   -74,    43,   -74,
-     128,   -74,    72,   128,    10,    90,   -74,    94,    88,    24,
-     103,   114,   114,   128,   128,   128,   -74,   -74,   128,   -74,
-     -74,   -74,   -74,   128,    46,    45,   -74,   121,     6,    58,
-      79,    58,   110,   124,    14,   -74,   -74,   -74,   -74,    93,
-      45,   -74,   -74,   -74,    13,   131,   -74,   -74,    58,   134,
-     119,    99,   143,   108,   127,    58,    58,   121,   -74,    85,
-     -74,   -74,   -74,   -74,    58,    58,    58,    58,   127,   141,
-      61,   -74,   142,   -74,   -74,   -74,   113,   116,   -74,   -74,
-     127,   127,   127,   127,   122,   134,   -74,   137,   114,   114,
-     144,   -74,   133,   -74,   -74,   114,   -74,   -74
+     102,   -14,    60,   -75,   -75,   -75,    45,   -75,    94,   -75,
+      65,    72,   -75,   -75,   -75,   -75,   -75,   -75,    73,   -75,
+     -75,    73,    42,    51,   -75,    91,    69,    53,   -75,    62,
+     -75,   116,   -75,    87,   116,    25,   106,   -75,   107,   123,
+      49,   124,   128,   128,   116,   116,   116,   -75,   -75,   116,
+     -75,   -75,   -75,   -75,   116,    73,    59,   -75,   126,    37,
+      43,    90,    43,   138,   139,     6,   -75,   -75,   -75,   -75,
+     137,    59,   -75,   -75,   -75,    14,   130,   -75,   -75,    43,
+     145,   120,   105,   142,   115,    86,    43,    43,   126,   -75,
+      81,   -75,   -75,   -75,   -75,    43,    43,    43,    43,    86,
+     141,    54,   -75,   143,   -75,   -75,   -75,   119,   122,   -75,
+     -75,    86,    86,    86,    86,   125,   145,   -75,   135,   128,
+     128,   146,   -75,   133,   -75,   -75,   128,   -75,   -75
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -857,80 +861,80 @@ static const yytype_int16 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     0,     0,    12,    13,    14,     0,     0,     5,     0,
-       0,     6,     4,    19,    17,     1,     3,     0,    11,     7,
-       0,    60,     0,     8,     0,    60,     0,     9,     0,    15,
-      21,    10,     0,    21,     0,     0,    61,     0,     0,     0,
-       0,     0,     0,    21,    21,    21,    25,    18,    26,    16,
-      23,    22,    20,    26,     0,     0,    27,     0,    62,     0,
-       0,     0,     0,     0,     0,    66,    64,    65,    34,     0,
-       0,    31,    32,    33,     0,     0,    45,    44,     0,    57,
-       0,     0,    64,     0,    52,     0,     0,    42,    40,     0,
-      24,    29,    35,    30,     0,     0,     0,     0,    54,    62,
-       0,    56,     0,    47,    67,    49,     0,     0,    43,    41,
-      48,    50,    51,    53,     0,     0,    46,    63,     0,     0,
-       0,    55,    37,    39,    63,     0,    36,    38
+       0,     0,     0,    13,    14,    15,     0,     2,     0,     6,
+       0,     0,     7,     5,    20,    18,     1,     4,     0,    12,
+       8,     0,    61,     0,     9,     0,    61,     0,    10,     0,
+      16,    22,    11,     0,    22,     0,     0,    62,     0,     0,
+       0,     0,     0,     0,    22,    22,    22,    26,    19,    27,
+      17,    24,    23,    21,    27,     0,     0,    28,     0,    63,
+       0,     0,     0,     0,     0,     0,    67,    65,    66,    35,
+       0,     0,    32,    33,    34,     0,     0,    46,    45,     0,
+      58,     0,     0,    65,     0,    53,     0,     0,    43,    41,
+       0,    25,    30,    36,    31,     0,     0,     0,     0,    55,
+      63,     0,    57,     0,    48,    68,    50,     0,     0,    44,
+      42,    49,    51,    52,    54,     0,     0,    47,    64,     0,
+       0,     0,    56,    38,    40,    64,     0,    37,    39
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int16 yypgoto[] =
 {
-     -74,   150,   -74,    -1,   -74,   -74,     2,   -74,   -74,   -74,
-     148,    96,   -41,   -74,   106,    91,   -74,   -74,   -74,   -74,
-     -74,   -56,   -74,   -74,   -10,   -73,   -74
+     -75,   -75,   150,   -75,   -33,   -75,   -75,     2,   -75,   -75,
+     -75,   148,   -21,   -42,   -75,    99,    89,   -75,   -75,   -75,
+     -75,   -75,   -57,   -75,   -75,    -4,   -74,   -75
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     6,     7,     8,     9,    20,    34,    11,    33,    24,
-      14,    35,    68,    48,    55,    69,    70,    71,   126,    72,
-      73,    74,   100,    75,    23,    76,    77
+      -1,     6,     7,     8,     9,    10,    21,    35,    12,    34,
+      25,    15,    36,    69,    49,    56,    70,    71,    72,   127,
+      73,    74,    75,   101,    76,    24,    77,    78
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
      positive, shift that token.  If negative, reduce the rule whose
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
-static const yytype_int8 yytable[] =
+static const yytype_int16 yytable[] =
 {
-      47,    49,    10,    81,    83,    84,   101,    26,    89,    10,
-      27,    38,    79,    39,    92,    87,    80,    58,    93,    88,
-      59,    12,    98,   -58,    40,    44,    60,    15,   -60,   106,
-     107,    94,    95,    96,    28,    61,    13,    21,   110,   111,
-     112,   113,   121,    65,    66,    67,    57,    53,    58,    25,
-      54,    59,    53,    46,   -28,    54,   -19,    60,    29,    57,
-      28,    58,    30,    28,    59,   115,    61,    62,   116,    63,
-      60,    64,    31,    32,    65,    66,    67,   122,   123,    61,
-      57,     1,    58,    36,   127,    59,   108,    65,    66,    67,
-     109,    60,    43,     2,     3,     4,     5,    41,    -2,     1,
-      61,    42,    90,    94,    95,    96,   103,    45,    65,    82,
-      67,     2,     3,     4,     5,   105,    85,    94,    95,    96,
-     118,    17,    46,   119,    18,    19,    94,    95,    96,    37,
-      86,    94,    95,    96,    94,    95,    96,    99,    78,    50,
-      51,    52,     3,     4,     5,    94,    95,    96,    97,   102,
-     104,   114,   120,   117,   -59,   124,   125,    16,    22,    56,
-       0,    91
+      48,    50,    11,    82,    84,    85,   102,    88,    90,    59,
+      11,    89,    60,    38,    27,    93,    54,    28,    61,    94,
+      13,    54,    99,    51,    52,    53,    39,    62,    40,   107,
+     108,    41,    95,    96,    97,    66,    67,    68,   111,   112,
+     113,   114,   122,    80,    58,    16,    59,    81,   -20,    60,
+      45,    55,    29,   -61,   -59,    61,    55,    30,   116,    29,
+      58,   117,    59,    14,    62,    60,    18,    47,   -29,    19,
+      20,    61,    66,    67,    68,    22,    26,   123,   124,    29,
+      62,    63,   109,    64,   128,    65,   110,    32,    66,    67,
+      68,    58,    33,    59,    -3,     1,    60,    31,    37,    95,
+      96,    97,    61,     1,    95,    96,    97,     2,     3,     4,
+       5,    62,   104,    42,    43,     2,     3,     4,     5,    66,
+      83,    68,   106,    95,    96,    97,   119,    44,    46,   120,
+       3,     4,     5,    95,    96,    97,    47,    95,    96,    97,
+      95,    96,    97,    79,    86,    87,    91,    98,   100,   105,
+     103,   115,   -60,    57,   118,   121,   126,   125,    17,    23,
+      92
 };
 
-static const yytype_int8 yycheck[] =
+static const yytype_uint8 yycheck[] =
 {
-      41,    42,     0,    59,    60,    61,    79,    17,    64,     7,
-      20,     1,     6,     3,     1,     1,    10,     3,     5,     5,
-       6,    34,    78,    17,    34,     1,    12,     0,     4,    85,
-      86,    18,    19,    20,    10,    21,     3,     3,    94,    95,
-      96,    97,   115,    29,    30,    31,     1,    48,     3,     3,
-      48,     6,    53,     8,     9,    53,     6,    12,     6,     1,
-      10,     3,     6,    10,     6,     4,    21,    22,     7,    24,
-      12,    26,    34,    30,    29,    30,    31,   118,   119,    21,
-       1,     1,     3,    11,   125,     6,     1,    29,    30,    31,
-       5,    12,     4,    13,    14,    15,    16,     7,     0,     1,
-      21,     7,     9,    18,    19,    20,     7,     4,    29,    30,
-      31,    13,    14,    15,    16,     7,     6,    18,    19,    20,
-       7,     1,     8,     7,     4,     5,    18,    19,    20,    33,
-       6,    18,    19,    20,    18,    19,    20,     3,    17,    43,
-      44,    45,    14,    15,    16,    18,    19,    20,    17,    30,
-       7,    10,    30,    11,    17,    11,    23,     7,    10,    53,
-      -1,    70
+      42,    43,     0,    60,    61,    62,    80,     1,    65,     3,
+       8,     5,     6,    34,    18,     1,    49,    21,    12,     5,
+      34,    54,    79,    44,    45,    46,     1,    21,     3,    86,
+      87,    35,    18,    19,    20,    29,    30,    31,    95,    96,
+      97,    98,   116,     6,     1,     0,     3,    10,     6,     6,
+       1,    49,    10,     4,    17,    12,    54,     6,     4,    10,
+       1,     7,     3,     3,    21,     6,     1,     8,     9,     4,
+       5,    12,    29,    30,    31,     3,     3,   119,   120,    10,
+      21,    22,     1,    24,   126,    26,     5,    34,    29,    30,
+      31,     1,    30,     3,     0,     1,     6,     6,    11,    18,
+      19,    20,    12,     1,    18,    19,    20,    13,    14,    15,
+      16,    21,     7,     7,     7,    13,    14,    15,    16,    29,
+      30,    31,     7,    18,    19,    20,     7,     4,     4,     7,
+      14,    15,    16,    18,    19,    20,     8,    18,    19,    20,
+      18,    19,    20,    17,     6,     6,     9,    17,     3,     7,
+      30,    10,    17,    54,    11,    30,    23,    11,     8,    11,
+      71
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
@@ -938,42 +942,42 @@ static const yytype_int8 yycheck[] =
 static const yytype_uint8 yystos[] =
 {
        0,     1,    13,    14,    15,    16,    36,    37,    38,    39,
-      41,    42,    34,     3,    45,     0,    36,     1,     4,     5,
-      40,     3,    45,    59,    44,     3,    59,    59,    10,     6,
-       6,    34,    30,    43,    41,    46,    11,    46,     1,     3,
-      59,     7,     7,     4,     1,     4,     8,    47,    48,    47,
-      46,    46,    46,    38,    41,    49,    49,     1,     3,     6,
-      12,    21,    22,    24,    26,    29,    30,    31,    47,    50,
-      51,    52,    54,    55,    56,    58,    60,    61,    17,     6,
-      10,    56,    30,    56,    56,     6,     6,     1,     5,    56,
-       9,    50,     1,     5,    18,    19,    20,    17,    56,     3,
-      57,    60,    30,     7,     7,     7,    56,    56,     1,     5,
-      56,    56,    56,    56,    10,     4,     7,    11,     7,     7,
-      30,    60,    47,    47,    11,    23,    53,    47
+      40,    42,    43,    34,     3,    46,     0,    37,     1,     4,
+       5,    41,     3,    46,    60,    45,     3,    60,    60,    10,
+       6,     6,    34,    30,    44,    42,    47,    11,    47,     1,
+       3,    60,     7,     7,     4,     1,     4,     8,    48,    49,
+      48,    47,    47,    47,    39,    42,    50,    50,     1,     3,
+       6,    12,    21,    22,    24,    26,    29,    30,    31,    48,
+      51,    52,    53,    55,    56,    57,    59,    61,    62,    17,
+       6,    10,    57,    30,    57,    57,     6,     6,     1,     5,
+      57,     9,    51,     1,     5,    18,    19,    20,    17,    57,
+       3,    58,    61,    30,     7,     7,     7,    57,    57,     1,
+       5,    57,    57,    57,    57,    10,     4,     7,    11,     7,
+       7,    30,    61,    48,    48,    11,    23,    54,    48
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    35,    36,    36,    36,    37,    37,    38,    39,    39,
-      39,    40,    41,    41,    41,    43,    42,    44,    42,    45,
-      46,    46,    46,    46,    47,    48,    49,    49,    50,    50,
-      51,    51,    51,    51,    51,    51,    52,    53,    53,    54,
-      55,    55,    55,    55,    56,    56,    56,    56,    56,    56,
-      56,    56,    56,    56,    56,    57,    57,    57,    58,    58,
-      59,    59,    60,    60,    61,    61,    61,    61
+       0,    35,    36,    37,    37,    37,    38,    38,    39,    40,
+      40,    40,    41,    42,    42,    42,    44,    43,    45,    43,
+      46,    47,    47,    47,    47,    48,    49,    50,    50,    51,
+      51,    52,    52,    52,    52,    52,    52,    53,    54,    54,
+      55,    56,    56,    56,    56,    57,    57,    57,    57,    57,
+      57,    57,    57,    57,    57,    57,    58,    58,    58,    59,
+      59,    60,    60,    61,    61,    62,    62,    62,    62
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     1,     2,     2,     1,     1,     2,     2,     3,
-       4,     1,     1,     1,     1,     0,     7,     0,     7,     1,
-       4,     0,     4,     4,     4,     1,     0,     2,     0,     2,
-       2,     1,     1,     1,     1,     2,     6,     0,     2,     5,
-       2,     3,     2,     3,     1,     1,     4,     3,     3,     3,
-       3,     3,     2,     3,     3,     3,     1,     0,     1,     4,
-       1,     4,     1,     4,     1,     1,     1,     3
+       0,     2,     1,     1,     2,     2,     1,     1,     2,     2,
+       3,     4,     1,     1,     1,     1,     0,     7,     0,     7,
+       1,     4,     0,     4,     4,     4,     1,     0,     2,     0,
+       2,     2,     1,     1,     1,     1,     2,     6,     0,     2,
+       5,     2,     3,     2,     3,     1,     1,     4,     3,     3,
+       3,     3,     3,     2,     3,     3,     3,     1,     0,     1,
+       4,     1,     4,     1,     4,     1,     1,     1,     3
 };
 
 
@@ -1650,56 +1654,65 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 372 "mad_parser.y" /* yacc.c:1646  */
+#line 376 "mad_parser.y" /* yacc.c:1646  */
     {
-  	(yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[0].attr_el));
-    cout << (yyval.attr_el)->code;
+    cout <<".data\n";
+    cout << get_data_string();
+    cout <<"\n .text \n .globl main \n";
+    cout << (yyvsp[0].attr_el)->code;
   }
-#line 1659 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1665 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 376 "mad_parser.y" /* yacc.c:1646  */
-    {
-  	(yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[-1].attr_el));
-    (yyval.attr_el)->code += (yyvsp[0].attr_el)->code;
-    cout << (yyval.attr_el)->code;
-  }
-#line 1669 "mad_parser.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 4:
-#line 381 "mad_parser.y" /* yacc.c:1646  */
-    { pretty_print_error("Compilation terminating with errors"); root = NULL;}
-#line 1675 "mad_parser.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 5:
 #line 384 "mad_parser.y" /* yacc.c:1646  */
     {
   	(yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[0].attr_el));
   }
-#line 1683 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1673 "mad_parser.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 4:
+#line 387 "mad_parser.y" /* yacc.c:1646  */
+    {
+  	(yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[-1].attr_el));
+    (yyval.attr_el)->code += (yyvsp[0].attr_el)->code;
+  }
+#line 1682 "mad_parser.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 5:
+#line 391 "mad_parser.y" /* yacc.c:1646  */
+    { pretty_print_error("Compilation terminating with errors"); root = NULL;}
+#line 1688 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 387 "mad_parser.y" /* yacc.c:1646  */
+#line 394 "mad_parser.y" /* yacc.c:1646  */
     {
   	(yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[0].attr_el));
   }
-#line 1691 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1696 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 392 "mad_parser.y" /* yacc.c:1646  */
+#line 397 "mad_parser.y" /* yacc.c:1646  */
     {
-    (yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[-1].attr_el));
+  	(yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[0].attr_el));
   }
-#line 1699 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1704 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 398 "mad_parser.y" /* yacc.c:1646  */
+#line 402 "mad_parser.y" /* yacc.c:1646  */
+    {
+    (yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[-1].attr_el));
+  }
+#line 1712 "mad_parser.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 9:
+#line 408 "mad_parser.y" /* yacc.c:1646  */
     {
     (yyval.attr_el) = new attr();
   	if (has_error)
@@ -1715,11 +1728,11 @@ yyreduce:
     }
 
 }
-#line 1719 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1732 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 9:
-#line 413 "mad_parser.y" /* yacc.c:1646  */
+  case 10:
+#line 423 "mad_parser.y" /* yacc.c:1646  */
     {
     (yyval.attr_el) = new attr();
   	if (has_error)
@@ -1734,79 +1747,80 @@ yyreduce:
       (yyval.attr_el)->type = (yyvsp[-1].attr_el)->type;
     }
   	}
-#line 1738 "mad_parser.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 10:
-#line 427 "mad_parser.y" /* yacc.c:1646  */
-    { (yyval.attr_el) = new attr(); (yyval.attr_el)->type = ERR; pretty_print_error("Missing comma in definitions list"); }
-#line 1744 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1751 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 430 "mad_parser.y" /* yacc.c:1646  */
-    {(yyval.attr_el) = new attr(); (yyval.attr_el)->type = ((yyvsp[-1].attr_el))->type; }
-#line 1750 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 437 "mad_parser.y" /* yacc.c:1646  */
+    { (yyval.attr_el) = new attr(); (yyval.attr_el)->type = ERR; pretty_print_error("Missing comma in definitions list"); }
+#line 1757 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 433 "mad_parser.y" /* yacc.c:1646  */
+#line 440 "mad_parser.y" /* yacc.c:1646  */
+    {(yyval.attr_el) = new attr(); (yyval.attr_el)->type = ((yyvsp[-1].attr_el))->type; }
+#line 1763 "mad_parser.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 13:
+#line 443 "mad_parser.y" /* yacc.c:1646  */
     {
     (yyval.attr_el) = new attr();
     (yyval.attr_el)->type = INT;
     (yyval.attr_el)->ival = INT_SIZE;
   }
-#line 1760 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1773 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 13:
-#line 438 "mad_parser.y" /* yacc.c:1646  */
+  case 14:
+#line 448 "mad_parser.y" /* yacc.c:1646  */
     {
     (yyval.attr_el) = new attr();
     (yyval.attr_el)->type = BOOL;
     (yyval.attr_el)->ival = BOOL_SIZE;
   }
-#line 1770 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1783 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 14:
-#line 443 "mad_parser.y" /* yacc.c:1646  */
+  case 15:
+#line 453 "mad_parser.y" /* yacc.c:1646  */
     {
   	(yyval.attr_el) = new attr();
     (yyval.attr_el)->type = CHAR;
     (yyval.attr_el)->ival = CHAR_SIZE;
   }
-#line 1780 "mad_parser.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 15:
-#line 456 "mad_parser.y" /* yacc.c:1646  */
-    { scope = 1; }
-#line 1786 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1793 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 456 "mad_parser.y" /* yacc.c:1646  */
+#line 466 "mad_parser.y" /* yacc.c:1646  */
+    { scope = 1; }
+#line 1799 "mad_parser.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 17:
+#line 466 "mad_parser.y" /* yacc.c:1646  */
     {
         //Scope Consideration
         scope = 0;
     		int cur_offset = 0;
         //Semantic
         (yyval.attr_el) = new attr();
-    		active_func_ptr->return_type = (TYPE)(yyvsp[-6].attr_el)->ival;
-    		for ( int i = 0; i < active_func_ptr->param_list.size(); i++ )
-        {
-        	switch(active_func_ptr->param_list[i].type)
-          {
-          	case INT: active_func_ptr->param_list[i].offset = cur_offset + INT_SIZE;
-            				cur_offset += INT_SIZE;
-            	break;
-            default: active_func_ptr->param_list[i].offset = cur_offset + BOOL_SIZE;
-            				cur_offset += BOOL_SIZE;
-            break;
-          }
-        }
-    		active_func_ptr->paramlist_size = cur_offset; //Setting paramlist size
+
+        // for ( int i = 0; i < active_func_ptr->param_list.size(); i++ )
+        // {
+        // 	switch(active_func_ptr->param_list[i].type)
+        //   {
+        //   	case INT: active_func_ptr->param_list[i].offset = cur_offset + INT_SIZE;
+        //               cout << "\t " << active_func_ptr->param_list[i].offset << " name: " << active_func_ptr->param_list[i].name << endl;
+        //     				cur_offset += INT_SIZE;
+        //     	break;
+        //     default: active_func_ptr->param_list[i].offset = cur_offset + BOOL_SIZE;
+        //     				cur_offset += BOOL_SIZE;
+        //     break;
+        //   }
+        // }
+    		active_func_ptr->paramlist_size = (yyvsp[-2].attr_el)->ival ; //Setting paramlist size
         //Code Generation
         (yyval.attr_el)->code = (yyvsp[-5].attr_el)->label + ":\n";
         //Store return $ra to stack and set frame pointer to $ra
@@ -1814,28 +1828,33 @@ yyreduce:
         (yyval.attr_el)->code += "move $fp $sp \n";
     		(yyval.attr_el)->code += "addiu $sp $sp -4\n";
     		(yyval.attr_el)->code += (yyvsp[0].attr_el)->code;
-    		(yyval.attr_el)->code += "move $sp $fp\n";
-    		(yyval.attr_el)->code += "lw $ra 0($fp)\n";          // $ra <- 0($fp)
-    		(yyval.attr_el)->code += "addiu $sp $sp 4\n";
+        (yyval.attr_el)->code += "lw $ra 0($fp)\n";
+        (yyval.attr_el)->code += "move $sp $fp\n";
+        // $$->code += "addiu $sp $sp 4\n";
+    		// //$$->code += "move $sp $fp\n";
+    		// $$->code += "lw $ra 4($sp)\n";          // $ra <- 0($fp)
+    		// $$->code += "addiu $sp $sp 4\n";
     		//Pop parameters
     		stringstream s;
     		s << active_func_ptr->paramlist_size;
     		(yyval.attr_el)->code += "addiu $sp $sp " + s.str() + "\n";
+        (yyval.attr_el)->code += "lw $fp 4($sp)\n";
+        (yyval.attr_el)->code += "addiu $sp $sp 4\n";
     		(yyval.attr_el)->code += "jr $ra\n";
     		//Semantic again
     		active_func_ptr = NULL;
 	}
-#line 1829 "mad_parser.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 17:
-#line 494 "mad_parser.y" /* yacc.c:1646  */
-    { scope = 1; }
-#line 1835 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1848 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 494 "mad_parser.y" /* yacc.c:1646  */
+#line 510 "mad_parser.y" /* yacc.c:1646  */
+    { scope = 1; }
+#line 1854 "mad_parser.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 19:
+#line 510 "mad_parser.y" /* yacc.c:1646  */
     {
 		//Scope Consideration
 		scope = 0;
@@ -1880,11 +1899,11 @@ yyreduce:
     		//Semantic again
     		active_func_ptr = NULL;
 	}
-#line 1884 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1903 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 19:
-#line 539 "mad_parser.y" /* yacc.c:1646  */
+  case 20:
+#line 555 "mad_parser.y" /* yacc.c:1646  */
     {
     (yyval.attr_el) = new attr();
 		if (func_table.count((yyvsp[0].node_con)) > 0)
@@ -1895,19 +1914,20 @@ yyreduce:
     else
     {
     	func_record f_temp;
-      func_table[(yyvsp[0].node_con)] = f_temp;
+      func_table[string((yyvsp[0].node_con))] = f_temp;
       //Setting active_func_ptr
-      active_func_ptr = &func_table[(yyvsp[0].node_con)];
-      active_func_ptr -> name = (yyvsp[0].node_con);
+      active_func_ptr = &func_table[string((yyvsp[0].node_con))];
+      active_func_ptr -> name = string((yyvsp[0].node_con));
+      active_func_ptr -> return_type = (yyvsp[-1].attr_el)->type;
     }
     (yyval.attr_el)->type = VOIDF;
     (yyval.attr_el)->label = (yyvsp[0].node_con);
   }
-#line 1907 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1927 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 20:
-#line 558 "mad_parser.y" /* yacc.c:1646  */
+  case 21:
+#line 575 "mad_parser.y" /* yacc.c:1646  */
     {
       //Nothing to do - check for errors and proceed
       (yyval.attr_el) = new attr();
@@ -1918,48 +1938,50 @@ yyreduce:
       }
       else
       {
+        active_func_ptr->param_list[(yyvsp[-2].attr_el)->ival].offset = (yyvsp[0].attr_el)->ival + ( (yyvsp[-3].attr_el)->ival );
+        // cout << active_func_ptr->param_list[$2->ival].name << " has offset " << active_func_ptr->param_list[$2->ival].offset << endl;
         (yyval.attr_el)->code = (yyvsp[-3].attr_el)->code + (yyvsp[-2].attr_el)->code;
         (yyval.attr_el)->ival = (yyvsp[0].attr_el)->ival + ((yyvsp[-3].attr_el)->ival);
       }
   }
-#line 1926 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1948 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 21:
-#line 572 "mad_parser.y" /* yacc.c:1646  */
+  case 22:
+#line 591 "mad_parser.y" /* yacc.c:1646  */
     {
     //Nothing to do
     (yyval.attr_el) = new attr();
     (yyval.attr_el)->code = "";
     (yyval.attr_el)->ival = 0;
   }
-#line 1937 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1959 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 22:
-#line 578 "mad_parser.y" /* yacc.c:1646  */
+  case 23:
+#line 597 "mad_parser.y" /* yacc.c:1646  */
     {
   	has_error = true;
     pretty_print_error (comma_error);
     (yyval.attr_el) = new attr();
     (yyval.attr_el)->type = ERR;
   }
-#line 1948 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1970 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 23:
-#line 584 "mad_parser.y" /* yacc.c:1646  */
+  case 24:
+#line 603 "mad_parser.y" /* yacc.c:1646  */
     {
   	has_error = true;
     pretty_print_error (identifier_error);
     (yyval.attr_el) = new attr();
     (yyval.attr_el)->type = ERR;
   }
-#line 1959 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1981 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 24:
-#line 592 "mad_parser.y" /* yacc.c:1646  */
+  case 25:
+#line 611 "mad_parser.y" /* yacc.c:1646  */
     {
 		(yyval.attr_el) = new attr();
 
@@ -1977,28 +1999,28 @@ yyreduce:
   	sym_table[scope] = temp;
   	scope--;
   }
-#line 1981 "mad_parser.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 25:
-#line 617 "mad_parser.y" /* yacc.c:1646  */
-    { scope++; }
-#line 1987 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2003 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 620 "mad_parser.y" /* yacc.c:1646  */
+#line 636 "mad_parser.y" /* yacc.c:1646  */
+    { scope++; }
+#line 2009 "mad_parser.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 27:
+#line 639 "mad_parser.y" /* yacc.c:1646  */
     {
   	//Nothing to do
     (yyval.attr_el) = new attr();
     (yyval.attr_el)->code = "";
 
   }
-#line 1998 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2020 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 27:
-#line 626 "mad_parser.y" /* yacc.c:1646  */
+  case 28:
+#line 645 "mad_parser.y" /* yacc.c:1646  */
     {
     //Nothing to do - check for error in further productions
     (yyval.attr_el) = new attr();
@@ -2011,22 +2033,22 @@ yyreduce:
     else
       (yyval.attr_el)->code = (yyvsp[-1].attr_el)->code + (yyvsp[0].attr_el)->code;
   }
-#line 2015 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2037 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 28:
-#line 641 "mad_parser.y" /* yacc.c:1646  */
+  case 29:
+#line 660 "mad_parser.y" /* yacc.c:1646  */
     {
     //Nothing to do
     (yyval.attr_el) = new attr();
     (yyval.attr_el)->code = "";
 
   }
-#line 2026 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2048 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 29:
-#line 647 "mad_parser.y" /* yacc.c:1646  */
+  case 30:
+#line 666 "mad_parser.y" /* yacc.c:1646  */
     {
     //Semantic Analyses - chaining
     (yyval.attr_el) = new attr();
@@ -2040,65 +2062,65 @@ yyreduce:
       (yyval.attr_el)->code = "";
     }
   }
-#line 2044 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2066 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 30:
-#line 662 "mad_parser.y" /* yacc.c:1646  */
+  case 31:
+#line 681 "mad_parser.y" /* yacc.c:1646  */
     {
     //Nothing to do
     (yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[-1].attr_el));
   }
-#line 2053 "mad_parser.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 31:
-#line 666 "mad_parser.y" /* yacc.c:1646  */
-    {
-    //Nothing to do
-    (yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[0].attr_el));
-  }
-#line 2062 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2075 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 670 "mad_parser.y" /* yacc.c:1646  */
+#line 685 "mad_parser.y" /* yacc.c:1646  */
     {
     //Nothing to do
     (yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[0].attr_el));
   }
-#line 2071 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2084 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 674 "mad_parser.y" /* yacc.c:1646  */
+#line 689 "mad_parser.y" /* yacc.c:1646  */
     {
     //Nothing to do
     (yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[0].attr_el));
   }
-#line 2080 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2093 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 678 "mad_parser.y" /* yacc.c:1646  */
+#line 693 "mad_parser.y" /* yacc.c:1646  */
     {
     //Nothing to do
     (yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[0].attr_el));
   }
-#line 2089 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2102 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 682 "mad_parser.y" /* yacc.c:1646  */
-    { (yyval.attr_el) = new attr(); (yyval.attr_el)->type = ERR; has_error = true; pretty_print_error("Possible missing semicolon with alr_subexpression"); }
-#line 2095 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 697 "mad_parser.y" /* yacc.c:1646  */
+    {
+    //Nothing to do
+    (yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[0].attr_el));
+  }
+#line 2111 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 685 "mad_parser.y" /* yacc.c:1646  */
+#line 701 "mad_parser.y" /* yacc.c:1646  */
+    { (yyval.attr_el) = new attr(); (yyval.attr_el)->type = ERR; has_error = true; pretty_print_error("Possible missing semicolon with alr_subexpression"); }
+#line 2117 "mad_parser.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 37:
+#line 704 "mad_parser.y" /* yacc.c:1646  */
     {
 		(yyval.attr_el) = new attr();
-		if ((yyvsp[-3].attr_el)->type != BOOL)
+		if ((yyvsp[-3].attr_el)->type == CHAR )
     {
     	has_error = true;
       (yyval.attr_el)->type = ERR;
@@ -2110,6 +2132,9 @@ yyreduce:
 	    endElse = get_label();
 
 	    (yyval.attr_el) -> code = (yyvsp[-3].attr_el)-> code;
+      if ((yyvsp[-3].attr_el)->type == INT){
+        (yyval.attr_el)->code += intToBool();
+      }
 	    (yyval.attr_el) -> code += "li $t1 0x1\n";
 	    (yyval.attr_el) -> code += "bne $t0 $t1 " + startElse + "\n";
 	    (yyval.attr_el) -> code += (yyvsp[-1].attr_el) ->code;
@@ -2119,22 +2144,22 @@ yyreduce:
 	    (yyval.attr_el) -> code += endElse + ":\n";
 
 	}
-#line 2123 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2148 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 37:
-#line 710 "mad_parser.y" /* yacc.c:1646  */
+  case 38:
+#line 732 "mad_parser.y" /* yacc.c:1646  */
     {
     	(yyval.attr_el) = new attr();
     	//Semantic Analyses - no check
     	//CodeGen
 	    (yyval.attr_el)-> code = "\n";
 	}
-#line 2134 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2159 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 38:
-#line 716 "mad_parser.y" /* yacc.c:1646  */
+  case 39:
+#line 738 "mad_parser.y" /* yacc.c:1646  */
     {
 		(yyval.attr_el) = new attr();
     //Semantic Analyses - no check
@@ -2142,11 +2167,11 @@ yyreduce:
 		(yyval.attr_el)->code = (yyvsp[0].attr_el)->code;
 
 	}
-#line 2146 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2171 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 39:
-#line 725 "mad_parser.y" /* yacc.c:1646  */
+  case 40:
+#line 747 "mad_parser.y" /* yacc.c:1646  */
     {
     (yyval.attr_el) = new attr();
     //Semantic Analyses
@@ -2175,11 +2200,11 @@ yyreduce:
       (yyval.attr_el)->code += endWhile + ":\n";
     }
 	}
-#line 2179 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2204 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 40:
-#line 755 "mad_parser.y" /* yacc.c:1646  */
+  case 41:
+#line 777 "mad_parser.y" /* yacc.c:1646  */
     {
     (yyval.attr_el) = new attr();
     //Semantic Analyses
@@ -2194,15 +2219,17 @@ yyreduce:
     //Nothing to do
 
 	}
-#line 2198 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2223 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 41:
-#line 769 "mad_parser.y" /* yacc.c:1646  */
+  case 42:
+#line 791 "mad_parser.y" /* yacc.c:1646  */
     {
     	(yyval.attr_el) = new attr();
     	//Semantic Analyses
-    	(yyval.attr_el) = (yyvsp[-1].attr_el);
+    	copy_attr((yyval.attr_el),(yyvsp[-1].attr_el));
+      // cout << active_func_ptr-> name << " HYT "<< func_table[active_func_ptr->name].return_type << endl ;
+      // cout << $2->type << " " << active_func_ptr->return_type << endl;
     	int downcast_needed = cast(active_func_ptr->return_type, (yyvsp[-1].attr_el)->type, 0);
       if ( active_func_ptr->return_type != (yyvsp[-1].attr_el)->type )
       {
@@ -2219,23 +2246,23 @@ yyreduce:
         }
       }
 	}
-#line 2223 "mad_parser.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 42:
-#line 789 "mad_parser.y" /* yacc.c:1646  */
-    {  (yyval.attr_el) = new attr(); (yyval.attr_el)->type = ERR; pretty_print_error(semicolon_error_return); }
-#line 2229 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2250 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 790 "mad_parser.y" /* yacc.c:1646  */
+#line 813 "mad_parser.y" /* yacc.c:1646  */
     {  (yyval.attr_el) = new attr(); (yyval.attr_el)->type = ERR; pretty_print_error(semicolon_error_return); }
-#line 2235 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2256 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 793 "mad_parser.y" /* yacc.c:1646  */
+#line 814 "mad_parser.y" /* yacc.c:1646  */
+    {  (yyval.attr_el) = new attr(); (yyval.attr_el)->type = ERR; pretty_print_error(semicolon_error_return); }
+#line 2262 "mad_parser.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 45:
+#line 817 "mad_parser.y" /* yacc.c:1646  */
     {
         // $$= new attr();
 	   //Semantic analyses - Nothing to check
@@ -2246,11 +2273,11 @@ yyreduce:
 	   // Tree stuff
 	   // $$ = as_tree_n("alr_subexpression", NONTERMINAL); $$->child = $1;
 	}
-#line 2250 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2277 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 45:
-#line 804 "mad_parser.y" /* yacc.c:1646  */
+  case 46:
+#line 828 "mad_parser.y" /* yacc.c:1646  */
     {
       //  $$= new attr();
 
@@ -2262,11 +2289,11 @@ yyreduce:
 	   //Tree stuff
 	   // $$ = as_tree_n("alr_subexpression", NONTERMINAL); $$->child = $1;
 	}
-#line 2266 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2293 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 46:
-#line 815 "mad_parser.y" /* yacc.c:1646  */
+  case 47:
+#line 839 "mad_parser.y" /* yacc.c:1646  */
     { //Function call
 
           (yyval.attr_el)= new attr();
@@ -2280,7 +2307,7 @@ yyreduce:
         }
     		else
           call_name_ptr = &func_table[(yyvsp[-3].node_con)];
-
+          // cout << call_param_list.size() <<"-call_param_list size && " << call_name_ptr->param_list.size() << endl;
     		if ( call_name_ptr->param_list.size() != call_param_list.size() )
         {
             (yyval.attr_el)->type = ERR;
@@ -2291,6 +2318,9 @@ yyreduce:
         {
             for ( int i = 0; i < call_param_list.size(); i++ )
             {
+                // cout << " call_param_list: " << call_param_list[i]->name << " " << call_param_list[i]->type << endl;
+                // cout << " call_name_ptr ki list:  " << ca
+
                 if ( call_param_list[i]->type != call_name_ptr->param_list[i].type )
                 {
                     has_error = true;
@@ -2304,6 +2334,7 @@ yyreduce:
         //CodeGeneration
         // $$->type = func_table[$1].return_type;
     		(yyval.attr_el)->code = "sw $fp 0($sp) \n"; // $fp -> 0($sp)
+        (yyval.attr_el)->code += "addiu $sp $sp -4\n";
     		string eleType;
     		int eleSize;
         for (int i=0;i< call_param_list.size(); i++){
@@ -2333,21 +2364,22 @@ yyreduce:
 				//Back to Semantic
         call_name_ptr = NULL;
   }
-#line 2337 "mad_parser.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 47:
-#line 881 "mad_parser.y" /* yacc.c:1646  */
-    {
-		//Semantic Analyses - no checks needed
-		//CodeGen
-		copy_attr((yyval.attr_el),(yyvsp[-1].attr_el));
-  }
-#line 2347 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2368 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 886 "mad_parser.y" /* yacc.c:1646  */
+#line 909 "mad_parser.y" /* yacc.c:1646  */
+    {
+		//Semantic Analyses - no checks needed
+		//CodeGen
+    (yyval.attr_el) = new attr();
+		copy_attr((yyval.attr_el),(yyvsp[-1].attr_el));
+  }
+#line 2379 "mad_parser.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 49:
+#line 915 "mad_parser.y" /* yacc.c:1646  */
     {
 
         (yyval.attr_el) = new attr();
@@ -2385,11 +2417,11 @@ yyreduce:
         (yyval.attr_el)->type = INT;
 	    }
 	}
-#line 2389 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2421 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 49:
-#line 923 "mad_parser.y" /* yacc.c:1646  */
+  case 50:
+#line 952 "mad_parser.y" /* yacc.c:1646  */
     {
         (yyval.attr_el)= new attr();
 		//Semantic analyses - no checks
@@ -2399,11 +2431,11 @@ yyreduce:
 		    (yyval.attr_el)->code += "neg $t0 $t0 \n";
 		}
 	}
-#line 2403 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2435 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 50:
-#line 932 "mad_parser.y" /* yacc.c:1646  */
+  case 51:
+#line 961 "mad_parser.y" /* yacc.c:1646  */
     {
         (yyval.attr_el) = new attr();
 	    //Semantic Analyses
@@ -2445,11 +2477,11 @@ yyreduce:
 
 		}
 	}
-#line 2449 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2481 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 51:
-#line 974 "mad_parser.y" /* yacc.c:1646  */
+  case 52:
+#line 1003 "mad_parser.y" /* yacc.c:1646  */
     {
         (yyval.attr_el) = new attr();
         //Semantic Analyses
@@ -2486,11 +2518,11 @@ yyreduce:
 
         }
 	}
-#line 2490 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2522 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 52:
-#line 1010 "mad_parser.y" /* yacc.c:1646  */
+  case 53:
+#line 1039 "mad_parser.y" /* yacc.c:1646  */
     {
     (yyval.attr_el)  = new attr();
 		if ((yyvsp[0].attr_el)->type == CHAR)
@@ -2502,6 +2534,7 @@ yyreduce:
 
 		//Code Generation
 		if (!has_error){
+        (yyval.attr_el)->type = BOOL;
 		    (yyval.attr_el)->code = (yyvsp[0].attr_el)->code;
 		    if ((yyvsp[0].attr_el)->type == INT){
 		        (yyval.attr_el)->code+= intToBool();
@@ -2509,15 +2542,15 @@ yyreduce:
 		    (yyval.attr_el)->code += "xori $t0 $t0 0x1\n";
 		}
 	}
-#line 2513 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2546 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 53:
-#line 1028 "mad_parser.y" /* yacc.c:1646  */
+  case 54:
+#line 1058 "mad_parser.y" /* yacc.c:1646  */
     {
         (yyval.attr_el)= new attr();
         //Semantic
-
+        //cout << $1->type <<" \t " << $3->type <<endl;
         if ( cast((yyvsp[-2].attr_el)->type, (yyvsp[0].attr_el)->type, 0) <  0)
         {
           (yyval.attr_el)->type = ERR;
@@ -2536,7 +2569,7 @@ yyreduce:
             if ( cast((yyvsp[-2].attr_el)->type, (yyvsp[0].attr_el)->type, 0) == 2)
             {
                 //CodeGen - no other casting test needed because only allowed downcast is from int to bool
-                (yyval.attr_el)->code += "#Casting of RHS";
+                (yyval.attr_el)->code += "#Casting of RHS\n";
                 (yyval.attr_el)->code += intToBool();
             }
             if ( (yyvsp[-2].attr_el)->type != ERR && (yyvsp[-2].attr_el)->code == "$" )
@@ -2544,7 +2577,7 @@ yyreduce:
                 lhsRecord = &active_func_ptr->param_list[(yyvsp[-2].attr_el)->ival];
                 stringstream s;
                 s << lhsRecord->offset;
-                (yyval.attr_el)->code += "sw " + s.str() + "($fp) $t0\n";
+                (yyval.attr_el)->code += "sw $t0 " + s.str() + "($fp) \n";
             }
 
             if ((yyvsp[-2].attr_el)->ival == -1 && (yyvsp[-2].attr_el)->type != ERR ){
@@ -2558,17 +2591,17 @@ yyreduce:
               }
         }
 	}
-#line 2562 "mad_parser.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 54:
-#line 1073 "mad_parser.y" /* yacc.c:1646  */
-    { (yyval.attr_el) = new attr(); (yyval.attr_el)->type = ERR; pretty_print_error("Missing identifier name"); }
-#line 2568 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2595 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 1078 "mad_parser.y" /* yacc.c:1646  */
+#line 1103 "mad_parser.y" /* yacc.c:1646  */
+    { (yyval.attr_el) = new attr(); (yyval.attr_el)->type = ERR; pretty_print_error("Missing identifier name"); }
+#line 2601 "mad_parser.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 56:
+#line 1108 "mad_parser.y" /* yacc.c:1646  */
     {
 	   //Semantic Analyses
      (yyval.attr_el) = new attr();
@@ -2590,26 +2623,36 @@ yyreduce:
 	   //Tree stuff
 	   // $$ = as_tree_n("id_list", NONTERMINAL); $$->child = $1; node *comma = as_tree_n("COMMA", TERMINAL); $$->child->sibling = comma; comma->sibling = $3;
 	}
-#line 2594 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2627 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 56:
-#line 1099 "mad_parser.y" /* yacc.c:1646  */
+  case 57:
+#line 1129 "mad_parser.y" /* yacc.c:1646  */
     {
       (yyval.attr_el) = new attr();
 	   //Semantic Analyses
 	   (yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[0].attr_el));
-	   (yyval.attr_el)->types.push_back((yyvsp[0].attr_el)->type);
-
+     if ( (yyvsp[0].attr_el)->type != ERR )
+     {
+    		if ((yyvsp[0].attr_el)->bval)
+        {
+        	call_param_list.push_back(& (call_name_ptr->param_list[(yyvsp[0].attr_el)->ival]) );
+        }
+       else
+       {
+       		call_param_list.push_back( get_record((yyvsp[0].attr_el)->label) );
+       }
+     }
+    //  cout << "Last: " << call_param_list.back()->name << endl ;
 	   //CodeGen
 
 	   // $$ = as_tree_n("id_list", NONTERMINAL); $$->child = $1;
 	}
-#line 2609 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2652 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 57:
-#line 1109 "mad_parser.y" /* yacc.c:1646  */
+  case 58:
+#line 1149 "mad_parser.y" /* yacc.c:1646  */
     {
       (yyval.attr_el) = new attr();
 	   //Semantic Analyses  - no checks needed
@@ -2617,11 +2660,11 @@ yyreduce:
 
 	   // $$ = as_tree_n("id_list", NONTERMINAL); $$->child = as_tree_n("EPSILON", TERMINAL);
 	}
-#line 2621 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2664 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 58:
-#line 1123 "mad_parser.y" /* yacc.c:1646  */
+  case 59:
+#line 1163 "mad_parser.y" /* yacc.c:1646  */
     {
 	    //Semantic Analyses -> param
       (yyval.attr_el) = new attr();
@@ -2665,11 +2708,11 @@ yyreduce:
 	    //Tree-related stuff
 	    // $$ = as_tree_n("use_ID", NONTERMINAL); $$->info = "use_ID";
 	}
-#line 2669 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2712 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 59:
-#line 1166 "mad_parser.y" /* yacc.c:1646  */
+  case 60:
+#line 1206 "mad_parser.y" /* yacc.c:1646  */
     {
         (yyval.attr_el) = new attr();
         //Semantic Analyses
@@ -2706,11 +2749,11 @@ yyreduce:
         //Tree-related stuff
 	    // $$ = as_tree_n("use_ID[arr]", NONTERMINAL); $$->info = "use_ID[arr]";
 	}
-#line 2710 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2753 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 60:
-#line 1204 "mad_parser.y" /* yacc.c:1646  */
+  case 61:
+#line 1244 "mad_parser.y" /* yacc.c:1646  */
     {
 	   // Semantic
     (yyval.attr_el) = new attr();
@@ -2764,11 +2807,11 @@ yyreduce:
        //Tree stuff
 	   // $$ = as_tree_n("decl_ID", NONTERMINAL); $$->info = "decl_ID";
 	}
-#line 2768 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2811 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 61:
-#line 1257 "mad_parser.y" /* yacc.c:1646  */
+  case 62:
+#line 1297 "mad_parser.y" /* yacc.c:1646  */
     {
       (yyval.attr_el) = new attr();
 	   //Semantic
@@ -2796,11 +2839,11 @@ yyreduce:
 	   //Tree stuff
 	   // $$ = as_tree_n("decl_ID[arr]", NONTERMINAL); $$->info = "decl_ID[arr]";
 	}
-#line 2800 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2843 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 62:
-#line 1286 "mad_parser.y" /* yacc.c:1646  */
+  case 63:
+#line 1326 "mad_parser.y" /* yacc.c:1646  */
     {
 	    //Semantic Analyses
       (yyval.attr_el) = new attr();
@@ -2818,6 +2861,7 @@ yyreduce:
 	            (yyval.attr_el)->type = active_func_ptr->param_list[flag].type;
             	(yyval.attr_el)->bval = true;
             	(yyval.attr_el)->ival = flag; //Indicates parameter
+              // cout << "var_use : " << active_func_ptr->param_list[flag].type << " " << active_func_ptr->param_list[flag].name << " " << active_func_ptr->param_list[flag].offset <<endl;
 	        }
         	else
           {
@@ -2850,7 +2894,7 @@ yyreduce:
             {
                 stringstream s;
                 s << active_func_ptr->param_list[flag].offset;
-                (yyval.attr_el)->code += "sw " + s.str() + "($fp) $t0\n";
+                (yyval.attr_el)->code += "lw $t0 " + s.str() + "($fp) \n";
             }
           else{
               (yyval.attr_el)->code = load_mips_id( get_record((yyvsp[0].node_con)) );
@@ -2861,11 +2905,11 @@ yyreduce:
 	    //Tree-related stuff
 	    // $$ = as_tree_n("use_ID", NONTERMINAL); $$->info = "use_ID";
 	}
-#line 2865 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2909 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 63:
-#line 1346 "mad_parser.y" /* yacc.c:1646  */
+  case 64:
+#line 1387 "mad_parser.y" /* yacc.c:1646  */
     {
 
         //Semantic Analyses
@@ -2905,11 +2949,11 @@ yyreduce:
         //Tree-related stuff
 	    // $$ = as_tree_n("use_ID[arr]", NONTERMINAL); $$->info = "use_ID[arr]";
 	}
-#line 2909 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2953 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 64:
-#line 1387 "mad_parser.y" /* yacc.c:1646  */
+  case 65:
+#line 1428 "mad_parser.y" /* yacc.c:1646  */
     {
 
 	    //Semantic Analyses
@@ -2922,11 +2966,11 @@ yyreduce:
 	    //CodeGen
 	    //No codegen assoc with this production
     }
-#line 2926 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2970 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 65:
-#line 1399 "mad_parser.y" /* yacc.c:1646  */
+  case 66:
+#line 1440 "mad_parser.y" /* yacc.c:1646  */
     {
 	    //Semantic Analyses
         (yyval.attr_el) = new attr();
@@ -2942,11 +2986,11 @@ yyreduce:
 	    //Tree-related stuff
 	    // $$ = as_tree_n("supported_constant", NONTERMINAL); $$->child = as_tree_n("INTCONST", VALUE); $$->child->info = $1;
 	}
-#line 2946 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2990 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 66:
-#line 1414 "mad_parser.y" /* yacc.c:1646  */
+  case 67:
+#line 1455 "mad_parser.y" /* yacc.c:1646  */
     {
 	    //Semantic Analyses
       (yyval.attr_el) = new attr();
@@ -2969,11 +3013,11 @@ yyreduce:
 	    //Tree-related stuff
 	    // $$ = as_tree_n("supported_constant", NONTERMINAL); $$->child = as_tree_n("BOOLCONST", VALUE); $$->child->info = $1;
 	}
-#line 2973 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 3017 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 67:
-#line 1436 "mad_parser.y" /* yacc.c:1646  */
+  case 68:
+#line 1477 "mad_parser.y" /* yacc.c:1646  */
     {
 
 	    //Semantic Analyses
@@ -2983,15 +3027,16 @@ yyreduce:
 	    (yyval.attr_el)->type = INT;
 
 	    //CodeGen
+      (yyval.attr_el)->code = "li $t0 -" + string((yyvsp[-1].node_con)) + "\n" ;
 	    //No codegen assoc with this production
 
 
 	}
-#line 2991 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 3036 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 2995 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 3040 "mad_parser.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -3219,7 +3264,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 1449 "mad_parser.y" /* yacc.c:1906  */
+#line 1491 "mad_parser.y" /* yacc.c:1906  */
 
 int num_times = 2;
 void pretty_print_error(const char* err_msg)
@@ -3257,6 +3302,6 @@ int main()
 	vector<int> print_vec;
 	yydebug = 0;
 	yyparse();
-	if(!has_error)	cout<<"hurray no error"<<endl;
+	if(!has_error)	cout<<""<<endl;
 	else cout<<"Compilation terminating with errors"<<endl;
 }

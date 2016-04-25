@@ -85,7 +85,7 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 323 "mad_parser.y" /* yacc.c:1909  */
+#line 327 "mad_parser.y" /* yacc.c:1909  */
 
 	struct attr* attr_el;
 	node* node_el;

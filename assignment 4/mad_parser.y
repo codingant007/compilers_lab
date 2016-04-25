@@ -112,7 +112,7 @@ string get_data_string(){
                 data_string << "0";
             }
             else{
-                data_string << ".byte";
+                data_string << ".byte ";
                 data_string << "0x41";
             }
         }
@@ -155,10 +155,11 @@ string get_mips_name (var_record* varRecord)
     mips_name += varRecord-> name;
 
     stringstream s;
-    s << "_" << varRecord->type << "_" << scope ;
+    s << "_" << varRecord->type << "_" << varRecord->scope ;
     mips_name += s.str();
     return mips_name;
 }
+
 
 string get_label()
 {
@@ -189,10 +190,12 @@ string load_mips_array(var_record* varRecord, int offSet)
     stringstream s,s1;
     s << offSet;
     s1 << eleSize;
-    loadCode = "mul $t1 " + s.str() + " " + s1.str() + "\n";
-    loadCode += "la $t2 " + get_mips_name(varRecord) + "\n";
-    loadCode += "add $t3 $t1 $t2 \n";
-    loadCode += loadType + " $t0 ($t3) \n";
+    loadCode = "li $t1 " + s.str() + "\n" ;
+    loadCode += "li $t2 " + s1.str() + "\n";
+    loadCode += "mul $t2 $t1 $t2\n" ;
+    loadCode += "la $t1 " + get_mips_name(varRecord) + "\n";
+    loadCode += "add $t1 $t1 $t2 \n";
+    loadCode += loadType + " $t0 ($t1) \n";
     return loadCode;
 }
 
@@ -215,10 +218,12 @@ string store_mips_array(var_record* varRecord, int offSet)
     stringstream s,s1;
     s << offSet;
     s1 << eleSize;
-    storeCode = "mul $t1 " + s.str() + " " + s1.str() + "\n";
-    storeCode += "la $t2 " + get_mips_name(varRecord) + "\n";
-    storeCode += "add $t3 $t1 $t2 \n";
-    storeCode +=  storeType + " $t0 ($t3)\n";
+    storeCode = "li $t1 " + s.str() + "\n" ;
+    storeCode += "li $t2 " + s1.str() + "\n";
+    storeCode += "mul $t2 $t1 $t2\n" ;
+    storeCode += "la $t1 " + get_mips_name(varRecord) + "\n";
+    storeCode += "add $t1 $t1 $t2 \n";
+    storeCode +=  storeType + " $t0 ($t1)\n";
     return storeCode;
 }
 
@@ -258,11 +263,10 @@ string store_mips_id (var_record* varRecord)
 
 string intToBool()
 {
-    string boolCode = "srl $t0 0x1F\n";
-    boolCode += "andi $t1 $t0 0x1\n";
-    boolCode += "addi $t0 $t1 0x1\n";
-    boolCode += "andi $t1 $t0 0x1\n";
-    boolCode += "ori $t0 $t1 0x0\n";
+    string boolCode = "srl $t0 $t0 0x1F\n";
+    boolCode += "andi $t0 $t0 0x1\n";
+    boolCode += "addi $t0 $t0 0x1\n";
+    boolCode += "andi $t0 $t0 0x1\n";
     return boolCode;
 }
 
@@ -326,7 +330,7 @@ node::node(const char* con, int t)
 	char* node_con;
 }
 
-%start mad_program
+%start start_mad_program
 
 %token <node_con> ID
 %token COMMA
@@ -368,15 +372,21 @@ node::node(const char* con, int t)
 
 %%
 
+start_mad_program:
+  mad_program{
+    cout <<".data\n";
+    cout << get_data_string();
+    cout <<"\n .text \n .globl main \n";
+    cout << $1->code;
+  }
+
 mad_program:
 	supported_declarations {
   	$$ = new attr(); copy_attr($$,$1);
-    cout << $$->code;
   }
 	| supported_declarations mad_program {
   	$$ = new attr(); copy_attr($$,$1);
     $$->code += $2->code;
-    cout << $$->code;
   }
 	| error '\n' { pretty_print_error("Compilation terminating with errors"); root = NULL;}
 
@@ -459,20 +469,21 @@ function_declarations:
     		int cur_offset = 0;
         //Semantic
         $$ = new attr();
-    		active_func_ptr->return_type = (TYPE)$1->ival;
-    		for ( int i = 0; i < active_func_ptr->param_list.size(); i++ )
-        {
-        	switch(active_func_ptr->param_list[i].type)
-          {
-          	case INT: active_func_ptr->param_list[i].offset = cur_offset + INT_SIZE;
-            				cur_offset += INT_SIZE;
-            	break;
-            default: active_func_ptr->param_list[i].offset = cur_offset + BOOL_SIZE;
-            				cur_offset += BOOL_SIZE;
-            break;
-          }
-        }
-    		active_func_ptr->paramlist_size = cur_offset; //Setting paramlist size
+
+        // for ( int i = 0; i < active_func_ptr->param_list.size(); i++ )
+        // {
+        // 	switch(active_func_ptr->param_list[i].type)
+        //   {
+        //   	case INT: active_func_ptr->param_list[i].offset = cur_offset + INT_SIZE;
+        //               cout << "\t " << active_func_ptr->param_list[i].offset << " name: " << active_func_ptr->param_list[i].name << endl;
+        //     				cur_offset += INT_SIZE;
+        //     	break;
+        //     default: active_func_ptr->param_list[i].offset = cur_offset + BOOL_SIZE;
+        //     				cur_offset += BOOL_SIZE;
+        //     break;
+        //   }
+        // }
+    		active_func_ptr->paramlist_size = $5->ival ; //Setting paramlist size
         //Code Generation
         $$->code = $2->label + ":\n";
         //Store return $ra to stack and set frame pointer to $ra
@@ -480,13 +491,18 @@ function_declarations:
         $$->code += "move $fp $sp \n";
     		$$->code += "addiu $sp $sp -4\n";
     		$$->code += $7->code;
-    		$$->code += "move $sp $fp\n";
-    		$$->code += "lw $ra 0($fp)\n";          // $ra <- 0($fp)
-    		$$->code += "addiu $sp $sp 4\n";
+        $$->code += "lw $ra 0($fp)\n";
+        $$->code += "move $sp $fp\n";
+        // $$->code += "addiu $sp $sp 4\n";
+    		// //$$->code += "move $sp $fp\n";
+    		// $$->code += "lw $ra 4($sp)\n";          // $ra <- 0($fp)
+    		// $$->code += "addiu $sp $sp 4\n";
     		//Pop parameters
     		stringstream s;
     		s << active_func_ptr->paramlist_size;
     		$$->code += "addiu $sp $sp " + s.str() + "\n";
+        $$->code += "lw $fp 4($sp)\n";
+        $$->code += "addiu $sp $sp 4\n";
     		$$->code += "jr $ra\n";
     		//Semantic again
     		active_func_ptr = NULL;
@@ -546,10 +562,11 @@ func_name:
     else
     {
     	func_record f_temp;
-      func_table[$1] = f_temp;
+      func_table[string($1)] = f_temp;
       //Setting active_func_ptr
-      active_func_ptr = &func_table[$1];
-      active_func_ptr -> name = $1;
+      active_func_ptr = &func_table[string($1)];
+      active_func_ptr -> name = string($1);
+      active_func_ptr -> return_type = $<attr_el>0->type;
     }
     $$->type = VOIDF;
     $$->label = $1;
@@ -565,6 +582,8 @@ argument_list:
       }
       else
       {
+        active_func_ptr->param_list[$2->ival].offset = $4->ival + ( $1->ival );
+        // cout << active_func_ptr->param_list[$2->ival].name << " has offset " << active_func_ptr->param_list[$2->ival].offset << endl;
         $$->code = $1->code + $2->code;
         $$->ival = $4->ival + ($1->ival);
       }
@@ -684,7 +703,7 @@ supported_statement:
 if_statement:
 	IF OPENPAREN alr_subexpression CLOSEPAREN statement_block else_statement {
 		$$ = new attr();
-		if ($3->type != BOOL)
+		if ($3->type == CHAR )
     {
     	has_error = true;
       $$->type = ERR;
@@ -696,6 +715,9 @@ if_statement:
 	    endElse = get_label();
 
 	    $$ -> code = $3-> code;
+      if ($3->type == INT){
+        $$->code += intToBool();
+      }
 	    $$ -> code += "li $t1 0x1\n";
 	    $$ -> code += "bne $t0 $t1 " + startElse + "\n";
 	    $$ -> code += $5 ->code;
@@ -769,7 +791,9 @@ return_statement:
 	| RETURN alr_subexpression SEMI {
     	$$ = new attr();
     	//Semantic Analyses
-    	$$ = $2;
+    	copy_attr($$,$2);
+      // cout << active_func_ptr-> name << " HYT "<< func_table[active_func_ptr->name].return_type << endl ;
+      // cout << $2->type << " " << active_func_ptr->return_type << endl;
     	int downcast_needed = cast(active_func_ptr->return_type, $2->type, 0);
       if ( active_func_ptr->return_type != $2->type )
       {
@@ -825,7 +849,7 @@ alr_subexpression:
         }
     		else
           call_name_ptr = &func_table[$1];
-
+          // cout << call_param_list.size() <<"-call_param_list size && " << call_name_ptr->param_list.size() << endl;
     		if ( call_name_ptr->param_list.size() != call_param_list.size() )
         {
             $$->type = ERR;
@@ -836,6 +860,9 @@ alr_subexpression:
         {
             for ( int i = 0; i < call_param_list.size(); i++ )
             {
+                // cout << " call_param_list: " << call_param_list[i]->name << " " << call_param_list[i]->type << endl;
+                // cout << " call_name_ptr ki list:  " << ca
+
                 if ( call_param_list[i]->type != call_name_ptr->param_list[i].type )
                 {
                     has_error = true;
@@ -849,6 +876,7 @@ alr_subexpression:
         //CodeGeneration
         // $$->type = func_table[$1].return_type;
     		$$->code = "sw $fp 0($sp) \n"; // $fp -> 0($sp)
+        $$->code += "addiu $sp $sp -4\n";
     		string eleType;
     		int eleSize;
         for (int i=0;i< call_param_list.size(); i++){
@@ -881,6 +909,7 @@ alr_subexpression:
 	| OPENPAREN alr_subexpression CLOSEPAREN {
 		//Semantic Analyses - no checks needed
 		//CodeGen
+    $$ = new attr();
 		copy_attr($$,$2);
   }
 	| alr_subexpression ARITH alr_subexpression {
@@ -1018,6 +1047,7 @@ alr_subexpression:
 
 		//Code Generation
 		if (!has_error){
+        $$->type = BOOL;
 		    $$->code = $2->code;
 		    if ($2->type == INT){
 		        $$->code+= intToBool();
@@ -1028,7 +1058,7 @@ alr_subexpression:
   | lhs EQ alr_subexpression {
         $$= new attr();
         //Semantic
-
+        //cout << $1->type <<" \t " << $3->type <<endl;
         if ( cast($1->type, $3->type, 0) <  0)
         {
           $$->type = ERR;
@@ -1047,7 +1077,7 @@ alr_subexpression:
             if ( cast($1->type, $3->type, 0) == 2)
             {
                 //CodeGen - no other casting test needed because only allowed downcast is from int to bool
-                $$->code += "#Casting of RHS";
+                $$->code += "#Casting of RHS\n";
                 $$->code += intToBool();
             }
             if ( $1->type != ERR && $1->code == "$" )
@@ -1055,7 +1085,7 @@ alr_subexpression:
                 lhsRecord = &active_func_ptr->param_list[$1->ival];
                 stringstream s;
                 s << lhsRecord->offset;
-                $$->code += "sw " + s.str() + "($fp) $t0\n";
+                $$->code += "sw $t0 " + s.str() + "($fp) \n";
             }
 
             if ($1->ival == -1 && $1->type != ERR ){
@@ -1100,8 +1130,18 @@ id_list:
       $$ = new attr();
 	   //Semantic Analyses
 	   $$ = new attr(); copy_attr($$,$1);
-	   $$->types.push_back($1->type);
-
+     if ( $1->type != ERR )
+     {
+    		if ($1->bval)
+        {
+        	call_param_list.push_back(& (call_name_ptr->param_list[$1->ival]) );
+        }
+       else
+       {
+       		call_param_list.push_back( get_record($1->label) );
+       }
+     }
+    //  cout << "Last: " << call_param_list.back()->name << endl ;
 	   //CodeGen
 
 	   // $$ = as_tree_n("id_list", NONTERMINAL); $$->child = $1;
@@ -1300,6 +1340,7 @@ var_use:
 	            $$->type = active_func_ptr->param_list[flag].type;
             	$$->bval = true;
             	$$->ival = flag; //Indicates parameter
+              // cout << "var_use : " << active_func_ptr->param_list[flag].type << " " << active_func_ptr->param_list[flag].name << " " << active_func_ptr->param_list[flag].offset <<endl;
 	        }
         	else
           {
@@ -1332,7 +1373,7 @@ var_use:
             {
                 stringstream s;
                 s << active_func_ptr->param_list[flag].offset;
-                $$->code += "sw " + s.str() + "($fp) $t0\n";
+                $$->code += "lw $t0 " + s.str() + "($fp) \n";
             }
           else{
               $$->code = load_mips_id( get_record($1) );
@@ -1442,6 +1483,7 @@ supported_constant:
 	    $$->type = INT;
 
 	    //CodeGen
+      $$->code = "li $t0 -" + string($2) + "\n" ;
 	    //No codegen assoc with this production
 
 
@@ -1483,6 +1525,6 @@ int main()
 	vector<int> print_vec;
 	yydebug = 0;
 	yyparse();
-	if(!has_error)	cout<<"hurray no error"<<endl;
+	if(!has_error)	cout<<""<<endl;
 	else cout<<"Compilation terminating with errors"<<endl;
 }
