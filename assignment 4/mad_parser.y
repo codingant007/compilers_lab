@@ -83,7 +83,7 @@ int cast (TYPE typeA, TYPE typeB, int is_up); // Return type: 0-> no casting pos
 
 //Function Declarations
 
-<<<<<<< HEAD
+
 void copy_attr( struct attr* A,struct attr* B){
   A->type = B->type;
   A->ival = B->ival;   //For storing values of constants
@@ -105,7 +105,7 @@ string get_data_string(){
     for(int i=0;i<mips_name.size();i++){
         var_record rec = mips_name[i];
         // Name
-        data_string << get_mips_name(&var_record) << ": ";
+        data_string << get_mips_name(&rec) << ": ";
         if(rec.var_type == SIMPLE){
             if(rec.type == INT){
                 data_string << ".word ";
