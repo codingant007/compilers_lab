@@ -8,12 +8,12 @@ Terminals unused in grammar
 
 
 State 82 conflicts: 1 shift/reduce
-State 84 conflicts: 3 reduce/reduce
-State 98 conflicts: 3 reduce/reduce
-State 113 conflicts: 3 reduce/reduce
-State 120 conflicts: 3 reduce/reduce
-State 121 conflicts: 3 reduce/reduce
-State 122 conflicts: 3 reduce/reduce
+State 84 conflicts: 3 shift/reduce
+State 98 conflicts: 3 shift/reduce
+State 110 conflicts: 3 shift/reduce
+State 111 conflicts: 3 shift/reduce
+State 112 conflicts: 3 shift/reduce
+State 113 conflicts: 3 shift/reduce
 
 
 Grammar
@@ -87,40 +87,31 @@ Grammar
    44                  | var_use
    45                  | ID OPENPAREN id_list CLOSEPAREN
    46                  | OPENPAREN alr_subexpression CLOSEPAREN
+   47                  | alr_subexpression ARITH alr_subexpression
+   48                  | OPENNEGATE alr_subexpression CLOSEPAREN
+   49                  | alr_subexpression RELN alr_subexpression
+   50                  | alr_subexpression LOGICAL alr_subexpression
+   51                  | LOGICALNOT alr_subexpression
+   52                  | lhs EQ alr_subexpression
+   53                  | error EQ alr_subexpression
 
-   47 @3: %empty
+   54 id_list: id_list COMMA var_use
+   55        | var_use
+   56        | %empty
 
-   48 alr_subexpression: alr_subexpression @3 ARITH alr_subexpression
-   49                  | OPENNEGATE alr_subexpression CLOSEPAREN
+   57 lhs: ID
+   58    | ID OPENSQUARE INTCONST CLOSESQUARE
 
-   50 @4: %empty
+   59 var_decl: ID
+   60         | ID OPENSQUARE INTCONST CLOSESQUARE
 
-   51 alr_subexpression: alr_subexpression @4 RELN alr_subexpression
+   61 var_use: ID
+   62        | ID OPENSQUARE INTCONST CLOSESQUARE
 
-   52 @5: %empty
-
-   53 alr_subexpression: alr_subexpression @5 LOGICAL alr_subexpression
-   54                  | LOGICALNOT alr_subexpression
-   55                  | lhs EQ alr_subexpression
-   56                  | error EQ alr_subexpression
-
-   57 id_list: id_list COMMA var_use
-   58        | var_use
-   59        | %empty
-
-   60 lhs: ID
-   61    | ID OPENSQUARE INTCONST CLOSESQUARE
-
-   62 var_decl: ID
-   63         | ID OPENSQUARE INTCONST CLOSESQUARE
-
-   64 var_use: ID
-   65        | ID OPENSQUARE INTCONST CLOSESQUARE
-
-   66 supported_constant: INTCONST
-   67                   | CHARCONST
-   68                   | BOOLCONST
-   69                   | OPENNEGATE INTCONST CLOSEPAREN
+   63 supported_constant: INTCONST
+   64                   | CHARCONST
+   65                   | BOOLCONST
+   66                   | OPENNEGATE INTCONST CLOSEPAREN
 
 
 Terminals, with rules where they appear
@@ -129,26 +120,26 @@ NONTERMINAL (0) 0
 TERMINAL (1)
 VALUE (2)
 '\n' (10) 3 9
-error (256) 3 9 21 22 34 41 42 56
-ID (258) 18 21 45 60 61 62 63 64 65
-COMMA (259) 10 19 22 57
+error (256) 3 9 21 22 34 41 42 53
+ID (258) 18 21 45 57 58 59 60 61 62
+COMMA (259) 10 19 22 54
 SEMI (260) 6 29 39 40
 OPENPAREN (261) 15 17 35 38 45 46
-CLOSEPAREN (262) 15 17 35 38 45 46 49 69
+CLOSEPAREN (262) 15 17 35 38 45 46 48 66
 OPENCURLY (263) 24
 CLOSECURLY (264) 23
-OPENSQUARE (265) 61 63 65
-CLOSESQUARE (266) 61 63 65
-OPENNEGATE (267) 49 69
+OPENSQUARE (265) 58 60 62
+CLOSESQUARE (266) 58 60 62
+OPENNEGATE (267) 48 66
 VOID (268) 17
 DTYPE_INT (269) 11
 DTYPE_BOOL (270) 12
 DTYPE_CHAR (271) 13
-EQ (272) 55 56
-ARITH (273) 48
-RELN (274) 51
-LOGICAL (275) 53
-LOGICALNOT (276) 54
+EQ (272) 52 53
+ARITH (273) 47
+RELN (274) 49
+LOGICAL (275) 50
+LOGICALNOT (276) 51
 IF (277) 35
 ELSE (278) 37
 WHILE (279) 38
@@ -156,9 +147,9 @@ FOR (280)
 RETURN (281) 39 40 41 42
 PRINT (282)
 READ (283)
-BOOLCONST (284) 68
-INTCONST (285) 61 63 65 66 69
-CHARCONST (286) 67
+BOOLCONST (284) 65
+INTCONST (285) 58 60 62 63 66
+CHARCONST (286) 64
 
 
 Nonterminals, with rules where they appear
@@ -206,24 +197,18 @@ while_statement (54)
 return_statement (55)
     on left: 39 40 41 42, on right: 32
 alr_subexpression (56)
-    on left: 43 44 45 46 48 49 51 53 54 55 56, on right: 29 34 35 38
-    40 42 46 48 49 51 53 54 55 56
-@3 (57)
-    on left: 47, on right: 48
-@4 (58)
-    on left: 50, on right: 51
-@5 (59)
-    on left: 52, on right: 53
-id_list (60)
-    on left: 57 58 59, on right: 45 57
-lhs (61)
-    on left: 60 61, on right: 55
-var_decl (62)
-    on left: 62 63, on right: 7 8 9 19
-var_use (63)
-    on left: 64 65, on right: 44 57 58
-supported_constant (64)
-    on left: 66 67 68 69, on right: 43
+    on left: 43 44 45 46 47 48 49 50 51 52 53, on right: 29 34 35 38
+    40 42 46 47 48 49 50 51 52 53
+id_list (57)
+    on left: 54 55 56, on right: 45 54
+lhs (58)
+    on left: 57 58, on right: 52
+var_decl (59)
+    on left: 59 60, on right: 7 8 9 19
+var_use (60)
+    on left: 61 62, on right: 44 54 55
+supported_constant (61)
+    on left: 63 64 65 66, on right: 43
 
 
 State 0
@@ -419,13 +404,13 @@ State 20
 State 21
 
    18 func_name: ID .
-   62 var_decl: ID .
-   63         | ID . OPENSQUARE INTCONST CLOSESQUARE
+   59 var_decl: ID .
+   60         | ID . OPENSQUARE INTCONST CLOSESQUARE
 
     OPENSQUARE  shift, and go to state 28
 
     OPENPAREN  reduce using rule 18 (func_name)
-    $default   reduce using rule 62 (var_decl)
+    $default   reduce using rule 59 (var_decl)
 
 
 State 22
@@ -451,12 +436,12 @@ State 24
 
 State 25
 
-   62 var_decl: ID .
-   63         | ID . OPENSQUARE INTCONST CLOSESQUARE
+   59 var_decl: ID .
+   60         | ID . OPENSQUARE INTCONST CLOSESQUARE
 
     OPENSQUARE  shift, and go to state 28
 
-    $default  reduce using rule 62 (var_decl)
+    $default  reduce using rule 59 (var_decl)
 
 
 State 26
@@ -475,7 +460,7 @@ State 27
 
 State 28
 
-   63 var_decl: ID OPENSQUARE . INTCONST CLOSESQUARE
+   60 var_decl: ID OPENSQUARE . INTCONST CLOSESQUARE
 
     INTCONST  shift, and go to state 32
 
@@ -512,7 +497,7 @@ State 31
 
 State 32
 
-   63 var_decl: ID OPENSQUARE INTCONST . CLOSESQUARE
+   60 var_decl: ID OPENSQUARE INTCONST . CLOSESQUARE
 
     CLOSESQUARE  shift, and go to state 36
 
@@ -552,9 +537,9 @@ State 35
 
 State 36
 
-   63 var_decl: ID OPENSQUARE INTCONST CLOSESQUARE .
+   60 var_decl: ID OPENSQUARE INTCONST CLOSESQUARE .
 
-    $default  reduce using rule 63 (var_decl)
+    $default  reduce using rule 60 (var_decl)
 
 
 State 37
@@ -574,13 +559,13 @@ State 38
 State 39
 
    21 argument_list: dtype ID . error argument_list
-   62 var_decl: ID .
-   63         | ID . OPENSQUARE INTCONST CLOSESQUARE
+   59 var_decl: ID .
+   60         | ID . OPENSQUARE INTCONST CLOSESQUARE
 
     error       shift, and go to state 44
     OPENSQUARE  shift, and go to state 28
 
-    COMMA  reduce using rule 62 (var_decl)
+    COMMA  reduce using rule 59 (var_decl)
 
 
 State 40
@@ -776,7 +761,7 @@ State 56
 
 State 57
 
-   56 alr_subexpression: error . EQ alr_subexpression
+   53 alr_subexpression: error . EQ alr_subexpression
 
     EQ  shift, and go to state 78
 
@@ -784,16 +769,16 @@ State 57
 State 58
 
    45 alr_subexpression: ID . OPENPAREN id_list CLOSEPAREN
-   60 lhs: ID .
-   61    | ID . OPENSQUARE INTCONST CLOSESQUARE
-   64 var_use: ID .
-   65        | ID . OPENSQUARE INTCONST CLOSESQUARE
+   57 lhs: ID .
+   58    | ID . OPENSQUARE INTCONST CLOSESQUARE
+   61 var_use: ID .
+   62        | ID . OPENSQUARE INTCONST CLOSESQUARE
 
     OPENPAREN   shift, and go to state 79
     OPENSQUARE  shift, and go to state 80
 
-    EQ        reduce using rule 60 (lhs)
-    $default  reduce using rule 64 (var_use)
+    EQ        reduce using rule 57 (lhs)
+    $default  reduce using rule 61 (var_use)
 
 
 State 59
@@ -817,8 +802,8 @@ State 59
 
 State 60
 
-   49 alr_subexpression: OPENNEGATE . alr_subexpression CLOSEPAREN
-   69 supported_constant: OPENNEGATE . INTCONST CLOSEPAREN
+   48 alr_subexpression: OPENNEGATE . alr_subexpression CLOSEPAREN
+   66 supported_constant: OPENNEGATE . INTCONST CLOSEPAREN
 
     error       shift, and go to state 57
     ID          shift, and go to state 58
@@ -837,7 +822,7 @@ State 60
 
 State 61
 
-   54 alr_subexpression: LOGICALNOT . alr_subexpression
+   51 alr_subexpression: LOGICALNOT . alr_subexpression
 
     error       shift, and go to state 57
     ID          shift, and go to state 58
@@ -893,23 +878,23 @@ State 64
 
 State 65
 
-   68 supported_constant: BOOLCONST .
+   65 supported_constant: BOOLCONST .
 
-    $default  reduce using rule 68 (supported_constant)
+    $default  reduce using rule 65 (supported_constant)
 
 
 State 66
 
-   66 supported_constant: INTCONST .
+   63 supported_constant: INTCONST .
 
-    $default  reduce using rule 66 (supported_constant)
+    $default  reduce using rule 63 (supported_constant)
 
 
 State 67
 
-   67 supported_constant: CHARCONST .
+   64 supported_constant: CHARCONST .
 
-    $default  reduce using rule 67 (supported_constant)
+    $default  reduce using rule 64 (supported_constant)
 
 
 State 68
@@ -983,25 +968,20 @@ State 74
 
    29 supported_statement: alr_subexpression . SEMI
    34                    | alr_subexpression . error
-   48 alr_subexpression: alr_subexpression . @3 ARITH alr_subexpression
-   51                  | alr_subexpression . @4 RELN alr_subexpression
-   53                  | alr_subexpression . @5 LOGICAL alr_subexpression
+   47 alr_subexpression: alr_subexpression . ARITH alr_subexpression
+   49                  | alr_subexpression . RELN alr_subexpression
+   50                  | alr_subexpression . LOGICAL alr_subexpression
 
-    error  shift, and go to state 92
-    SEMI   shift, and go to state 93
-
-    ARITH    reduce using rule 47 (@3)
-    RELN     reduce using rule 50 (@4)
-    LOGICAL  reduce using rule 52 (@5)
-
-    @3  go to state 94
-    @4  go to state 95
-    @5  go to state 96
+    error    shift, and go to state 92
+    SEMI     shift, and go to state 93
+    ARITH    shift, and go to state 94
+    RELN     shift, and go to state 95
+    LOGICAL  shift, and go to state 96
 
 
 State 75
 
-   55 alr_subexpression: lhs . EQ alr_subexpression
+   52 alr_subexpression: lhs . EQ alr_subexpression
 
     EQ  shift, and go to state 97
 
@@ -1022,7 +1002,7 @@ State 77
 
 State 78
 
-   56 alr_subexpression: error EQ . alr_subexpression
+   53 alr_subexpression: error EQ . alr_subexpression
 
     error       shift, and go to state 57
     ID          shift, and go to state 58
@@ -1045,7 +1025,7 @@ State 79
 
     ID  shift, and go to state 99
 
-    $default  reduce using rule 59 (id_list)
+    $default  reduce using rule 56 (id_list)
 
     id_list  go to state 100
     var_use  go to state 101
@@ -1053,8 +1033,8 @@ State 79
 
 State 80
 
-   61 lhs: ID OPENSQUARE . INTCONST CLOSESQUARE
-   65 var_use: ID OPENSQUARE . INTCONST CLOSESQUARE
+   58 lhs: ID OPENSQUARE . INTCONST CLOSESQUARE
+   62 var_use: ID OPENSQUARE . INTCONST CLOSESQUARE
 
     INTCONST  shift, and go to state 102
 
@@ -1062,68 +1042,55 @@ State 80
 State 81
 
    46 alr_subexpression: OPENPAREN alr_subexpression . CLOSEPAREN
-   48                  | alr_subexpression . @3 ARITH alr_subexpression
-   51                  | alr_subexpression . @4 RELN alr_subexpression
-   53                  | alr_subexpression . @5 LOGICAL alr_subexpression
+   47                  | alr_subexpression . ARITH alr_subexpression
+   49                  | alr_subexpression . RELN alr_subexpression
+   50                  | alr_subexpression . LOGICAL alr_subexpression
 
     CLOSEPAREN  shift, and go to state 103
-
-    RELN      reduce using rule 50 (@4)
-    LOGICAL   reduce using rule 52 (@5)
-    $default  reduce using rule 47 (@3)
-
-    @3  go to state 94
-    @4  go to state 95
-    @5  go to state 96
+    ARITH       shift, and go to state 94
+    RELN        shift, and go to state 95
+    LOGICAL     shift, and go to state 96
 
 
 State 82
 
-   66 supported_constant: INTCONST .
-   69                   | OPENNEGATE INTCONST . CLOSEPAREN
+   63 supported_constant: INTCONST .
+   66                   | OPENNEGATE INTCONST . CLOSEPAREN
 
     CLOSEPAREN  shift, and go to state 104
 
-    CLOSEPAREN  [reduce using rule 66 (supported_constant)]
-    $default    reduce using rule 66 (supported_constant)
+    CLOSEPAREN  [reduce using rule 63 (supported_constant)]
+    $default    reduce using rule 63 (supported_constant)
 
 
 State 83
 
-   48 alr_subexpression: alr_subexpression . @3 ARITH alr_subexpression
-   49                  | OPENNEGATE alr_subexpression . CLOSEPAREN
-   51                  | alr_subexpression . @4 RELN alr_subexpression
-   53                  | alr_subexpression . @5 LOGICAL alr_subexpression
+   47 alr_subexpression: alr_subexpression . ARITH alr_subexpression
+   48                  | OPENNEGATE alr_subexpression . CLOSEPAREN
+   49                  | alr_subexpression . RELN alr_subexpression
+   50                  | alr_subexpression . LOGICAL alr_subexpression
 
     CLOSEPAREN  shift, and go to state 105
-
-    RELN      reduce using rule 50 (@4)
-    LOGICAL   reduce using rule 52 (@5)
-    $default  reduce using rule 47 (@3)
-
-    @3  go to state 94
-    @4  go to state 95
-    @5  go to state 96
+    ARITH       shift, and go to state 94
+    RELN        shift, and go to state 95
+    LOGICAL     shift, and go to state 96
 
 
 State 84
 
-   48 alr_subexpression: alr_subexpression . @3 ARITH alr_subexpression
-   51                  | alr_subexpression . @4 RELN alr_subexpression
-   53                  | alr_subexpression . @5 LOGICAL alr_subexpression
-   54                  | LOGICALNOT alr_subexpression .
+   47 alr_subexpression: alr_subexpression . ARITH alr_subexpression
+   49                  | alr_subexpression . RELN alr_subexpression
+   50                  | alr_subexpression . LOGICAL alr_subexpression
+   51                  | LOGICALNOT alr_subexpression .
 
-    ARITH     reduce using rule 47 (@3)
-    ARITH     [reduce using rule 54 (alr_subexpression)]
-    RELN      reduce using rule 50 (@4)
-    RELN      [reduce using rule 54 (alr_subexpression)]
-    LOGICAL   reduce using rule 52 (@5)
-    LOGICAL   [reduce using rule 54 (alr_subexpression)]
-    $default  reduce using rule 54 (alr_subexpression)
+    ARITH    shift, and go to state 94
+    RELN     shift, and go to state 95
+    LOGICAL  shift, and go to state 96
 
-    @3  go to state 94
-    @4  go to state 95
-    @5  go to state 96
+    ARITH     [reduce using rule 51 (alr_subexpression)]
+    RELN      [reduce using rule 51 (alr_subexpression)]
+    LOGICAL   [reduce using rule 51 (alr_subexpression)]
+    $default  reduce using rule 51 (alr_subexpression)
 
 
 State 85
@@ -1167,7 +1134,7 @@ State 86
 State 87
 
    41 return_statement: RETURN error .
-   56 alr_subexpression: error . EQ alr_subexpression
+   53 alr_subexpression: error . EQ alr_subexpression
 
     EQ  shift, and go to state 78
 
@@ -1185,20 +1152,15 @@ State 89
 
    40 return_statement: RETURN alr_subexpression . SEMI
    42                 | RETURN alr_subexpression . error
-   48 alr_subexpression: alr_subexpression . @3 ARITH alr_subexpression
-   51                  | alr_subexpression . @4 RELN alr_subexpression
-   53                  | alr_subexpression . @5 LOGICAL alr_subexpression
+   47 alr_subexpression: alr_subexpression . ARITH alr_subexpression
+   49                  | alr_subexpression . RELN alr_subexpression
+   50                  | alr_subexpression . LOGICAL alr_subexpression
 
-    error  shift, and go to state 108
-    SEMI   shift, and go to state 109
-
-    ARITH    reduce using rule 47 (@3)
-    RELN     reduce using rule 50 (@4)
-    LOGICAL  reduce using rule 52 (@5)
-
-    @3  go to state 94
-    @4  go to state 95
-    @5  go to state 96
+    error    shift, and go to state 108
+    SEMI     shift, and go to state 109
+    ARITH    shift, and go to state 94
+    RELN     shift, and go to state 95
+    LOGICAL  shift, and go to state 96
 
 
 State 90
@@ -1231,28 +1193,64 @@ State 93
 
 State 94
 
-   48 alr_subexpression: alr_subexpression @3 . ARITH alr_subexpression
+   47 alr_subexpression: alr_subexpression ARITH . alr_subexpression
 
-    ARITH  shift, and go to state 110
+    error       shift, and go to state 57
+    ID          shift, and go to state 58
+    OPENPAREN   shift, and go to state 59
+    OPENNEGATE  shift, and go to state 60
+    LOGICALNOT  shift, and go to state 61
+    BOOLCONST   shift, and go to state 65
+    INTCONST    shift, and go to state 66
+    CHARCONST   shift, and go to state 67
+
+    alr_subexpression   go to state 110
+    lhs                 go to state 75
+    var_use             go to state 76
+    supported_constant  go to state 77
 
 
 State 95
 
-   51 alr_subexpression: alr_subexpression @4 . RELN alr_subexpression
+   49 alr_subexpression: alr_subexpression RELN . alr_subexpression
 
-    RELN  shift, and go to state 111
+    error       shift, and go to state 57
+    ID          shift, and go to state 58
+    OPENPAREN   shift, and go to state 59
+    OPENNEGATE  shift, and go to state 60
+    LOGICALNOT  shift, and go to state 61
+    BOOLCONST   shift, and go to state 65
+    INTCONST    shift, and go to state 66
+    CHARCONST   shift, and go to state 67
+
+    alr_subexpression   go to state 111
+    lhs                 go to state 75
+    var_use             go to state 76
+    supported_constant  go to state 77
 
 
 State 96
 
-   53 alr_subexpression: alr_subexpression @5 . LOGICAL alr_subexpression
+   50 alr_subexpression: alr_subexpression LOGICAL . alr_subexpression
 
-    LOGICAL  shift, and go to state 112
+    error       shift, and go to state 57
+    ID          shift, and go to state 58
+    OPENPAREN   shift, and go to state 59
+    OPENNEGATE  shift, and go to state 60
+    LOGICALNOT  shift, and go to state 61
+    BOOLCONST   shift, and go to state 65
+    INTCONST    shift, and go to state 66
+    CHARCONST   shift, and go to state 67
+
+    alr_subexpression   go to state 112
+    lhs                 go to state 75
+    var_use             go to state 76
+    supported_constant  go to state 77
 
 
 State 97
 
-   55 alr_subexpression: lhs EQ . alr_subexpression
+   52 alr_subexpression: lhs EQ . alr_subexpression
 
     error       shift, and go to state 57
     ID          shift, and go to state 58
@@ -1271,38 +1269,35 @@ State 97
 
 State 98
 
-   48 alr_subexpression: alr_subexpression . @3 ARITH alr_subexpression
-   51                  | alr_subexpression . @4 RELN alr_subexpression
-   53                  | alr_subexpression . @5 LOGICAL alr_subexpression
-   56                  | error EQ alr_subexpression .
+   47 alr_subexpression: alr_subexpression . ARITH alr_subexpression
+   49                  | alr_subexpression . RELN alr_subexpression
+   50                  | alr_subexpression . LOGICAL alr_subexpression
+   53                  | error EQ alr_subexpression .
 
-    ARITH     reduce using rule 47 (@3)
-    ARITH     [reduce using rule 56 (alr_subexpression)]
-    RELN      reduce using rule 50 (@4)
-    RELN      [reduce using rule 56 (alr_subexpression)]
-    LOGICAL   reduce using rule 52 (@5)
-    LOGICAL   [reduce using rule 56 (alr_subexpression)]
-    $default  reduce using rule 56 (alr_subexpression)
+    ARITH    shift, and go to state 94
+    RELN     shift, and go to state 95
+    LOGICAL  shift, and go to state 96
 
-    @3  go to state 94
-    @4  go to state 95
-    @5  go to state 96
+    ARITH     [reduce using rule 53 (alr_subexpression)]
+    RELN      [reduce using rule 53 (alr_subexpression)]
+    LOGICAL   [reduce using rule 53 (alr_subexpression)]
+    $default  reduce using rule 53 (alr_subexpression)
 
 
 State 99
 
-   64 var_use: ID .
-   65        | ID . OPENSQUARE INTCONST CLOSESQUARE
+   61 var_use: ID .
+   62        | ID . OPENSQUARE INTCONST CLOSESQUARE
 
     OPENSQUARE  shift, and go to state 114
 
-    $default  reduce using rule 64 (var_use)
+    $default  reduce using rule 61 (var_use)
 
 
 State 100
 
    45 alr_subexpression: ID OPENPAREN id_list . CLOSEPAREN
-   57 id_list: id_list . COMMA var_use
+   54 id_list: id_list . COMMA var_use
 
     COMMA       shift, and go to state 115
     CLOSEPAREN  shift, and go to state 116
@@ -1310,15 +1305,15 @@ State 100
 
 State 101
 
-   58 id_list: var_use .
+   55 id_list: var_use .
 
-    $default  reduce using rule 58 (id_list)
+    $default  reduce using rule 55 (id_list)
 
 
 State 102
 
-   61 lhs: ID OPENSQUARE INTCONST . CLOSESQUARE
-   65 var_use: ID OPENSQUARE INTCONST . CLOSESQUARE
+   58 lhs: ID OPENSQUARE INTCONST . CLOSESQUARE
+   62 var_use: ID OPENSQUARE INTCONST . CLOSESQUARE
 
     CLOSESQUARE  shift, and go to state 117
 
@@ -1332,52 +1327,42 @@ State 103
 
 State 104
 
-   69 supported_constant: OPENNEGATE INTCONST CLOSEPAREN .
+   66 supported_constant: OPENNEGATE INTCONST CLOSEPAREN .
 
-    $default  reduce using rule 69 (supported_constant)
+    $default  reduce using rule 66 (supported_constant)
 
 
 State 105
 
-   49 alr_subexpression: OPENNEGATE alr_subexpression CLOSEPAREN .
+   48 alr_subexpression: OPENNEGATE alr_subexpression CLOSEPAREN .
 
-    $default  reduce using rule 49 (alr_subexpression)
+    $default  reduce using rule 48 (alr_subexpression)
 
 
 State 106
 
    35 if_statement: IF OPENPAREN alr_subexpression . CLOSEPAREN statement_block else_statement
-   48 alr_subexpression: alr_subexpression . @3 ARITH alr_subexpression
-   51                  | alr_subexpression . @4 RELN alr_subexpression
-   53                  | alr_subexpression . @5 LOGICAL alr_subexpression
+   47 alr_subexpression: alr_subexpression . ARITH alr_subexpression
+   49                  | alr_subexpression . RELN alr_subexpression
+   50                  | alr_subexpression . LOGICAL alr_subexpression
 
     CLOSEPAREN  shift, and go to state 118
-
-    RELN      reduce using rule 50 (@4)
-    LOGICAL   reduce using rule 52 (@5)
-    $default  reduce using rule 47 (@3)
-
-    @3  go to state 94
-    @4  go to state 95
-    @5  go to state 96
+    ARITH       shift, and go to state 94
+    RELN        shift, and go to state 95
+    LOGICAL     shift, and go to state 96
 
 
 State 107
 
    38 while_statement: WHILE OPENPAREN alr_subexpression . CLOSEPAREN statement_block
-   48 alr_subexpression: alr_subexpression . @3 ARITH alr_subexpression
-   51                  | alr_subexpression . @4 RELN alr_subexpression
-   53                  | alr_subexpression . @5 LOGICAL alr_subexpression
+   47 alr_subexpression: alr_subexpression . ARITH alr_subexpression
+   49                  | alr_subexpression . RELN alr_subexpression
+   50                  | alr_subexpression . LOGICAL alr_subexpression
 
     CLOSEPAREN  shift, and go to state 119
-
-    RELN      reduce using rule 50 (@4)
-    LOGICAL   reduce using rule 52 (@5)
-    $default  reduce using rule 47 (@3)
-
-    @3  go to state 94
-    @4  go to state 95
-    @5  go to state 96
+    ARITH       shift, and go to state 94
+    RELN        shift, and go to state 95
+    LOGICAL     shift, and go to state 96
 
 
 State 108
@@ -1396,95 +1381,86 @@ State 109
 
 State 110
 
-   48 alr_subexpression: alr_subexpression @3 ARITH . alr_subexpression
+   47 alr_subexpression: alr_subexpression . ARITH alr_subexpression
+   47                  | alr_subexpression ARITH alr_subexpression .
+   49                  | alr_subexpression . RELN alr_subexpression
+   50                  | alr_subexpression . LOGICAL alr_subexpression
 
-    error       shift, and go to state 57
-    ID          shift, and go to state 58
-    OPENPAREN   shift, and go to state 59
-    OPENNEGATE  shift, and go to state 60
-    LOGICALNOT  shift, and go to state 61
-    BOOLCONST   shift, and go to state 65
-    INTCONST    shift, and go to state 66
-    CHARCONST   shift, and go to state 67
+    ARITH    shift, and go to state 94
+    RELN     shift, and go to state 95
+    LOGICAL  shift, and go to state 96
 
-    alr_subexpression   go to state 120
-    lhs                 go to state 75
-    var_use             go to state 76
-    supported_constant  go to state 77
+    ARITH     [reduce using rule 47 (alr_subexpression)]
+    RELN      [reduce using rule 47 (alr_subexpression)]
+    LOGICAL   [reduce using rule 47 (alr_subexpression)]
+    $default  reduce using rule 47 (alr_subexpression)
 
 
 State 111
 
-   51 alr_subexpression: alr_subexpression @4 RELN . alr_subexpression
+   47 alr_subexpression: alr_subexpression . ARITH alr_subexpression
+   49                  | alr_subexpression . RELN alr_subexpression
+   49                  | alr_subexpression RELN alr_subexpression .
+   50                  | alr_subexpression . LOGICAL alr_subexpression
 
-    error       shift, and go to state 57
-    ID          shift, and go to state 58
-    OPENPAREN   shift, and go to state 59
-    OPENNEGATE  shift, and go to state 60
-    LOGICALNOT  shift, and go to state 61
-    BOOLCONST   shift, and go to state 65
-    INTCONST    shift, and go to state 66
-    CHARCONST   shift, and go to state 67
+    ARITH    shift, and go to state 94
+    RELN     shift, and go to state 95
+    LOGICAL  shift, and go to state 96
 
-    alr_subexpression   go to state 121
-    lhs                 go to state 75
-    var_use             go to state 76
-    supported_constant  go to state 77
+    ARITH     [reduce using rule 49 (alr_subexpression)]
+    RELN      [reduce using rule 49 (alr_subexpression)]
+    LOGICAL   [reduce using rule 49 (alr_subexpression)]
+    $default  reduce using rule 49 (alr_subexpression)
 
 
 State 112
 
-   53 alr_subexpression: alr_subexpression @5 LOGICAL . alr_subexpression
+   47 alr_subexpression: alr_subexpression . ARITH alr_subexpression
+   49                  | alr_subexpression . RELN alr_subexpression
+   50                  | alr_subexpression . LOGICAL alr_subexpression
+   50                  | alr_subexpression LOGICAL alr_subexpression .
 
-    error       shift, and go to state 57
-    ID          shift, and go to state 58
-    OPENPAREN   shift, and go to state 59
-    OPENNEGATE  shift, and go to state 60
-    LOGICALNOT  shift, and go to state 61
-    BOOLCONST   shift, and go to state 65
-    INTCONST    shift, and go to state 66
-    CHARCONST   shift, and go to state 67
+    ARITH    shift, and go to state 94
+    RELN     shift, and go to state 95
+    LOGICAL  shift, and go to state 96
 
-    alr_subexpression   go to state 122
-    lhs                 go to state 75
-    var_use             go to state 76
-    supported_constant  go to state 77
+    ARITH     [reduce using rule 50 (alr_subexpression)]
+    RELN      [reduce using rule 50 (alr_subexpression)]
+    LOGICAL   [reduce using rule 50 (alr_subexpression)]
+    $default  reduce using rule 50 (alr_subexpression)
 
 
 State 113
 
-   48 alr_subexpression: alr_subexpression . @3 ARITH alr_subexpression
-   51                  | alr_subexpression . @4 RELN alr_subexpression
-   53                  | alr_subexpression . @5 LOGICAL alr_subexpression
-   55                  | lhs EQ alr_subexpression .
+   47 alr_subexpression: alr_subexpression . ARITH alr_subexpression
+   49                  | alr_subexpression . RELN alr_subexpression
+   50                  | alr_subexpression . LOGICAL alr_subexpression
+   52                  | lhs EQ alr_subexpression .
 
-    ARITH     reduce using rule 47 (@3)
-    ARITH     [reduce using rule 55 (alr_subexpression)]
-    RELN      reduce using rule 50 (@4)
-    RELN      [reduce using rule 55 (alr_subexpression)]
-    LOGICAL   reduce using rule 52 (@5)
-    LOGICAL   [reduce using rule 55 (alr_subexpression)]
-    $default  reduce using rule 55 (alr_subexpression)
+    ARITH    shift, and go to state 94
+    RELN     shift, and go to state 95
+    LOGICAL  shift, and go to state 96
 
-    @3  go to state 94
-    @4  go to state 95
-    @5  go to state 96
+    ARITH     [reduce using rule 52 (alr_subexpression)]
+    RELN      [reduce using rule 52 (alr_subexpression)]
+    LOGICAL   [reduce using rule 52 (alr_subexpression)]
+    $default  reduce using rule 52 (alr_subexpression)
 
 
 State 114
 
-   65 var_use: ID OPENSQUARE . INTCONST CLOSESQUARE
+   62 var_use: ID OPENSQUARE . INTCONST CLOSESQUARE
 
-    INTCONST  shift, and go to state 123
+    INTCONST  shift, and go to state 120
 
 
 State 115
 
-   57 id_list: id_list COMMA . var_use
+   54 id_list: id_list COMMA . var_use
 
     ID  shift, and go to state 99
 
-    var_use  go to state 124
+    var_use  go to state 121
 
 
 State 116
@@ -1496,11 +1472,11 @@ State 116
 
 State 117
 
-   61 lhs: ID OPENSQUARE INTCONST CLOSESQUARE .
-   65 var_use: ID OPENSQUARE INTCONST CLOSESQUARE .
+   58 lhs: ID OPENSQUARE INTCONST CLOSESQUARE .
+   62 var_use: ID OPENSQUARE INTCONST CLOSESQUARE .
 
-    EQ        reduce using rule 61 (lhs)
-    $default  reduce using rule 65 (var_use)
+    EQ        reduce using rule 58 (lhs)
+    $default  reduce using rule 62 (var_use)
 
 
 State 118
@@ -1509,7 +1485,7 @@ State 118
 
     OPENCURLY  shift, and go to state 46
 
-    statement_block  go to state 125
+    statement_block  go to state 122
     opencurly        go to state 48
 
 
@@ -1519,127 +1495,67 @@ State 119
 
     OPENCURLY  shift, and go to state 46
 
-    statement_block  go to state 126
+    statement_block  go to state 123
     opencurly        go to state 48
 
 
 State 120
 
-   48 alr_subexpression: alr_subexpression . @3 ARITH alr_subexpression
-   48                  | alr_subexpression @3 ARITH alr_subexpression .
-   51                  | alr_subexpression . @4 RELN alr_subexpression
-   53                  | alr_subexpression . @5 LOGICAL alr_subexpression
+   62 var_use: ID OPENSQUARE INTCONST . CLOSESQUARE
 
-    ARITH     reduce using rule 47 (@3)
-    ARITH     [reduce using rule 48 (alr_subexpression)]
-    RELN      reduce using rule 48 (alr_subexpression)
-    RELN      [reduce using rule 50 (@4)]
-    LOGICAL   reduce using rule 48 (alr_subexpression)
-    LOGICAL   [reduce using rule 52 (@5)]
-    $default  reduce using rule 48 (alr_subexpression)
-
-    @3  go to state 94
-    @4  go to state 95
-    @5  go to state 96
+    CLOSESQUARE  shift, and go to state 124
 
 
 State 121
 
-   48 alr_subexpression: alr_subexpression . @3 ARITH alr_subexpression
-   51                  | alr_subexpression . @4 RELN alr_subexpression
-   51                  | alr_subexpression @4 RELN alr_subexpression .
-   53                  | alr_subexpression . @5 LOGICAL alr_subexpression
+   54 id_list: id_list COMMA var_use .
 
-    ARITH     reduce using rule 47 (@3)
-    ARITH     [reduce using rule 51 (alr_subexpression)]
-    RELN      reduce using rule 50 (@4)
-    RELN      [reduce using rule 51 (alr_subexpression)]
-    LOGICAL   reduce using rule 51 (alr_subexpression)
-    LOGICAL   [reduce using rule 52 (@5)]
-    $default  reduce using rule 51 (alr_subexpression)
-
-    @3  go to state 94
-    @4  go to state 95
-    @5  go to state 96
+    $default  reduce using rule 54 (id_list)
 
 
 State 122
 
-   48 alr_subexpression: alr_subexpression . @3 ARITH alr_subexpression
-   51                  | alr_subexpression . @4 RELN alr_subexpression
-   53                  | alr_subexpression . @5 LOGICAL alr_subexpression
-   53                  | alr_subexpression @5 LOGICAL alr_subexpression .
-
-    ARITH     reduce using rule 47 (@3)
-    ARITH     [reduce using rule 53 (alr_subexpression)]
-    RELN      reduce using rule 50 (@4)
-    RELN      [reduce using rule 53 (alr_subexpression)]
-    LOGICAL   reduce using rule 52 (@5)
-    LOGICAL   [reduce using rule 53 (alr_subexpression)]
-    $default  reduce using rule 53 (alr_subexpression)
-
-    @3  go to state 94
-    @4  go to state 95
-    @5  go to state 96
-
-
-State 123
-
-   65 var_use: ID OPENSQUARE INTCONST . CLOSESQUARE
-
-    CLOSESQUARE  shift, and go to state 127
-
-
-State 124
-
-   57 id_list: id_list COMMA var_use .
-
-    $default  reduce using rule 57 (id_list)
-
-
-State 125
-
    35 if_statement: IF OPENPAREN alr_subexpression CLOSEPAREN statement_block . else_statement
 
-    ELSE  shift, and go to state 128
+    ELSE  shift, and go to state 125
 
     $default  reduce using rule 36 (else_statement)
 
-    else_statement  go to state 129
+    else_statement  go to state 126
 
 
-State 126
+State 123
 
    38 while_statement: WHILE OPENPAREN alr_subexpression CLOSEPAREN statement_block .
 
     $default  reduce using rule 38 (while_statement)
 
 
-State 127
+State 124
 
-   65 var_use: ID OPENSQUARE INTCONST CLOSESQUARE .
+   62 var_use: ID OPENSQUARE INTCONST CLOSESQUARE .
 
-    $default  reduce using rule 65 (var_use)
+    $default  reduce using rule 62 (var_use)
 
 
-State 128
+State 125
 
    37 else_statement: ELSE . statement_block
 
     OPENCURLY  shift, and go to state 46
 
-    statement_block  go to state 130
+    statement_block  go to state 127
     opencurly        go to state 48
 
 
-State 129
+State 126
 
    35 if_statement: IF OPENPAREN alr_subexpression CLOSEPAREN statement_block else_statement .
 
     $default  reduce using rule 35 (if_statement)
 
 
-State 130
+State 127
 
    37 else_statement: ELSE statement_block .
 

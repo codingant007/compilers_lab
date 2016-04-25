@@ -805,7 +805,7 @@ alr_subexpression:
       //  $$= new attr();
 
 	   //Semantic analyses - Nothing to check
-	   $$ = new attr(); copy_attr($$,$1);
+     $$ = new attr(); copy_attr($$,$1);
 
 	   //CodeGen - Nothing to do
 
@@ -881,26 +881,15 @@ alr_subexpression:
 	| OPENPAREN alr_subexpression CLOSEPAREN {
 		//Semantic Analyses - no checks needed
 		//CodeGen
-		$$ = $2;
+		copy_attr($$,$2);
   }
-	| alr_subexpression
-      {
-	    //Semantic Analyses
-	    //Code Generation
-      $<attr_el>$ = new attr();
-	        if (!has_error){
-	            $<attr_el>$->code = ($<attr_el>0)->code;
-    	        $<attr_el>$->code += "sw $t0 0($s0) \n";
-    	        $<attr_el>$->code += "addiu $sp $sp -4\n";
-	        }
-	    }
+	| alr_subexpression ARITH alr_subexpression {
 
-	    ARITH alr_subexpression {
         $$ = new attr();
         // cout<< $1->type << " " << $4->type <<endl;
 	    //Semantic Analyses
       //cout << $1->type << "\t"<< $1->code <<endl;
-	    if (cast($1->type, $4->type, 1) < 0)
+	    if (cast($1->type, $3->type, 1) < 0)
 	    {
 	        has_error = 1;
 	        $$->type = ERR;
@@ -909,22 +898,26 @@ alr_subexpression:
 
 	    //Code Generation
 	    if (!has_error){
-	        $$->code = $<attr_el>2->code;
-	        $$->code += $4->code;
-            $$->code += "lw $t1 4($sp)\n";
-            $$->code += "addiu $sp $sp 4\n";
-	        if ($3 == "+"){
+        $$->code = $1->code;
+        $$->code += "sw $t0 0($sp) \n";
+        $$->code += "addiu $sp $sp -4\n";
+        $$->code +=  $3->code;
+        $$->code += "lw $t1 4($sp)\n";
+        $$->code += "addiu $sp $sp 4\n";
+        // cout << $2 << " " << ($2 == "+") <<endl;
+	        if (string($2) == string("+")){
 	            $$->code += "add $t0 $t0 $t1\n";
 	        }
-	        else if ($3 == "-"){
+	        else if ( string($2) == string("-")){
 	            $$->code += "sub $t0 $t1 $t0\n";
 	        }
-	        else if ($3 == "*"){
+	        else if ( string($2) == string("*")){
 	            $$->code += "mul $t0 $t0 $t1\n";
 	        }
-	        else if ($3 == "/"){
+	        else if ( string($2) == string("/")){
 	            $$->code += "div $t0 $t1 $t0\n";
 	        }
+        $$->type = INT;
 	    }
 	}
 	| OPENNEGATE alr_subexpression CLOSEPAREN {
@@ -936,22 +929,10 @@ alr_subexpression:
 		    $$->code += "neg $t0 $t0 \n";
 		}
 	}
-	| alr_subexpression
-	    {
-	    //Semantic Analyses - no checks
-	    //Code Generation
-      $<attr_el>$ = new attr();
-	        if (!has_error){
-	            $<attr_el>$->code = ($<attr_el>0)->code;
-    	        $<attr_el>$->code += "sw $t0 0($s0) \n";
-    	        $<attr_el>$->code += "addiu $sp $sp -4\n";
-	        }
-	    }
-
-	    RELN alr_subexpression {
+	| alr_subexpression   RELN alr_subexpression {
         $$ = new attr();
 	    //Semantic Analyses
-	    if ( !are_comparable($1->type, $4->type) )
+	    if ( !are_comparable($1->type, $3->type) )
 	    {
 	        has_error = true;
 	        $$->type = ERR;
@@ -961,26 +942,28 @@ alr_subexpression:
 		//Code Generation
 		if (!has_error){
 		    $$->type = BOOL;
-		    $$->code = $<attr_el>2->code;
-	        $$->code += $4->code;
-            $$->code += "lw $t1 4($sp)\n";
-            $$->code += "addiu $sp $sp 4\n";
-	        if ($3 == "=="){
+        $$->code = $1->code;
+        $$->code += "sw $t0 0($sp) \n";
+        $$->code += "addiu $sp $sp -4\n";
+        $$->code += $3->code;
+        $$->code += "lw $t1 4($sp)\n";
+        $$->code += "addiu $sp $sp 4\n";
+	        if (string($2) == string("==") ){
 	            $$->code += "seq $t0 $t1 $t0\n";
 	        }
-	        else if ($3 == "<"){
+	        else if (string($2) == string("<") ){
 	            $$->code += "slt $t0 $t1 $t0\n";
 	        }
-	        else if ($3 == "<="){
+	        else if ( string($2) == string("<=")){
 	            $$->code += "sle $t0 $t1 $t0\n";
 	        }
-	        else if ($3 == ">"){
+	        else if (string($2) == string(">")){
 	            $$->code += "sgt $t0 $t1 $t0\n";
 	        }
-	        else if ($3 == ">="){
+	        else if (string($2) == string(">=")){
 	            $$->code += "sge $t0 $t1 $t0\n";
 	        }
-	        else if ($3 == "!="){
+	        else if (string($2) == string("!=")){
 	            $$->code += "seq $t0 $t1 $t0\n";
 	            $$->code += "xori $t0 $t0 0x1\n";
 	        }
@@ -988,28 +971,10 @@ alr_subexpression:
 		}
 	}
 
-	| alr_subexpression
-	    {
-        $<attr_el>$ = new attr();
-	    //Semantic Analyses - no checks
-	    if ($<attr_el>$->type == CHAR){
-	        has_error = true;
-	    }
-	    //Code Generation
-
-	        if (!has_error){
-	            $<attr_el>$->code = ($<attr_el>0)->code;
-	            if ($<attr_el>$->type == INT){
-	                $<attr_el>$->code += intToBool();
-	            }
-    	        $<attr_el>$->code += "sw $t0 0($s0) \n";
-    	        $<attr_el>$->code += "addiu $sp $sp -4\n";
-	        }
-	    }
-	  LOGICAL alr_subexpression {
+	| alr_subexpression LOGICAL alr_subexpression {
         $$ = new attr();
         //Semantic Analyses
-        if ( ($1->type == CHAR || $4->type == CHAR) )
+        if ( ($1->type == CHAR || $3->type == CHAR) )
         {
             has_error = true;
             $$->type = ERR;
@@ -1018,18 +983,25 @@ alr_subexpression:
         //Code Generation
         if (!has_error){
             $$->type = BOOL;
-            $$->code = $<attr_el>2->code;
-	        $$->code += $4->code;
-	        if ($4->type == INT){
+
+            $$->code = $1->code;
+            if ($1->type == INT){
+              $$->code += intToBool();
+            }
+            $$->code += "sw $t0 0($sp) \n";
+            $$->code += "addiu $sp $sp -4\n";
+            $$->code += $3->code;
+
+          if ($3->type == INT){
 	            $$->code += intToBool();
 	        }
             $$->code += "lw $t1 4($sp)\n";
             $$->code += "addiu $sp $sp 4\n";
 
-            if ($3 == "&&"){
+            if (string($2) == string("&&")){
                 $$->code += "and $t0 $t0 $t1\n";
             }
-            else if ($3 == "||"){
+            else if (string($2) == string("||")){
                 $$->code += "or $t0 $t0 $t1\n";
             }
 
@@ -1418,7 +1390,8 @@ supported_constant:
         $$ = new attr();
         $$->ival =  atoi($1);
         $$->type = INT;
-        $$->code = "li $t0 " + string($1) + "\n";
+        string s = $1;
+        $$->code = "li $t0 " + s + "\n";
 
 	    //CodeGen
 	    //No codegen assoc with this production
@@ -1431,7 +1404,8 @@ supported_constant:
 
 	    //CodeGen
 
-        $$->code = "li $t0 \'" + string($1) + "\' \n";
+        string s = $1;
+        $$->code = "li $t0 \'" + s + "\' \n";
 
 
 	    //Tree-related stuff
