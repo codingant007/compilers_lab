@@ -343,7 +343,7 @@ variable_declarations:
 	variable_definitions SEMI {
     $$ = $1;
   }
-	| variable_definitions error { $$ = new attr(); $$->type = ERR; pretty_print_error(semicolon_error); }
+//	| variable_definitions error { $$ = new attr(); $$->type = ERR; pretty_print_error(semicolon_error); }
 
 variable_definitions:
 	dtype var_decl {
@@ -390,15 +390,15 @@ dtype:
     $$->type = CHAR;
     $$->ival = CHAR_SIZE;
   }
-	| error {
-    $$ = new attr();
-    $$->type = ERR;
-    $$->ival = -1;
-    pretty_print_error(type_error);
-  }
+	// | error {
+  //   $$ = new attr();
+  //   $$->type = ERR;
+  //   $$->ival = -1;
+  //   pretty_print_error(type_error);
+  // }
 
 function_declarations:
-	dtype func_name  { scope = 1; } OPENPAREN argument_list CLOSEPAREN statement_block {
+	dtype func_name  OPENPAREN { scope = 1; } argument_list CLOSEPAREN statement_block {
         //Scope Consideration
         scope = 0;
     		int cur_offset = 0;
@@ -533,7 +533,7 @@ argument_list:
   }
 
 statement_block:
-OPENCURLY { scope++; } variable_list statement_list CLOSECURLY {
+opencurly variable_list statement_list CLOSECURLY {
 		$$ = new attr();
 
   	if (has_error)
@@ -543,19 +543,22 @@ OPENCURLY { scope++; } variable_list statement_list CLOSECURLY {
     }
   	else
     {
-    	$$->code = $3->code + $4->code;
+    	$$->code = $2->code + $3->code;
     }
   	//Scope resolution
     map<string, var_record> temp;
   	sym_table[scope] = temp;
   	scope--;
   }
-	| OPENCURLY variable_list statement_list error {
-  	has_error = true;
-    pretty_print_error (" Possible missing closing brace in statement block ");
-    $$ = new attr();
-    $$->type = ERR;
-  }
+	// | OPENCURLY variable_list statement_list error {
+  // 	has_error = true;
+  //   pretty_print_error (" Possible missing closing brace in statement block ");
+  //   $$ = new attr();
+  //   $$->type = ERR;
+  // }
+
+opencurly:
+  OPENCURLY { scope++; }
 
 variable_list:
 	%empty /*epsilon production*/ {
@@ -583,7 +586,7 @@ statement_list:
     //Nothing to do
     $$ = new attr();
     $$->code = "";
-    
+
   }
 	| supported_statement statement_list {
     //Semantic Analyses - chaining
@@ -785,7 +788,8 @@ alr_subexpression:
 	   // Tree stuff
 	   // $$ = as_tree_n("alr_subexpression", NONTERMINAL); $$->child = $1;
 	}
-	| var_use {
+	| var_use
+    {
         $$= new attr();
 
 	   //Semantic analyses - Nothing to check
@@ -1037,8 +1041,8 @@ alr_subexpression:
 	}
 
 	| error EQ alr_subexpression { $$ = new attr(); $$->type = ERR; pretty_print_error("Missing identifier name"); }
-	| var_use error alr_subexpression {$$ = new attr(); $$->type = ERR; pretty_print_error("Possible missing equalty sign"); }
-	| var_use OPENPAREN id_list error { $$ = new attr(); $$->type = ERR; pretty_print_error("Possible missing closing parenthesis"); }
+	//| var_use error alr_subexpression {$$ = new attr(); $$->type = ERR; pretty_print_error("Possible missing equalty sign"); }
+	//| var_use OPENPAREN id_list error { $$ = new attr(); $$->type = ERR; pretty_print_error("Possible missing closing parenthesis"); }
 
 id_list:
 	id_list COMMA var_use {
@@ -1080,10 +1084,10 @@ id_list:
 	   // $$ = as_tree_n("id_list", NONTERMINAL); $$->child = as_tree_n("EPSILON", TERMINAL);
 	}
 
-	| error COMMA id_list {
-      $$ = new attr();
-	    $$->type = ERR; pretty_print_error("Missing identifier name");
-	}
+	// | error COMMA id_list {
+  //     $$ = new attr();
+	//     $$->type = ERR; pretty_print_error("Missing identifier name");
+	// }
 
 lhs:
     ID {
@@ -1236,7 +1240,7 @@ var_decl:
             id_rec.name = $1;
             id_rec.scope = scope;
             id_rec.dim = atoi($3);
-            id_rec.type = $$->type;
+            id_rec.type = $<attr_el>0->type;
             sym_table[scope][$1] = id_rec;
 	   }
 
@@ -1406,10 +1410,7 @@ supported_constant:
 	    //CodeGen
 	    //No codegen assoc with this production
 
-		//Tree-related stuff
-// 		$$ = as_tree_n("supported_constant", NONTERMINAL); $$->child = as_tree_n("OPENNEGATE", TERMINAL);
-// 		node* intconst = as_tree_n("INTCONST", VALUE); $$->child->sibling = intconst;intconst->info = $2;
-// 		node* closeparen = as_tree_n("CLOSEPAREN", TERMINAL); intconst->sibling = closeparen;
+
 	}
 %%
 int num_times = 2;
