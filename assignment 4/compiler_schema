@@ -28,7 +28,7 @@ int <> bool
 set <string> mips_name;
 string data;
 
-string get_label();
+string get_label(); //Only returns the name of the label
 
 
 //For downcasting bool to int

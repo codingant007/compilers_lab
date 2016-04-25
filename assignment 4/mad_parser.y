@@ -4,6 +4,9 @@
 
 #define SIMPLE 0
 #define ARRAY 1
+#define INT_SIZE 4
+#define BOOL_SIZE 1
+#define CHAR_SIZE 1
 
 #define pretty_print_error yyerror
 #define as_tree_n new node
@@ -23,10 +26,11 @@ extern int lengthyy;
 extern int yylineno;
 extern char* textyy;
 
-enum TYPE {INT, CHAR, BOOL, ERR};
+enum TYPE {VOIDF, INT, CHAR, BOOL, ERR};
 
 struct var_record {
-    string name;
+    bool is_param;
+  	string name;
     int scope,var_type,dim,offset;
     TYPE type;
 };
@@ -37,6 +41,7 @@ struct func_record
     TYPE return_type;
     string name;
     vector<var_record> param_list;
+    int paramlist_size;
 };
 
 //Attributes Structure
@@ -49,6 +54,7 @@ struct attr
     bool bval;
 
     string code; //Code gen by diff non-terminals
+    string label; // Useful for if-else-operation
     vector<TYPE> types; //Types in parameter list
 };
 
@@ -57,14 +63,13 @@ struct attr
 int scope = 0;
 int labelNumber = 0;
 string data;
-set<string> mips_name;
+vector< var_record > mips_name;
 func_record *active_func_ptr, *call_name_ptr;
+vector<var_record*> call_param_list;
 
 //Tree printing
 node *root;
 bool has_error;
-
-
 
 map<string, func_record> func_table;
 map<int, map<string, var_record> > sym_table;
@@ -80,7 +85,7 @@ int cast (TYPE typeA, TYPE typeB, int is_up); // Return type: 0-> no casting pos
 
 var_record* get_record(string name)
 {
-    for(int i=scope;i>=0;i--)
+    for(int i=scope;i>=2;i--)
     {
         if (sym_table[i].find(name) != sym_table[i].end())
         {
@@ -101,18 +106,19 @@ string get_mips_name (var_record* varRecord)
     }
     mips_name += "_";
     mips_name += varRecord-> name;
-    mips_name += "_";
+
     stringstream s;
-    s << scope;
+    s << "_" << varRecord->type << "_" << scope ;
     mips_name += s.str();
     return mips_name;
 }
 
 string get_label()
 {
+    //Only returns the name of the label
 	stringstream s;
 	s << labelNumber;
-    string label =  "LABEL" + s.str() + ":\n";
+    string label =  "LABEL" + s.str();
     labelNumber++;
     return label;
 }
@@ -309,120 +315,421 @@ node::node(const char* con, int t)
 %token TERMINAL 1
 %token VALUE 2
 
-%type <node_el> mad_program supported_declarations variable_declarations function_declarations variable_definitions dtype argument_list statement_block
-%type <node_el> variable_list statement_list supported_statement if_statement else_statement while_statement return_statement
-%type <attr_el> var_decl var_use id_list supported_constant alr_subexpression lhs
+%type <attr_el> mad_program supported_declarations variable_declarations function_declarations variable_definitions dtype argument_list statement_block
+%type <attr_el> variable_list statement_list supported_statement if_statement else_statement while_statement return_statement
+%type <attr_el> var_decl var_use id_list supported_constant alr_subexpression lhs func_name
 
 %%
 
 mad_program:
-	supported_declarations { $$ = as_tree_n("mad_program", NONTERMINAL); $$->child = $1; root = $$;}
-	| supported_declarations mad_program { $$ = as_tree_n("mad_program", NONTERMINAL); $$->child = $1; $1->sibling = $2; root = $$;}
+	supported_declarations {
+  	$$ = $1;
+  }
+	| supported_declarations mad_program {
+  	$$ = $1;
+    $$->code += $2->code;
+  }
 	| error '\n' { pretty_print_error("Compilation terminating with errors"); root = NULL;}
 
 supported_declarations:
-	variable_declarations { $$ = as_tree_n("supported_declarations", NONTERMINAL); $$->child = $1; }
-	| function_declarations {$$ = as_tree_n("supported_declarations", NONTERMINAL); $$->child = $1;}
+	variable_declarations {
+  	$$ = $1;
+  }
+	| function_declarations {
+  	$$ = $1;
+  }
 
 variable_declarations:
-	variable_definitions SEMI {$$ = as_tree_n("variable_declarations", NONTERMINAL); $$->child = $1; $1->sibling = as_tree_n("SEMI", TERMINAL);}
-	| variable_definitions error { $$ = as_tree_n("error", TERMINAL); pretty_print_error(semicolon_error); }
+	variable_definitions SEMI {
+    $$ = $1;
+  }
+	| variable_definitions error { $$ = new attr(); $$->type = ERR; pretty_print_error(semicolon_error); }
 
 variable_definitions:
-	dtype var_decl {cout<<"dtype var_decl"<<endl; $$ = as_tree_n("variable_definitions", NONTERMINAL); $$->child = $1;}// $1->sibling = $2;}
-	| variable_definitions COMMA var_decl {$$ = as_tree_n("variable_definitions", NONTERMINAL); $$->child = $1; $1->sibling = as_tree_n("COMMA", TERMINAL); } //$1->sibling->sibling = $3; }
-	| variable_definitions error var_decl '\n' { $$ = as_tree_n("error", TERMINAL); pretty_print_error("Missing comma in definitions list"); }
+	dtype var_decl {
+    $$ = new attr();
+  	if (has_error)
+    {
+    	$$->type = ERR;
+      $$->code = "";
+    }
+  	else
+    {
+    	$$->code = $2->code;
+      $$->type = $1->type;
+    }
+
+}
+	| variable_definitions COMMA {$<attr_el>$ = new attr(); $<attr_el>$->type = ($<attr_el>-1)->type; } var_decl {
+    $$ = new attr();
+  	if (has_error)
+    {
+    	$$->type = ERR;
+      $$->code = "";
+    }
+  	else
+    {
+    	$$->code = $1->code + $4->code;
+    }
+  	}
+	| variable_definitions error var_decl '\n' { $$ = new attr(); $$->type = ERR; pretty_print_error("Missing comma in definitions list"); }
 
 dtype:
-	DTYPE_INT {$$ = as_tree_n("DTYPE_INT", TERMINAL); /*$$->child = $1;*/}
-	| DTYPE_BOOL {$$ = as_tree_n("DTYPE_BOOL", TERMINAL); /*$$->child = $1;*/}
-	| DTYPE_CHAR {$$ = as_tree_n("DTYPE_CHAR", TERMINAL); /*$$->child = $1;*/}
-	| error {$$ = as_tree_n("error", TERMINAL); pretty_print_error(type_error); }
+	DTYPE_INT {
+    $$ = new attr();
+    $$->type = INT;
+    $$->ival = INT_SIZE;
+  }
+	| DTYPE_BOOL {
+    $$ = new attr();
+    $$->type = BOOL;
+    $$->ival = BOOL_SIZE;
+  }
+	| DTYPE_CHAR {
+  	$$ = new attr();
+    $$->type = CHAR;
+    $$->ival = CHAR_SIZE;
+  }
+	| error {
+    $$ = new attr();
+    $$->type = ERR;
+    $$->ival = -1;
+    pretty_print_error(type_error);
+  }
 
 function_declarations:
-	dtype ID OPENPAREN argument_list CLOSEPAREN statement_block {$$ = as_tree_n("function_declarations", NONTERMINAL); $$->child = $1; node* id = as_tree_n("ID", VALUE); id->info = $2; $1->sibling = id; node* openparen = as_tree_n("OPENPAREN", TERMINAL); id->sibling = openparen; openparen->sibling = $4; node* closeparen = as_tree_n("CLOSEPAREN", TERMINAL); $4->sibling = closeparen; closeparen->sibling = $6; }
-	| VOID ID OPENPAREN argument_list CLOSEPAREN statement_block {
-		$$ = as_tree_n("function_declarations", NONTERMINAL);
-		$$->child = as_tree_n("VOID", TERMINAL);
-		node* id = as_tree_n("ID", VALUE); id->info = $2; $$->child->sibling = id;
-		node* openparen = as_tree_n("OPENPAREN", TERMINAL); id->sibling = openparen;
-		openparen->sibling = $4;
-		node* closeparen = as_tree_n("CLOSEPAREN", TERMINAL); $4->sibling = closeparen;
-		closeparen->sibling = $6;
+	dtype func_name  { scope = 1; } OPENPAREN argument_list CLOSEPAREN statement_block {
+        //Scope Consideration
+        scope = 0;
+    		int cur_offset = 0;
+        //Semantic
+        $$ = new attr();
+    		active_func_ptr->return_type = (TYPE)$1->ival;
+    		for ( int i = 0; i < active_func_ptr->param_list.size(); i++ )
+        {
+        	switch(active_func_ptr->param_list[i].type)
+          {
+          	case INT: active_func_ptr->param_list[i].offset = cur_offset + INT_SIZE;
+            				cur_offset += INT_SIZE;
+            	break;
+            default: active_func_ptr->param_list[i].offset = cur_offset + BOOL_SIZE;
+            				cur_offset += BOOL_SIZE;
+            break;
+          }
+        }
+    		active_func_ptr->paramlist_size = cur_offset; //Setting paramlist size
+        //Code Generation
+        $$->code = $2->label + ":\n";
+        //Store return $ra to stack and set frame pointer to $ra
+        $$->code += "sw $ra 0($sp)\n";
+        $$->code += "move $fp $sp \n";
+    		$$->code += "addiu $sp $sp -4\n";
+    		$$->code += $7->code;
+    		$$->code += "move $sp $fp\n";
+    		$$->code += "lw $ra 0($fp)\n";          // $ra <- 0($fp)
+    		$$->code += "addiu $sp $sp 4\n";
+    		//Pop parameters
+    		stringstream s;
+    		s << active_func_ptr->paramlist_size;
+    		$$->code += "addiu $sp $sp " + s.str() + "\n";
+    		$$->code += "jr $ra\n";
+    		//Semantic again
+    		active_func_ptr = NULL;
 	}
+	| VOID func_name { scope = 1; } OPENPAREN argument_list CLOSEPAREN statement_block {
+		//Scope Consideration
+		scope = 0;
 
-argument_list:
-	dtype var_decl COMMA argument_list {
-		$$ = as_tree_n("argument_list", NONTERMINAL); $$->child = $1;
-		/* $1->sibling = $2; //node* id = as_tree_n("ID", VALUE); id->info = $2;
-		node* comma= as_tree_n("COMMA", TERMINAL); $2->sibling = comma; comma->sibling = $4; } |dtype ID {$$ = as_tree_n("argument_list", NONTERMINAL); $$->child = $1; node* id = as_tree_n("ID", VALUE); id->info = $2; $1->sibling = id;} */
+		//Semantic
+    $$ = new attr();
+    //Scope Consideration
+        scope = 0;
+    		int cur_offset = 0;
+        //Semantic
+        $$ = new attr();
+    		active_func_ptr->return_type = VOIDF;
+    		for ( int i = 0; i < active_func_ptr->param_list.size(); i++ )
+        {
+        	switch(active_func_ptr->param_list[i].type)
+          {
+          	case INT: active_func_ptr->param_list[i].offset = cur_offset + INT_SIZE;
+            				cur_offset += INT_SIZE;
+            	break;
+            default: active_func_ptr->param_list[i].offset = cur_offset + BOOL_SIZE;
+            				cur_offset += BOOL_SIZE;
+            break;
+          }
+        }
+    		active_func_ptr->paramlist_size = cur_offset; //Setting paramlist size
+    //Code Generation
+    		$$->code = $2->label + ":\n";
+        //Store return $ra to stack and set frame pointer to $ra
+        $$->code += "sw $ra 0($sp) \n";
+        $$->code += "move $fp $sp \n";
+    		$$->code += "addiu $sp $sp -4\n";
+    		$$->code += $7->code;
+    		$$->code += "move $sp $fp\n";
+    		$$->code += "lw $ra 0($fp)\n";          // $ra <- 0($fp)
+    		$$->code += "addiu $sp $sp 4\n";
+    		//Pop parameters
+    		stringstream s;
+    		s << active_func_ptr->paramlist_size;
+    		$$->code += "addiu $sp $sp " + s.str() + "\n";
+    		$$-> code += "jr $ra\n";
+
+    		//Semantic again
+    		active_func_ptr = NULL;
+	}
+func_name:
+	ID {
+    $$ = new attr();
+		if (func_table.count($1) > 0)
+    {
+    	has_error = true;
+      pretty_print_error ("Semantic error: Redeclaration of function name");
+    }
+    else
+    {
+    	func_record f_temp;
+      func_table[$1] = f_temp;
+      //Setting active_func_ptr
+      active_func_ptr = &func_table[$1];
+    }
+    $$->type = VOIDF;
+    $$->label = $1;
   }
-  |%empty /*epsilon production*/ {$$ = as_tree_n("function_declarations", NONTERMINAL); $$->child = as_tree_n("EPSILON", TERMINAL); }
-	| dtype ID error argument_list { $$ = as_tree_n("error", TERMINAL); pretty_print_error(comma_error); }
-	| dtype error COMMA argument_list { $$ = as_tree_n("error", TERMINAL); pretty_print_error(identifier_error); }
+argument_list:
+		 dtype var_decl COMMA argument_list {
+      //Nothing to do - check for errors and proceed
+      $$ = new attr();
+      if (has_error)
+      {
+        $$->type = ERR;
+        $$->code = "";
+      }
+      else
+      {
+        $$->code = $1->code + $2->code;
+        $$->ival = $4->ival + ($1->ival);
+      }
+  }
+  |%empty /*epsilon production*/ {
+    //Nothing to do
+    $$ = new attr();
+    $$->code = "";
+    $$->ival = 0;
+  }
+	| dtype ID error argument_list {
+  	has_error = true;
+    pretty_print_error (comma_error);
+    $$ = new attr();
+    $$->type = ERR;
+  }
+	| dtype error COMMA argument_list {
+  	has_error = true;
+    pretty_print_error (identifier_error);
+    $$ = new attr();
+    $$->type = ERR;
+  }
 
 statement_block:
-	OPENCURLY variable_list statement_list CLOSECURLY { $$ = as_tree_n("statement_block", NONTERMINAL); $$->child = as_tree_n("OPENCURLY", TERMINAL); $$->child->sibling = $2; $2->sibling = $3; $3->sibling = as_tree_n("CLOSECURLY", TERMINAL); }
-	| OPENCURLY variable_list statement_list error { $$ = as_tree_n("error", TERMINAL); pretty_print_error("Possible missing semicolon in statement block"); }
+OPENCURLY { scope++; } variable_list statement_list CLOSECURLY {
+		$$ = new attr();
+
+  	if (has_error)
+    {
+    	$$->type = ERR;
+      $$->code = "";
+    }
+  	else
+    {
+    	$$->code = $3->code + $4->code;
+    }
+  	//Scope resolution
+    map<string, var_record> temp;
+  	sym_table[scope] = temp;
+  	scope--;
+  }
+	| OPENCURLY variable_list statement_list error {
+  	has_error = true;
+    pretty_print_error (" Possible missing closing brace in statement block ");
+    $$ = new attr();
+    $$->type = ERR;
+  }
 
 variable_list:
-	%empty /*epsilon production*/ {$$ = as_tree_n("variable_list", NONTERMINAL); $$->child = as_tree_n("EPSILON", TERMINAL); }
-	| variable_declarations variable_list { $$ = as_tree_n("variable_list", NONTERMINAL); $$->child = $1; $1->sibling = $2; }
+	%empty /*epsilon production*/ {
+  	//Nothing to do
+    $$ = new attr();
+    $$->code = "";
+
+  }
+	| variable_declarations variable_list {
+    //Nothing to do - check for error in further productions
+    $$ = new attr();
+
+    if (has_error)
+    {
+      $$->type = ERR;
+      $$->code = "";
+    }
+    else
+      $$->code = $1->code + $2->code;
+  }
+
 
 statement_list:
-	%empty {$$ = as_tree_n("statement_list", NONTERMINAL); $$->child = as_tree_n("EPSILON", TERMINAL); }
-	| supported_statement statement_list {$$ = as_tree_n("statement_list", NONTERMINAL); $$->child = $1; $1->sibling = $2;}
+	%empty {
+    //Nothing to do
+    $$ = new attr();
+    $$->code = "";
+    
+  }
+	| supported_statement statement_list {
+    //Semantic Analyses - chaining
+    $$ = new attr();
+    if (!has_error)
+    {
+    	$$->code = $1->code + "\n" + $2->code;
+    }
+    else
+    {
+      $$->type = ERR;
+      $$->code = "";
+    }
+  }
 
 supported_statement:
-	alr_subexpression SEMI {cout<<$1->code<<endl; $$ = as_tree_n("supported_statement", NONTERMINAL);}// $$->child = $1; $1->sibling = as_tree_n("SEMI", TERMINAL);}
-	| if_statement { $$ = as_tree_n("supported_statement", NONTERMINAL); $$->child = $1; }
-	| while_statement { $$ = as_tree_n("supported_statement", NONTERMINAL); $$->child = $1; }
-	| return_statement { $$ = as_tree_n("supported_statement", NONTERMINAL); $$->child = $1; }
-	| statement_block { $$ = as_tree_n("supported_statement", NONTERMINAL); $$->child = $1; }
-	| alr_subexpression error { pretty_print_error("Possible missing semicolon with alr_subexpression"); $$ = as_tree_n("error", TERMINAL); }
+	alr_subexpression SEMI {
+    //Nothing to do
+    $$ = $1;
+  }
+	| if_statement {
+    //Nothing to do
+    $$ = $1;
+  }
+	| while_statement {
+    //Nothing to do
+    $$ = $1;
+  }
+	| return_statement {
+    //Nothing to do
+    $$ = $1;
+  }
+	| statement_block {
+    //Nothing to do
+    $$ = $1;
+  }
+	| alr_subexpression error { $$ = new attr(); $$->type = ERR; has_error = true; pretty_print_error("Possible missing semicolon with alr_subexpression"); }
 
 if_statement:
-	IF OPENPAREN alr_subexpression CLOSEPAREN statement_block else_statement { //CHANGED IF EXPRESSION INTERNAL TO STATEMENT BLOCK
-		$$ = as_tree_n("if_statement", NONTERMINAL);
-		$$->child = as_tree_n("IF", TERMINAL);
-		/*node* openparen = as_tree_n("OPENPAREN", TERMINAL); $$->child->sibling = openparen;
-		openparen->sibling = $3;
-		node* closeparen = as_tree_n("CLOSEPAREN", TERMINAL); $3->sibling = closeparen;
-		closeparen->sibling = $5;
-		$5->sibling = $6;*/
+	IF OPENPAREN alr_subexpression CLOSEPAREN statement_block else_statement {
+		$$ = new attr();
+		if ($3->type != BOOL)
+    {
+    	has_error = true;
+      $$->type = ERR;
+      pretty_print_error ("Incompatible types: Expected boolean expression in if condition");
+    }
+		//Code Generation
+	    string startElse,endElse;
+	    startElse = get_label();
+	    endElse = get_label();
+
+	    $$ -> code = $3-> code;
+	    $$ -> code += "li $t1 0x1\n";
+	    $$ -> code += "bne $t0 $t1 " + startElse + "\n";
+	    $$ -> code += $5 ->code;
+	    $$ -> code += "b " + endElse + "\n";
+	    $$ -> code += startElse + ":\n";
+	    $$ -> code += $6->code;
+	    $$ -> code += endElse + ":\n";
+
 	}
 
 else_statement:
-	%empty {$$ = as_tree_n("else_statement", NONTERMINAL); $$->child = as_tree_n("EPSILON", TERMINAL); }
-	| ELSE supported_statement {
-		$$ = as_tree_n("else_statement", NONTERMINAL);
-		$$->child = as_tree_n("ELSE", TERMINAL);
-		$$->child->sibling = $2;
+	%empty {
+    	$$ = new attr();
+    	//Semantic Analyses - no check
+    	//CodeGen
+	    $$-> code = "\n";
+	}
+	| ELSE statement_block {
+		$$ = new attr();
+    //Semantic Analyses - no check
+		//Code Generation
+		$$->code = $2->code;
+
+
 	}
 
 while_statement:
 	WHILE OPENPAREN alr_subexpression CLOSEPAREN statement_block {
-		$$ = as_tree_n("while_statement", NONTERMINAL);
-		$$->child = as_tree_n("WHILE", TERMINAL);
-		node* openparen = as_tree_n("OPENPAREN", TERMINAL); $$->child->sibling = openparen;
-		/*openparen->sibling = $3;
-		node* closeparen = as_tree_n("CLOSEPAREN", TERMINAL); $3->sibling = closeparen;*/
+    $$ = new attr();
+    //Semantic Analyses
+    if ($3->type != BOOL)
+    {
+    	has_error = true;
+      $$->type = ERR;
+      pretty_print_error ("Incompatible types: Expected boolean expression in while condition");
+    }
+
+		//Code Generation
+    if (!has_error)
+    {
+      string startWhile = get_label();
+      string endWhile = get_label();
+      //Start While loop
+      $$->code = startWhile + ":\n";
+      //Evaluate alr_subexpression
+      $$->code += $3->code;
+      $$->code += "li $t1 0x1\n";
+      $$->code += "bne $t0 $t1 " + endWhile + "\n";
+      //Perform main Statement Block
+      $$->code += $5->code;
+      $$->code += "b " + startWhile + "\n";
+      //FinishWhile
+      $$->code += endWhile + ":\n";
+    }
 	}
 
 return_statement:
 	RETURN SEMI {
-		$$ = as_tree_n("return_statement", NONTERMINAL);
-		$$->child = as_tree_n("RETURN", TERMINAL);
-		node* semi = as_tree_n("SEMI", TERMINAL); $$->child->sibling = semi;
+    $$ = new attr();
+    //Semantic Analyses
+		if ( active_func_ptr->return_type != VOIDF )
+    {
+      		$$->type = ERR;
+          has_error = true;
+          pretty_print_error("Incompatible types: function return type not void");
+    }
+
+    //Code Generation
+    //Nothing to do
+
 	}
 	| RETURN alr_subexpression SEMI {
-		$$ = as_tree_n("return_statement", NONTERMINAL);
-		$$->child = as_tree_n("RETURN", TERMINAL);
-		/*$$->child->sibling = $2;
-		node* semi = as_tree_n("SEMI", TERMINAL); $2->sibling = semi;*/
+    	$$ = new attr();
+    	//Semantic Analyses
+    	$$ = $2;
+    	int downcast_needed = cast(active_func_ptr->return_type, $2->type, 0);
+      if ( active_func_ptr->return_type != $2->type )
+      {
+        if (downcast_needed < 0 || (downcast_needed == 2 && $2->type == CHAR) )
+        {
+          $$->type = ERR;
+          has_error = true;
+          pretty_print_error("Incompatible types: function return type and returned expression");
+        }
+        else
+        {
+        	//CodeGen - extra
+        	$$->code += intToBool();
+        }
+      }
 	}
-	| RETURN error { $$ = as_tree_n("error", TERMINAL);pretty_print_error(semicolon_error_return); }
-	| RETURN alr_subexpression error {$$ = as_tree_n("error", TERMINAL); pretty_print_error(semicolon_error_return); }
+	| RETURN error {  $$ = new attr(); $$->type = ERR; pretty_print_error(semicolon_error_return); }
+	| RETURN alr_subexpression error {  $$ = new attr(); $$->type = ERR; pretty_print_error(semicolon_error_return); }
 
 alr_subexpression:
 	lhs EQ alr_subexpression {
@@ -436,23 +743,29 @@ alr_subexpression:
 	        has_error = true;
         }
 
-
         //Code Generation
         if (!has_error)
         {
             var_record *lhsRecord = get_record($1->code);
             $$ -> code = $3->code;
-            cout << $1 ->type << "\t" << $3->type <<"\t" << cast($1->type,$3->type,0) << endl;
+
+
             if ( cast($1->type, $3->type, 0) == 2)
             {
                 //CodeGen - no other casting test needed because only allowed downcast is from int to bool
                 $$->code += "#Casting of RHS";
                 $$->code += intToBool();
             }
-            else{
-              if ($1->ival == -1 && $1->type != ERR ){
-                  //ID
+            if ( $1->type != ERR && $1->code == "$" )
+            {
+                lhsRecord = &active_func_ptr->param_list[$1->ival];
+                stringstream s;
+                s << lhsRecord->offset;
+                $$->code += "sw " + s.str() + "($fp) $t0\n";
+            }
 
+            if ($1->ival == -1 && $1->type != ERR ){
+                  //ID
                   $$->code += store_mips_id(lhsRecord);
 
               }
@@ -460,23 +773,14 @@ alr_subexpression:
                   //ID[const]
                   $$->code += store_mips_array(lhsRecord,$1->ival);
               }
-            }
-
-
         }
-
-//      Tree stuff
-// 		$$ = as_tree_n("alr_subexpression", NONTERMINAL);
-// 		$$->child = $1;
-// 		node* openparen = as_tree_n("EQ", TERMINAL); $$->child->sibling = openparen;
-// 		openparen->sibling = $3;
 	}
 	| supported_constant {
         $$= new attr();
 	   //Semantic analyses - Nothing to check
 	   $$ = $1;
 
-	   //CodeGen - Nothing to do
+	   //CodeGen
 
 	   // Tree stuff
 	   // $$ = as_tree_n("alr_subexpression", NONTERMINAL); $$->child = $1;
@@ -496,13 +800,17 @@ alr_subexpression:
 
           $$= new attr();
         //Semantic analyses
+    		call_name_ptr = NULL;
         if ( func_table.count($1) == 0 )
         {
             $$->type = ERR;
             has_error = true;
             pretty_print_error("Semantic error: Function not declared");
         }
-        else if ( func_table[$1].param_list.size() != $3->types.size() )
+    		else
+          call_name_ptr = &func_table[$1];
+
+    		if ( call_name_ptr->param_list.size() != call_param_list.size() )
         {
             $$->type = ERR;
             has_error = true;
@@ -510,9 +818,9 @@ alr_subexpression:
         }
         else
         {
-            for ( int i = 0; i < $3->types.size(); i++ )
+            for ( int i = 0; i < call_param_list.size(); i++ )
             {
-                if ( $3->types[i] != func_table[$1].param_list[i].type )
+                if ( call_param_list[i]->type != call_name_ptr->param_list[i].type )
                 {
                     has_error = true;
                     $$->type = ERR;
@@ -520,32 +828,45 @@ alr_subexpression:
                 }
             }
         }
+    		$$->type = call_name_ptr->return_type;
 
         //CodeGeneration
         // $$->type = func_table[$1].return_type;
-        //We will implement code generation for functions in next stage.
+    		$$->code = "sw $fp 0($sp) \n"; // $fp -> 0($sp)
+    		string eleType;
+    		int eleSize;
+        for (int i=0;i< call_param_list.size(); i++){
 
+          if (call_param_list[i]->type == INT){
+          	eleType = "lw";
+            eleSize = 4;
+          }
+          else{
+           	eleType = "lb";
+            eleSize = 1;
+          }
+            if (call_param_list[i]->is_param == true){
+              	stringstream s;
+              	s << call_param_list[i]->offset;
+            		$$->code += eleType + " $t1 " + s.str() + "($fp) \n";
+            }
+          else{
+               $$->code += eleType + " $t1 " + get_mips_name(call_param_list[i]) + "\n";
+          }
+          $$->code += "sw $t1 0($sp)\n";
+          stringstream s1; s1 <<eleSize;
+					$$->code += "addiu $sp $sp -" + s1.str() + "\n";
+        }
+    		$$->code += "jal " +string($1) + "\n";
 
-//      Tree stuff
-// 		$$ = as_tree_n("alr_subexpression", NONTERMINAL);
-// 		$$->child = as_tree_n("ID", VALUE);$$->child->info = $1;
-// 		node* openparen = as_tree_n("OPENPAREN", TERMINAL); $$->child->sibling = openparen;
-// 		openparen->sibling = $3;
-// 		node* closeparen = as_tree_n("CLOSEPAREN", TERMINAL); $3->sibling = closeparen;
-	}
+				//Back to Semantic
+        call_name_ptr = NULL;
+  }
 	| OPENPAREN alr_subexpression CLOSEPAREN {
-        $$= new attr();
 		//Semantic Analyses - no checks needed
 		//CodeGen
 		$$ = $2;
-
-//      Tree stuff
-// 		$$ = as_tree_n("alr_subexpression", NONTERMINAL);
-// 		$$->child = as_tree_n("OPENPAREN", TERMINAL);
-// 		$$->child->sibling = $2;
-// 		node* closeparen = as_tree_n("CLOSEPAREN", TERMINAL); $2->sibling = closeparen;
-
-	}
+  }
 	| alr_subexpression
       {
 	    //Semantic Analyses
@@ -587,11 +908,6 @@ alr_subexpression:
 	            $$->code += "div $t0 $t1 $t0\n";
 	        }
 	    }
-
-	   // $$ = as_tree_n("alr_subexpression", NONTERMINAL);
-	   // $$->child = $1; $1->sibling= as_tree_n("ARITH", VALUE);
-	   // $1->sibling->info = $2;
-	   // $1->sibling->sibling = $3;
 	}
 	| OPENNEGATE alr_subexpression CLOSEPAREN {
         $$= new attr();
@@ -601,13 +917,6 @@ alr_subexpression:
 		if(!has_error){
 		    $$->code += "neg $t0 $t0 \n";
 		}
-
-//      Tree stuff
-// 		$$ = as_tree_n("alr_subexpression", NONTERMINAL);
-// 		$$->child = as_tree_n("OPENNEGATE", TERMINAL);
-// 		$$->child->sibling = $2;
-// 		node* closeparen = as_tree_n("CLOSEPAREN", TERMINAL); $2->sibling = closeparen;
-
 	}
 	| alr_subexpression
 	    {
@@ -659,12 +968,6 @@ alr_subexpression:
 	        }
 
 		}
-
-//      Tree stuff
-// 		$$ = as_tree_n("alr_subexpression", NONTERMINAL);
-// 		$$->child = $1;
-// 		node* reln = as_tree_n("RELN", VALUE); reln->info = $2;$1->sibling = reln;
-// 		reln->sibling = $3;
 	}
 
 	| alr_subexpression
@@ -694,8 +997,6 @@ alr_subexpression:
             $$->type = ERR;
             pretty_print_error ("Semantic Error: Logical comparison with a CHAR type");
         }
-
-
         //Code Generation
         if (!has_error){
             $$->type = BOOL;
@@ -715,12 +1016,6 @@ alr_subexpression:
             }
 
         }
-
-//      Tree stuff
-// 		$$ = as_tree_n("alr_subexpression", NONTERMINAL);
-// 		$$->child = $1;
-// 		node* reln = as_tree_n("LOGICAL", VALUE);reln->info=$2; $1->sibling = reln;
-// 		reln->sibling = $3;
 	}
 	| LOGICALNOT alr_subexpression {
     $$  = new attr();
@@ -739,12 +1034,6 @@ alr_subexpression:
 		    }
 		    $$->code += "xori $t0 $t0 0x1\n";
 		}
-
-//      Tree stuff
-// 		$$ = as_tree_n("alr_subexpression", NONTERMINAL);
-// 		$$->child = as_tree_n("LOGICALNOT", VALUE); $$->child->info = "!";
-// 		$$->child->sibling = $2;
-
 	}
 
 	| error EQ alr_subexpression { $$ = new attr(); $$->type = ERR; pretty_print_error("Missing identifier name"); }
@@ -756,7 +1045,17 @@ id_list:
 	   //Semantic Analyses
      $$ = new attr();
 	   $$ = $1;
-	   $$->types.push_back($3->type);
+	   if ( $3->type != ERR )
+     {
+    		if ($3->bval)
+        {
+        	call_param_list.push_back(& (call_name_ptr->param_list[$3->ival]) );
+        }
+       else
+       {
+       		call_param_list.push_back( get_record($3->label) );
+       }
+     }
 
 	   //CodeGen
 
@@ -788,15 +1087,29 @@ id_list:
 
 lhs:
     ID {
-	    //Semantic Analyses
+	    //Semantic Analyses -> param
       $$ = new attr();
 	    var_record* id_rec = get_record($1);
 	    if ( id_rec == NULL )
 	    {
-	        $$->type = ERR;
-	        $$->ival = -1;
-	        pretty_print_error("Semantic Error: ID not declared before use");
-	        has_error = true;
+	        //Check if valid parameter
+	        int flag = -1;
+	        for ( int i = 0; i < active_func_ptr->param_list.size(); i++ )
+	            if ( active_func_ptr->param_list[i].name == $1 )
+	                { flag = i; break; }
+	        if (flag >= 0)
+	        {
+	            $$->type = active_func_ptr->param_list[flag].type;
+	            $$->ival = flag;
+	            $$->code = "$";
+	        }
+	        else
+	        {
+	            $$->type = ERR;
+    	        $$->ival = -1;
+    	        pretty_print_error("Semantic Error: ID not declared before use");
+    	        has_error = true;
+	        }
 	    }
 	    else if ( id_rec->var_type != SIMPLE )
 	    {
@@ -837,7 +1150,7 @@ lhs:
 	        int iconst = atoi($3);
 	        if(iconst < 0 || iconst >= id_rec->dim)
 	        {
-	            $$->type - ERR;
+	            $$->type = ERR;
 	            pretty_print_error("Semantic Error: Array dimensions violated.");
 	            has_error = true;
 	        }
@@ -857,34 +1170,51 @@ var_decl:
 	ID {
 	   // Semantic
     $$ = new attr();
-     if( sym_table.count(scope) > 0 && sym_table[scope].count($1) != 0 )
-	   {
-	        $$->type = ERR;
-	        pretty_print_error("Semantic Error: ID redeclaration in same scope.");
-	        has_error = true;
-	   }
-	   else
-	   {
-            var_record id_rec;
-            id_rec.var_type = SIMPLE;
-            id_rec.name = $1;
-            id_rec.scope = scope;
-            id_rec.dim = 0;
-            id_rec.type = $$->type;
-            if (!sym_table.count(scope))
-            {
-              map <string,var_record> temp;
-              temp[$1] = id_rec;
-              sym_table[scope] = temp;
-            }
-            else{
-              sym_table[scope][$1] = id_rec;
-            }
-            // cout << $1 << " inserted." << endl;
-	   }
+    if (scope == 1)
+    {
+    	var_record id_rec;
+      id_rec.is_param = true;
+      id_rec.var_type = SIMPLE;
+      id_rec.name = $1;
+      id_rec.scope = scope;
+      id_rec.dim = 0;
+      id_rec.type = ($<attr_el>0)->type;
+      active_func_ptr->param_list.push_back(id_rec);
+      $$->ival = active_func_ptr->param_list.size() - 1;
+    }
+    else
+    {
+       if( sym_table.count(scope) > 0 && sym_table[scope].count($1) != 0 )
+       {
+            $$->type = ERR;
+            pretty_print_error("Semantic Error: ID redeclaration in same scope.");
+            has_error = true;
+       }
+       else
+       {
+              var_record id_rec;
+         			id_rec.is_param = false;
+              id_rec.var_type = SIMPLE;
+              id_rec.name = $1;
+              id_rec.scope = scope;
+              id_rec.dim = 0;
+              id_rec.type = ($<attr_el>0)->type;
+              if (!sym_table.count(scope))
+              {
+                map <string,var_record> temp;
+                temp[$1] = id_rec;
+                sym_table[scope] = temp;
+              }
+              else{
+                sym_table[scope][$1] = id_rec;
+              }
+         			$$->ival = -1;
+              // cout << $1 << " inserted." << endl;
+       }
 
-	   //CodeGen
-	   mips_name.insert(get_mips_name(&sym_table[scope][$1])); //For adding to data declarations
+       //CodeGen
+       mips_name.push_back( sym_table[scope][$1] ); //For adding to data declarations
+    }
 
        //Tree stuff
 	   // $$ = as_tree_n("decl_ID", NONTERMINAL); $$->info = "decl_ID";
@@ -901,6 +1231,7 @@ var_decl:
 	   else
 	   {
             var_record id_rec;
+       			id_rec.is_param = false;
             id_rec.var_type = ARRAY;
             id_rec.name = $1;
             id_rec.scope = scope;
@@ -910,7 +1241,7 @@ var_decl:
 	   }
 
        //CodeGen
-	   mips_name.insert(get_mips_name(&sym_table[scope][$1])); //For adding to data declarations
+	   mips_name.push_back(sym_table[scope][$1]); //For adding to data declarations
 
 	   //Tree stuff
 	   // $$ = as_tree_n("decl_ID[arr]", NONTERMINAL); $$->info = "decl_ID[arr]";
@@ -920,13 +1251,29 @@ var_use:
 	ID {
 	    //Semantic Analyses
       $$ = new attr();
+    	bool is_param = false;
+    	int flag = -1;
 	    var_record* id_rec = get_record($1);
 	    if ( id_rec == NULL )
 	    {
-	        $$->type = ERR;
-	        $$->ival = -1;
-	        pretty_print_error("Semantic Error: ID not declared before use");
-	        has_error = true;
+	        for ( int i = 0; i < active_func_ptr->param_list.size(); i++ )
+	            if ( active_func_ptr->param_list[i].name == $1 )
+	                { flag = i;break; }
+	        if (flag >= 0)
+	        {
+             	is_param = true;
+	            $$->type = active_func_ptr->param_list[flag].type;
+            	$$->bval = true;
+            	$$->ival = flag; //Indicates parameter
+	        }
+        	else
+          {
+            $$->type = ERR;
+            $$->bval = false;
+            $$->ival = -1;
+            pretty_print_error("Semantic Error: ID not declared before use");
+            has_error = true;
+          }
 	    }
 	    else if ( id_rec->var_type != SIMPLE )
 	    {
@@ -936,14 +1283,24 @@ var_use:
 	    }
 	    else
 	    {
-        cout << $1 << id_rec->type <<endl;
 	        $$->type = id_rec->type;
+        	$$->bval = false;        	//Indicates normal variable
 	        $$->ival = -1;
+        	$$->label = $1;
 	    }
 
 	    //CodeGen
 	    if (!has_error){
-	        $$->code = load_mips_id( get_record($1) );
+	        //Check in local variables -> if not found, check in param list -> if found, load param by offset
+          if ( is_param )
+            {
+                stringstream s;
+                s << active_func_ptr->param_list[flag].offset;
+                $$->code += "sw " + s.str() + "($fp) $t0\n";
+            }
+          else{
+              $$->code = load_mips_id( get_record($1) );
+          }
 	    }
 
 
@@ -978,8 +1335,7 @@ var_use:
 	        }
 	        $$->type = id_rec->type;
 	        $$->ival = iconst;
-
-
+        	$$->label = $1;
 	    }
 
         //CodeGen
@@ -998,6 +1354,7 @@ supported_constant:
         $$ = new attr();
         $$->ival =  atoi($1);
         $$->type = INT;
+        $$->code = "li $t0 " + string($1) + "\n";
 
 	    //CodeGen
 	    //No codegen assoc with this production
@@ -1007,9 +1364,11 @@ supported_constant:
         $$ = new attr();
         $$->cval =  *($1);
         $$->type = CHAR;
+
 	    //CodeGen
 
-	    //No codegen assoc with this production
+        $$->code = "li $t0 \'" + string($1) + "\' \n";
+
 
 	    //Tree-related stuff
 	    // $$ = as_tree_n("supported_constant", NONTERMINAL); $$->child = as_tree_n("INTCONST", VALUE); $$->child->info = $1;
@@ -1017,15 +1376,21 @@ supported_constant:
 	| BOOLCONST {
 	    //Semantic Analyses
       $$ = new attr();
-	    if( !strcmp($1, "true") )
-	        $$->bval = 1;
-	    else
-	        $$->bval = 0;
+	    if( !strcmp($1, "true") ){
+          $$->bval = 1;
+          $$->code = "li $t0 1\n";
+      }
+
+	    else{
+            $$->bval = 0;
+            $$->code = "li $t0 0\n";
+      }
+
 	    $$->type = BOOL;
 
         //Semantic Analyses
 	    //CodeGen
-	    //No codegen assoc with this production
+
 
 	    //Tree-related stuff
 	    // $$ = as_tree_n("supported_constant", NONTERMINAL); $$->child = as_tree_n("BOOLCONST", VALUE); $$->child->info = $1;

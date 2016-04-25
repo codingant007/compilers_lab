@@ -1,9 +1,4 @@
 int main()
 {
-		char z;
-		int x,a;
-		bool f;
-		int t[10];
-		
-		f = a;
+	int x;
 }
