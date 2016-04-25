@@ -83,6 +83,7 @@ int cast (TYPE typeA, TYPE typeB, int is_up); // Return type: 0-> no casting pos
 
 //Function Declarations
 
+<<<<<<< HEAD
 void copy_attr( struct attr* A,struct attr* B){
   A->type = B->type;
   A->ival = B->ival;   //For storing values of constants
@@ -96,6 +97,38 @@ void copy_attr( struct attr* A,struct attr* B){
 }
 
 
+
+
+string get_data_string(){
+    stringstream data_string;
+    data_string << '\n';
+    for(int i=0;i<mips_name.size();i++){
+        var_record rec = mips_name[i];
+        // Name
+        data_string << get_mips_name(&var_record) << ": ";
+        if(rec.var_type == SIMPLE){
+            if(rec.type == INT){
+                data_string << ".word ";
+                data_string << "0";
+            }
+            else{
+                data_string << ".byte";
+                data_string << "0x41";
+            }
+        }
+        else{
+            data_string << ".space ";
+            if(rec.type == INT){
+                data_string << (rec.dim)*4;
+            }
+            else{
+                data_string << rec.dim;
+            }
+        }
+        data_string << "\n";
+    }
+    return data_string.str();
+}
 
 var_record* get_record(string name)
 {
