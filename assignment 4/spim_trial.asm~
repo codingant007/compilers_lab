@@ -1,0 +1,11 @@
+	.data
+
+	.globl	main
+	
+	.text
+main:
+
+	# initialize 
+	li	$s0, 10
+	
+	jr $ra

@@ -77,12 +77,18 @@
 #define as_tree_n new node
 #define lengthyy yyleng
 #define textyy yytext
-#define semicolon_error "Semicolon not found in variable declaration list :P"
-#define comma_error "Comma not found in argument list :P"
-#define identifier_error "Missing identifier in argument list"
-#define semicolon_error_for "Semicolon not found in for"
+#define semicolon_error "Semicolon kadu"
+#define comma_error "Comma kadu"
+#define identifier_error " identifier kadu"
+#define semicolon_error_for "Semicolon forlu kadu"
 #define type_error "Unknown type declaration"
-#define semicolon_error_return "Semicolon not found with return :P"
+#define semicolon_error_return "Semicolon returnlo kadu :P"
+
+
+#define vyavadhi scope
+#define peru name
+#define daram  string
+#define dakshina code
 
 using namespace std;
 
@@ -95,21 +101,22 @@ enum TYPE {VOIDF, INT, CHAR, BOOL, ERR};
 
 struct var_record {
     bool is_param;
-  	string name;
-    int scope,var_type,dim,offset;
+  	daram peru;
+    int vyavadhi,var_type,dim,offset;
     TYPE type;
+    daram mips_name;
 };
 
 
 struct func_record
 {
     TYPE return_type;
-    string name;
+    daram peru;
     vector<var_record> param_list;
     int paramlist_size;
 };
 
-//Attributes Structure
+//Attributes aakaramure
 struct attr
 {
     TYPE type;
@@ -118,32 +125,32 @@ struct attr
     float fval;
     bool bval;
 
-    string code; //Code gen by diff non-terminals
-    string label; // Useful for if-else-operation
+    daram dakshina; //Code gen by diff non-terminals
+    daram label; // Useful for if-else-operation
     vector<TYPE> types; //Types in parameter list
 };
 
 
 //GLOBAL VARIABLES FOR SEMANTIC ANALYSIS
-int scope = 0;
+int vyavadhi = 0;
 int labelNumber = 0;
-string data;
+daram data;
 vector< var_record > mips_name;
 func_record *active_func_ptr, *call_name_ptr;
 vector<var_record*> call_param_list;
 
 //Tree printing
 node *root;
-bool has_error;
+bool arey_galti_hai_kya;
 
-map<string, func_record> func_table;
-map<int, map<string, var_record> > sym_table;
+map<daram, func_record> func_table;
+map<int, map<daram, var_record> > sym_table;
 
 void pretty_print_error(const char*);
-var_record* get_record (string);
-string get_mips_name (var_record*);
-string load_mips_array(var_record* varRecord, int offSet);
-string store_mips_array(var_record* varRecord, int offSet);
+var_record* get_record (daram);
+daram get_mips_name (var_record*);
+daram load_mips_array(var_record* varRecord, int offSet);
+daram store_mips_array(var_record* varRecord, int offSet);
 int cast (TYPE typeA, TYPE typeB, int is_up); // Return type: 0-> no casting possible 1-> typeA can be casted 2-> typeB can be casted
 
 //Function Declarations
@@ -156,23 +163,23 @@ void copy_attr( struct attr* A,struct attr* B){
   A->fval = B->fval;
   A->bval = B->bval;
 
-  A->code = B->code; //Code gen by diff non-terminals
+  A->dakshina = B->dakshina; //Code gen by diff non-terminals
   A->label = B->label; // Useful for if-else-operation
 
 }
 
 
-string get_data_string(){
+daram get_data_string(){
     stringstream data_string;
     data_string << '\n';
-    set <string> temp_mips_name;
+    set <daram> temp_mips_name;
     for(int i=0;i<mips_name.size();i++){
         var_record rec = mips_name[i];
-        if (temp_mips_name.count( get_mips_name(&mips_name[i])) ==0)
+        if (temp_mips_name.count( rec.mips_name ) ==0)
         {
-          // Name
-          temp_mips_name.insert(get_mips_name(&mips_name[i]));
-          data_string << get_mips_name(&rec) << ": ";
+          // peru
+          temp_mips_name.insert(rec.mips_name);
+          data_string << rec.mips_name << ": ";
           if(rec.var_type == SIMPLE){
               if(rec.type == INT){
                   data_string << ".word ";
@@ -199,50 +206,50 @@ string get_data_string(){
     return data_string.str();
 }
 
-var_record* get_record(string name)
+var_record* get_record(daram peru)
 {
-    for(int i=scope;i>=2;i--)
+    for(int i=vyavadhi;i>=2;i--)
     {
-        if (sym_table[i].find(name) != sym_table[i].end())
+        if (sym_table[i].find(peru) != sym_table[i].end())
         {
-            return &sym_table[i][name];
+            return &sym_table[i][peru];
         }
     }
     return NULL;
 }
 
-string get_mips_name (var_record* varRecord)
+daram get_mips_name (var_record* varRecord)
 {
-    string mips_name;
+    daram mips_name;
     if (active_func_ptr == NULL){
       mips_name = "main";
     }
     else{
-      mips_name = active_func_ptr -> name;
+      mips_name = active_func_ptr -> peru;
     }
     mips_name += "_";
-    mips_name += varRecord-> name;
+    mips_name += varRecord-> peru;
 
-    stringstream s;
-    s << "_" << varRecord->type << "_" << varRecord->scope ;
+    stringstream s;//int ko string karne ka aur koi raasta nahe mila
+    s << "_" << varRecord->type << "_" << varRecord->vyavadhi ;
     mips_name += s.str();
     return mips_name;
 }
 
 
-string get_label()
+daram get_label()
 {
-    //Only returns the name of the label
-	stringstream s;
+    //Only returns the peru of the label
+	stringstream s;//int ko string karne ka aur koi raasta nahe mila
 	s << labelNumber;
-    string label =  "LABEL" + s.str();
+    daram label =  "LABEL" + s.str();
     labelNumber++;
     return label;
 }
 
-string load_mips_array(var_record* varRecord, int offSet)
+daram load_mips_array(var_record* varRecord, int offSet)
 {
-    string loadCode,loadType;
+    daram loadCode,loadType;
     int eleSize;
     if (varRecord->type == INT){
         eleSize = 4;
@@ -268,9 +275,9 @@ string load_mips_array(var_record* varRecord, int offSet)
     return loadCode;
 }
 
-string store_mips_array(var_record* varRecord, int offSet)
+daram store_mips_array(var_record* varRecord, int offSet)
 {
-    string storeCode,storeType;
+    daram storeCode,storeType;
     int eleSize;
     if (varRecord->type == INT){
         eleSize = 4;
@@ -296,9 +303,9 @@ string store_mips_array(var_record* varRecord, int offSet)
     return storeCode;
 }
 
-string load_mips_id(var_record* varRecord)
+daram load_mips_id(var_record* varRecord)
 {
-    string loadCode,loadType;
+    daram loadCode,loadType;
     if (varRecord->type == INT){
         loadType = "lw";
     }
@@ -313,9 +320,9 @@ string load_mips_id(var_record* varRecord)
     return loadCode;
 }
 
-string store_mips_id (var_record* varRecord)
+daram store_mips_id (var_record* varRecord)
 {
-    string storeCode,storeType;
+    daram storeCode,storeType;
     if (varRecord->type == INT){
         storeType = "sw";
     }
@@ -330,36 +337,36 @@ string store_mips_id (var_record* varRecord)
     return storeCode;
 }
 
-string intToBool()
+daram intToBool()
 {
-    string boolCode = "srl $t0 $t0 0x1F\n";
+    daram boolCode = "srl $t0 $t0 0x1F\n";
     boolCode += "andi $t0 $t0 0x1\n";
     boolCode += "addi $t0 $t0 0x1\n";
     boolCode += "andi $t0 $t0 0x1\n";
     return boolCode;
 }
 
-int cast (TYPE typeA, TYPE typeB, int is_up)
+int cast (TYPE pehla_waala_type, TYPE doosra_waala_type, int is_up)
 {
-    if (typeA == typeB)
+    if (pehla_waala_type == doosra_waala_type)
         return 0;
     if (is_up == 1){
         /* char can be converted to int, bool can be converted to int */
-        if ( (typeA == CHAR || typeA == BOOL) && typeB == INT)
+        if ( (pehla_waala_type == CHAR || pehla_waala_type == BOOL) && doosra_waala_type == INT)
         {
             return 1;
         }
-        else if ((typeB == CHAR || typeB == BOOL) && typeA == INT){
+        else if ((doosra_waala_type == CHAR || doosra_waala_type == BOOL) && pehla_waala_type == INT){
             return 2;
         }
         return -1;
     }
     else{
         //int can be converted to bool
-        if ( typeA == BOOL && typeB == INT ){
+        if ( pehla_waala_type == BOOL && doosra_waala_type == INT ){
             return 2;
         }
-        else if (typeA == INT && typeB == BOOL){
+        else if (pehla_waala_type == INT && doosra_waala_type == BOOL){
             return 1;
         }
         return -1;
@@ -374,7 +381,7 @@ int are_comparable(TYPE typeA, TYPE typeB)
     else return true;
 }
 
-node::node(string con, node_type t)
+node::node(daram con, node_type t)
 {
 	content = con;
 	type = t;
@@ -382,6 +389,7 @@ node::node(string con, node_type t)
 	sibling = NULL;
 	info = "";
 }
+//First SEGEMENT
 node::node(const char* con, int t)
 {
 	content = (con);
@@ -392,7 +400,7 @@ node::node(const char* con, int t)
 }
 
 
-#line 396 "mad_parser.tab.c" /* yacc.c:339  */
+#line 404 "mad_parser.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -467,13 +475,13 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 331 "mad_parser.y" /* yacc.c:355  */
+#line 339 "mad_parser.y" /* yacc.c:355  */
 
 	struct attr* attr_el;
 	node* node_el;
 	char* node_con;
 
-#line 477 "mad_parser.tab.c" /* yacc.c:355  */
+#line 485 "mad_parser.tab.c" /* yacc.c:355  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -488,7 +496,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 492 "mad_parser.tab.c" /* yacc.c:358  */
+#line 500 "mad_parser.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -728,18 +736,18 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  16
+#define YYFINAL  15
 /* YYLAST -- Last index in YYTABLE.  */
 #define YYLAST   160
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  35
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  28
+#define YYNNTS  29
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  68
+#define YYNRULES  69
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  129
+#define YYNSTATES  130
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
@@ -788,13 +796,13 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   380,   380,   388,   391,   395,   398,   401,   406,   412,
-     427,   441,   444,   447,   452,   457,   470,   470,   514,   514,
-     559,   579,   595,   601,   607,   615,   640,   643,   649,   664,
-     670,   685,   689,   693,   697,   701,   705,   708,   736,   742,
-     751,   781,   795,   817,   818,   821,   831,   843,   913,   919,
-     956,   965,  1007,  1043,  1062,  1110,  1115,  1136,  1156,  1170,
-    1213,  1251,  1304,  1333,  1394,  1435,  1447,  1462,  1484
+       0,   388,   388,   396,   399,   403,   406,   409,   414,   420,
+     435,   449,   452,   455,   460,   465,   478,   478,   519,   519,
+     519,   551,   571,   587,   593,   599,   607,   635,   638,   644,
+     659,   665,   680,   684,   688,   692,   696,   700,   703,   731,
+     737,   746,   776,   790,   812,   813,   816,   825,   836,   906,
+     912,   951,   960,  1002,  1038,  1057,  1105,  1109,  1129,  1149,
+    1160,  1203,  1240,  1293,  1322,  1382,  1422,  1434,  1448,  1469
 };
 #endif
 
@@ -811,11 +819,12 @@ static const char *const yytname[] =
   "INTCONST", "CHARCONST", "TERMINAL", "VALUE", "'\\n'", "$accept",
   "start_mad_program", "mad_program", "supported_declarations",
   "variable_declarations", "variable_definitions", "comma_rule", "dtype",
-  "function_declarations", "$@1", "$@2", "func_name", "argument_list",
-  "statement_block", "opencurly", "variable_list", "statement_list",
-  "supported_statement", "if_statement", "else_statement",
-  "while_statement", "return_statement", "alr_subexpression", "id_list",
-  "lhs", "var_decl", "var_use", "supported_constant", YY_NULLPTR
+  "function_declarations", "$@1", "@2", "$@3", "func_name",
+  "argument_list", "statement_block", "opencurly", "variable_list",
+  "statement_list", "supported_statement", "if_statement",
+  "else_statement", "while_statement", "return_statement",
+  "alr_subexpression", "id_list", "lhs", "var_decl", "var_use",
+  "supported_constant", YY_NULLPTR
 };
 #endif
 
@@ -831,12 +840,12 @@ static const yytype_uint16 yytoknum[] =
 };
 # endif
 
-#define YYPACT_NINF -75
+#define YYPACT_NINF -76
 
 #define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-75)))
+  (!!((Yystate) == (-76)))
 
-#define YYTABLE_NINF -62
+#define YYTABLE_NINF -63
 
 #define yytable_value_is_error(Yytable_value) \
   0
@@ -845,19 +854,19 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-     102,   -14,    60,   -75,   -75,   -75,    45,   -75,    94,   -75,
-      65,    72,   -75,   -75,   -75,   -75,   -75,   -75,    73,   -75,
-     -75,    73,    42,    51,   -75,    91,    69,    53,   -75,    62,
-     -75,   116,   -75,    87,   116,    25,   106,   -75,   107,   123,
-      49,   124,   128,   128,   116,   116,   116,   -75,   -75,   116,
-     -75,   -75,   -75,   -75,   116,    73,    59,   -75,   126,    37,
-      43,    90,    43,   138,   139,     6,   -75,   -75,   -75,   -75,
-     137,    59,   -75,   -75,   -75,    14,   130,   -75,   -75,    43,
-     145,   120,   105,   142,   115,    86,    43,    43,   126,   -75,
-      81,   -75,   -75,   -75,   -75,    43,    43,    43,    43,    86,
-     141,    54,   -75,   143,   -75,   -75,   -75,   119,   122,   -75,
-     -75,    86,    86,    86,    86,   125,   145,   -75,   135,   128,
-     128,   146,   -75,   133,   -75,   -75,   128,   -75,   -75
+      52,   -23,   -76,   -76,   -76,   -76,    16,   -76,   113,   -76,
+     133,    24,   -76,   -76,    32,   -76,   -76,    33,   -76,   -76,
+      33,    11,    37,   -76,   -76,   -76,    34,    28,   -76,    20,
+     -76,    63,   -76,    69,   127,   127,   -76,    57,    67,    76,
+      81,    71,    82,    85,    85,   127,   127,   127,   -76,   -76,
+     127,   -76,   -76,   -76,   -76,   127,    33,    25,   -76,    73,
+     130,    70,    91,    70,    98,    99,    58,   -76,   -76,   -76,
+     -76,    86,    25,   -76,   -76,   -76,    97,    94,   -76,   -76,
+      70,   115,   109,     0,   128,    89,   131,    70,    70,    73,
+     -76,   105,   -76,   -76,   -76,   -76,    70,    70,    70,    70,
+     131,   138,    41,   -76,   141,   -76,   -76,   -76,   112,   126,
+     -76,   -76,   131,   131,   131,   131,   123,   115,   -76,   137,
+      85,    85,   144,   -76,   134,   -76,   -76,    85,   -76,   -76
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -865,35 +874,35 @@ static const yytype_int16 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     0,     0,    13,    14,    15,     0,     2,     0,     6,
-       0,     0,     7,     5,    20,    18,     1,     4,     0,    12,
-       8,     0,    61,     0,     9,     0,    61,     0,    10,     0,
-      16,    22,    11,     0,    22,     0,     0,    62,     0,     0,
-       0,     0,     0,     0,    22,    22,    22,    26,    19,    27,
-      17,    24,    23,    21,    27,     0,     0,    28,     0,    63,
-       0,     0,     0,     0,     0,     0,    67,    65,    66,    35,
-       0,     0,    32,    33,    34,     0,     0,    46,    45,     0,
-      58,     0,     0,    65,     0,    53,     0,     0,    43,    41,
-       0,    25,    30,    36,    31,     0,     0,     0,     0,    55,
-      63,     0,    57,     0,    48,    68,    50,     0,     0,    44,
-      42,    49,    51,    52,    54,     0,     0,    47,    64,     0,
-       0,     0,    56,    38,    40,    64,     0,    37,    39
+       0,     0,    18,    13,    14,    15,     0,     2,     0,     6,
+       0,     0,     7,     5,     0,     1,     4,     0,    12,     8,
+       0,    62,     0,     9,    21,    19,    62,     0,    10,     0,
+      16,     0,    11,     0,    23,    23,    63,     0,     0,     0,
+       0,     0,     0,     0,     0,    23,    23,    23,    27,    17,
+      28,    20,    25,    24,    22,    28,     0,     0,    29,     0,
+      64,     0,     0,     0,     0,     0,     0,    68,    66,    67,
+      36,     0,     0,    33,    34,    35,     0,     0,    47,    46,
+       0,    59,     0,     0,    66,     0,    54,     0,     0,    44,
+      42,     0,    26,    31,    37,    32,     0,     0,     0,     0,
+      56,    64,     0,    58,     0,    49,    69,    51,     0,     0,
+      45,    43,    50,    52,    53,    55,     0,     0,    48,    65,
+       0,     0,     0,    57,    39,    41,    65,     0,    38,    40
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int16 yypgoto[] =
 {
-     -75,   -75,   150,   -75,   -33,   -75,   -75,     2,   -75,   -75,
-     -75,   148,   -21,   -42,   -75,    99,    89,   -75,   -75,   -75,
-     -75,   -75,   -57,   -75,   -75,    -4,   -74,   -75
+     -76,   -76,   148,   -76,   -41,   -76,   -76,     2,   -76,   -76,
+     -76,   -76,   145,   -22,   -43,   -76,   103,    88,   -76,   -76,
+     -76,   -76,   -76,   -58,   -76,   -76,    -5,   -75,   -76
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
-static const yytype_int8 yydefgoto[] =
+static const yytype_int16 yydefgoto[] =
 {
-      -1,     6,     7,     8,     9,    10,    21,    35,    12,    34,
-      25,    15,    36,    69,    49,    56,    70,    71,    72,   127,
-      73,    74,    75,   101,    76,    24,    77,    78
+      -1,     6,     7,     8,     9,    10,    20,    37,    12,    34,
+      14,    31,    22,    38,    70,    50,    57,    71,    72,    73,
+     128,    74,    75,    76,   102,    77,    23,    78,    79
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -901,44 +910,44 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int16 yytable[] =
 {
-      48,    50,    11,    82,    84,    85,   102,    88,    90,    59,
-      11,    89,    60,    38,    27,    93,    54,    28,    61,    94,
-      13,    54,    99,    51,    52,    53,    39,    62,    40,   107,
-     108,    41,    95,    96,    97,    66,    67,    68,   111,   112,
-     113,   114,   122,    80,    58,    16,    59,    81,   -20,    60,
-      45,    55,    29,   -61,   -59,    61,    55,    30,   116,    29,
-      58,   117,    59,    14,    62,    60,    18,    47,   -29,    19,
-      20,    61,    66,    67,    68,    22,    26,   123,   124,    29,
-      62,    63,   109,    64,   128,    65,   110,    32,    66,    67,
-      68,    58,    33,    59,    -3,     1,    60,    31,    37,    95,
-      96,    97,    61,     1,    95,    96,    97,     2,     3,     4,
-       5,    62,   104,    42,    43,     2,     3,     4,     5,    66,
-      83,    68,   106,    95,    96,    97,   119,    44,    46,   120,
-       3,     4,     5,    95,    96,    97,    47,    95,    96,    97,
-      95,    96,    97,    79,    86,    87,    91,    98,   100,   105,
-     103,   115,   -60,    57,   118,   121,   126,   125,    17,    23,
-      92
+      49,    51,    11,    83,    85,    86,   103,   105,    91,    55,
+      11,    13,    27,    39,    55,    28,    15,   -21,    96,    97,
+      98,    29,   100,    52,    53,    54,    59,    21,    60,   108,
+     109,    61,    42,    48,   -30,    24,    26,    62,   112,   113,
+     114,   115,   123,    30,    29,   117,    63,    64,   118,    65,
+      33,    66,    56,     1,    67,    68,    69,    56,    40,    89,
+      41,    60,    32,    90,    61,     2,     3,     4,     5,    35,
+      62,    59,    46,    60,    43,   -62,    61,   124,   125,    63,
+      36,    29,    62,    44,   129,    45,    47,    67,    68,    69,
+      80,    63,    59,    48,    60,    92,   107,    61,    94,    67,
+      68,    69,    95,    62,    87,    88,   110,    96,    97,    98,
+     111,    99,    63,    -3,     1,    96,    97,    98,   101,   120,
+      67,    84,    69,    96,    97,    98,     2,     3,     4,     5,
+      96,    97,    98,   121,    17,   106,    81,    18,    19,   104,
+      82,     3,     4,     5,    96,    97,    98,   -60,   116,    96,
+      97,    98,   119,   122,   -61,   126,    16,   127,    58,    25,
+      93
 };
 
 static const yytype_uint8 yycheck[] =
 {
-      42,    43,     0,    60,    61,    62,    80,     1,    65,     3,
-       8,     5,     6,    34,    18,     1,    49,    21,    12,     5,
-      34,    54,    79,    44,    45,    46,     1,    21,     3,    86,
-      87,    35,    18,    19,    20,    29,    30,    31,    95,    96,
-      97,    98,   116,     6,     1,     0,     3,    10,     6,     6,
-       1,    49,    10,     4,    17,    12,    54,     6,     4,    10,
-       1,     7,     3,     3,    21,     6,     1,     8,     9,     4,
-       5,    12,    29,    30,    31,     3,     3,   119,   120,    10,
-      21,    22,     1,    24,   126,    26,     5,    34,    29,    30,
-      31,     1,    30,     3,     0,     1,     6,     6,    11,    18,
-      19,    20,    12,     1,    18,    19,    20,    13,    14,    15,
-      16,    21,     7,     7,     7,    13,    14,    15,    16,    29,
-      30,    31,     7,    18,    19,    20,     7,     4,     4,     7,
-      14,    15,    16,    18,    19,    20,     8,    18,    19,    20,
-      18,    19,    20,    17,     6,     6,     9,    17,     3,     7,
-      30,    10,    17,    54,    11,    30,    23,    11,     8,    11,
-      71
+      43,    44,     0,    61,    62,    63,    81,     7,    66,    50,
+       8,    34,    17,    35,    55,    20,     0,     6,    18,    19,
+      20,    10,    80,    45,    46,    47,     1,     3,     3,    87,
+      88,     6,    37,     8,     9,     3,     3,    12,    96,    97,
+      98,    99,   117,     6,    10,     4,    21,    22,     7,    24,
+      30,    26,    50,     1,    29,    30,    31,    55,     1,     1,
+       3,     3,    34,     5,     6,    13,    14,    15,    16,     6,
+      12,     1,     1,     3,     7,     4,     6,   120,   121,    21,
+      11,    10,    12,     7,   127,     4,     4,    29,    30,    31,
+      17,    21,     1,     8,     3,     9,     7,     6,     1,    29,
+      30,    31,     5,    12,     6,     6,     1,    18,    19,    20,
+       5,    17,    21,     0,     1,    18,    19,    20,     3,     7,
+      29,    30,    31,    18,    19,    20,    13,    14,    15,    16,
+      18,    19,    20,     7,     1,     7,     6,     4,     5,    30,
+      10,    14,    15,    16,    18,    19,    20,    17,    10,    18,
+      19,    20,    11,    30,    17,    11,     8,    23,    55,    14,
+      72
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
@@ -946,42 +955,42 @@ static const yytype_uint8 yycheck[] =
 static const yytype_uint8 yystos[] =
 {
        0,     1,    13,    14,    15,    16,    36,    37,    38,    39,
-      40,    42,    43,    34,     3,    46,     0,    37,     1,     4,
-       5,    41,     3,    46,    60,    45,     3,    60,    60,    10,
-       6,     6,    34,    30,    44,    42,    47,    11,    47,     1,
-       3,    60,     7,     7,     4,     1,     4,     8,    48,    49,
-      48,    47,    47,    47,    39,    42,    50,    50,     1,     3,
-       6,    12,    21,    22,    24,    26,    29,    30,    31,    48,
-      51,    52,    53,    55,    56,    57,    59,    61,    62,    17,
-       6,    10,    57,    30,    57,    57,     6,     6,     1,     5,
-      57,     9,    51,     1,     5,    18,    19,    20,    17,    57,
-       3,    58,    61,    30,     7,     7,     7,    57,    57,     1,
-       5,    57,    57,    57,    57,    10,     4,     7,    11,     7,
-       7,    30,    61,    48,    48,    11,    23,    54,    48
+      40,    42,    43,    34,    45,     0,    37,     1,     4,     5,
+      41,     3,    47,    61,     3,    47,     3,    61,    61,    10,
+       6,    46,    34,    30,    44,     6,    11,    42,    48,    48,
+       1,     3,    61,     7,     7,     4,     1,     4,     8,    49,
+      50,    49,    48,    48,    48,    39,    42,    51,    51,     1,
+       3,     6,    12,    21,    22,    24,    26,    29,    30,    31,
+      49,    52,    53,    54,    56,    57,    58,    60,    62,    63,
+      17,     6,    10,    58,    30,    58,    58,     6,     6,     1,
+       5,    58,     9,    52,     1,     5,    18,    19,    20,    17,
+      58,     3,    59,    62,    30,     7,     7,     7,    58,    58,
+       1,     5,    58,    58,    58,    58,    10,     4,     7,    11,
+       7,     7,    30,    62,    49,    49,    11,    23,    55,    49
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
        0,    35,    36,    37,    37,    37,    38,    38,    39,    40,
-      40,    40,    41,    42,    42,    42,    44,    43,    45,    43,
-      46,    47,    47,    47,    47,    48,    49,    50,    50,    51,
-      51,    52,    52,    52,    52,    52,    52,    53,    54,    54,
-      55,    56,    56,    56,    56,    57,    57,    57,    57,    57,
-      57,    57,    57,    57,    57,    57,    58,    58,    58,    59,
-      59,    60,    60,    61,    61,    62,    62,    62,    62
+      40,    40,    41,    42,    42,    42,    44,    43,    45,    46,
+      43,    47,    48,    48,    48,    48,    49,    50,    51,    51,
+      52,    52,    53,    53,    53,    53,    53,    53,    54,    55,
+      55,    56,    57,    57,    57,    57,    58,    58,    58,    58,
+      58,    58,    58,    58,    58,    58,    58,    59,    59,    59,
+      60,    60,    61,    61,    62,    62,    63,    63,    63,    63
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
        0,     2,     1,     1,     2,     2,     1,     1,     2,     2,
-       3,     4,     1,     1,     1,     1,     0,     7,     0,     7,
-       1,     4,     0,     4,     4,     4,     1,     0,     2,     0,
-       2,     2,     1,     1,     1,     1,     2,     6,     0,     2,
-       5,     2,     3,     2,     3,     1,     1,     4,     3,     3,
-       3,     3,     3,     2,     3,     3,     3,     1,     0,     1,
-       4,     1,     4,     1,     4,     1,     1,     1,     3
+       3,     4,     1,     1,     1,     1,     0,     7,     0,     0,
+       8,     1,     4,     0,     4,     4,     4,     1,     0,     2,
+       0,     2,     2,     1,     1,     1,     1,     2,     6,     0,
+       2,     5,     2,     3,     2,     3,     1,     1,     4,     3,
+       3,     3,     3,     3,     2,     3,     3,     3,     1,     0,
+       1,     4,     1,     4,     1,     4,     1,     1,     1,     3
 };
 
 
@@ -1658,155 +1667,155 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 380 "mad_parser.y" /* yacc.c:1646  */
+#line 388 "mad_parser.y" /* yacc.c:1646  */
     {
     cout <<".data\n";
     cout << get_data_string();
     cout <<"\n .text \n .globl main \n";
-    cout << (yyvsp[0].attr_el)->code;
+    cout << (yyvsp[0].attr_el)->dakshina;
   }
-#line 1669 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1678 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 388 "mad_parser.y" /* yacc.c:1646  */
+#line 396 "mad_parser.y" /* yacc.c:1646  */
     {
   	(yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[0].attr_el));
-  }
-#line 1677 "mad_parser.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 4:
-#line 391 "mad_parser.y" /* yacc.c:1646  */
-    {
-  	(yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[-1].attr_el));
-    (yyval.attr_el)->code += (yyvsp[0].attr_el)->code;
   }
 #line 1686 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
+  case 4:
+#line 399 "mad_parser.y" /* yacc.c:1646  */
+    {
+  	(yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[-1].attr_el));
+    (yyval.attr_el)->dakshina += (yyvsp[0].attr_el)->dakshina;
+  }
+#line 1695 "mad_parser.tab.c" /* yacc.c:1646  */
+    break;
+
   case 5:
-#line 395 "mad_parser.y" /* yacc.c:1646  */
+#line 403 "mad_parser.y" /* yacc.c:1646  */
     { pretty_print_error("Compilation terminating with errors"); root = NULL;}
-#line 1692 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1701 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 398 "mad_parser.y" /* yacc.c:1646  */
+#line 406 "mad_parser.y" /* yacc.c:1646  */
     {
   	(yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[0].attr_el));
   }
-#line 1700 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1709 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 401 "mad_parser.y" /* yacc.c:1646  */
+#line 409 "mad_parser.y" /* yacc.c:1646  */
     {
   	(yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[0].attr_el));
   }
-#line 1708 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1717 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 406 "mad_parser.y" /* yacc.c:1646  */
+#line 414 "mad_parser.y" /* yacc.c:1646  */
     {
     (yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[-1].attr_el));
   }
-#line 1716 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1725 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 412 "mad_parser.y" /* yacc.c:1646  */
+#line 420 "mad_parser.y" /* yacc.c:1646  */
     {
     (yyval.attr_el) = new attr();
-  	if (has_error)
+  	if (arey_galti_hai_kya)
     {
     	(yyval.attr_el)->type = ERR;
-      (yyval.attr_el)->code = "";
+      (yyval.attr_el)->dakshina = "";
     }
   	else
     {
-    	(yyval.attr_el)->code = (yyvsp[0].attr_el)->code;
+    	(yyval.attr_el)->dakshina = (yyvsp[0].attr_el)->dakshina;
       (yyval.attr_el)->type = (yyvsp[-1].attr_el)->type;
 
     }
 
 }
-#line 1736 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1745 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 427 "mad_parser.y" /* yacc.c:1646  */
+#line 435 "mad_parser.y" /* yacc.c:1646  */
     {
     (yyval.attr_el) = new attr();
-  	if (has_error)
+  	if (arey_galti_hai_kya)
     {
     	(yyval.attr_el)->type = ERR;
-      (yyval.attr_el)->code = "";
+      (yyval.attr_el)->dakshina = "";
     }
   	else
     {
       (yyvsp[0].attr_el)->type = (yyvsp[-1].attr_el)->type;
-    	(yyval.attr_el)->code = (yyvsp[-2].attr_el)->code + (yyvsp[0].attr_el)->code;
+    	(yyval.attr_el)->dakshina = (yyvsp[-2].attr_el)->dakshina + (yyvsp[0].attr_el)->dakshina;
       (yyval.attr_el)->type = (yyvsp[-1].attr_el)->type;
     }
   	}
-#line 1755 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1764 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 441 "mad_parser.y" /* yacc.c:1646  */
+#line 449 "mad_parser.y" /* yacc.c:1646  */
     { (yyval.attr_el) = new attr(); (yyval.attr_el)->type = ERR; pretty_print_error("Missing comma in definitions list"); }
-#line 1761 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1770 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 444 "mad_parser.y" /* yacc.c:1646  */
+#line 452 "mad_parser.y" /* yacc.c:1646  */
     {(yyval.attr_el) = new attr(); (yyval.attr_el)->type = ((yyvsp[-1].attr_el))->type; }
-#line 1767 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1776 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 447 "mad_parser.y" /* yacc.c:1646  */
+#line 455 "mad_parser.y" /* yacc.c:1646  */
     {
     (yyval.attr_el) = new attr();
     (yyval.attr_el)->type = INT;
     (yyval.attr_el)->ival = INT_SIZE;
   }
-#line 1777 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1786 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 452 "mad_parser.y" /* yacc.c:1646  */
+#line 460 "mad_parser.y" /* yacc.c:1646  */
     {
     (yyval.attr_el) = new attr();
     (yyval.attr_el)->type = BOOL;
     (yyval.attr_el)->ival = BOOL_SIZE;
   }
-#line 1787 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1796 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 457 "mad_parser.y" /* yacc.c:1646  */
+#line 465 "mad_parser.y" /* yacc.c:1646  */
     {
   	(yyval.attr_el) = new attr();
     (yyval.attr_el)->type = CHAR;
     (yyval.attr_el)->ival = CHAR_SIZE;
   }
-#line 1797 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1806 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 470 "mad_parser.y" /* yacc.c:1646  */
-    { scope = 1; }
-#line 1803 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 478 "mad_parser.y" /* yacc.c:1646  */
+    { vyavadhi = 1; }
+#line 1812 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 470 "mad_parser.y" /* yacc.c:1646  */
+#line 478 "mad_parser.y" /* yacc.c:1646  */
     {
-        //Scope Consideration
-        scope = 0;
+        //vyavadhi Consideration
+        vyavadhi = 0;
     		int cur_offset = 0;
         //Semantic
         (yyval.attr_el) = new attr();
@@ -1816,7 +1825,7 @@ yyreduce:
         // 	switch(active_func_ptr->param_list[i].type)
         //   {
         //   	case INT: active_func_ptr->param_list[i].offset = cur_offset + INT_SIZE;
-        //               cout << "\t " << active_func_ptr->param_list[i].offset << " name: " << active_func_ptr->param_list[i].name << endl;
+        //               cout << "\t " << active_func_ptr->param_list[i].offset << " peru: " << active_func_ptr->param_list[i].peru << endl;
         //     				cur_offset += INT_SIZE;
         //     	break;
         //     default: active_func_ptr->param_list[i].offset = cur_offset + BOOL_SIZE;
@@ -1826,396 +1835,386 @@ yyreduce:
         // }
     		active_func_ptr->paramlist_size = (yyvsp[-2].attr_el)->ival ; //Setting paramlist size
         //Code Generation
-        (yyval.attr_el)->code = (yyvsp[-5].attr_el)->label + ":\n";
+        (yyval.attr_el)->dakshina = (yyvsp[-5].attr_el)->label + ":\n";
         //Store return $ra to stack and set frame pointer to $ra
-        (yyval.attr_el)->code += "sw $ra 0($sp)\n";
-        (yyval.attr_el)->code += "move $fp $sp \n";
-    		(yyval.attr_el)->code += "addiu $sp $sp -4\n";
-    		(yyval.attr_el)->code += (yyvsp[0].attr_el)->code;
-        (yyval.attr_el)->code += "lw $ra 0($fp)\n";
-        (yyval.attr_el)->code += "move $sp $fp\n";
-        // $$->code += "addiu $sp $sp 4\n";
-    		// //$$->code += "move $sp $fp\n";
-    		// $$->code += "lw $ra 4($sp)\n";          // $ra <- 0($fp)
-    		// $$->code += "addiu $sp $sp 4\n";
+        (yyval.attr_el)->dakshina += "sw $ra 0($sp)\n";
+        (yyval.attr_el)->dakshina += "move $fp $sp \n";
+    		(yyval.attr_el)->dakshina += "addiu $sp $sp -4\n";
+    		(yyval.attr_el)->dakshina += (yyvsp[0].attr_el)->dakshina;
+        (yyval.attr_el)->dakshina += "lw $ra 0($fp)\n";
+        (yyval.attr_el)->dakshina += "move $sp $fp\n";
+
     		//Pop parameters
-    		stringstream s;
+    		stringstream s;//int ko string karne ka aur koi raasta nahe mila
     		s << active_func_ptr->paramlist_size;
-    		(yyval.attr_el)->code += "addiu $sp $sp " + s.str() + "\n";
-        (yyval.attr_el)->code += "lw $fp 4($sp)\n";
-        (yyval.attr_el)->code += "addiu $sp $sp 4\n";
-    		(yyval.attr_el)->code += "jr $ra\n";
+    		(yyval.attr_el)->dakshina += "addiu $sp $sp " + s.str() + "\n";
+        (yyval.attr_el)->dakshina += "lw $fp 4($sp)\n";
+        (yyval.attr_el)->dakshina += "addiu $sp $sp 4\n";
+    		(yyval.attr_el)->dakshina += "jr $ra\n";
     		//Semantic again
     		active_func_ptr = NULL;
 	}
-#line 1852 "mad_parser.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 18:
-#line 514 "mad_parser.y" /* yacc.c:1646  */
-    { scope = 1; }
 #line 1858 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
+  case 18:
+#line 519 "mad_parser.y" /* yacc.c:1646  */
+    {(yyval.attr_el) = new attr(); (yyval.attr_el)-> type = VOIDF; }
+#line 1864 "mad_parser.tab.c" /* yacc.c:1646  */
+    break;
+
   case 19:
-#line 514 "mad_parser.y" /* yacc.c:1646  */
+#line 519 "mad_parser.y" /* yacc.c:1646  */
+    { vyavadhi = 1; }
+#line 1870 "mad_parser.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 20:
+#line 519 "mad_parser.y" /* yacc.c:1646  */
     {
-		//Scope Consideration
-		scope = 0;
+		//vyavadhi Consideration
+		vyavadhi = 0;
 
 		//Semantic
     (yyval.attr_el) = new attr();
-    //Scope Consideration
-        scope = 0;
+    //vyavadhi Consideration
+        vyavadhi = 0;
     		int cur_offset = 0;
         //Semantic
         (yyval.attr_el) = new attr();
-    		active_func_ptr->return_type = VOIDF;
-    		for ( int i = 0; i < active_func_ptr->param_list.size(); i++ )
-        {
-        	switch(active_func_ptr->param_list[i].type)
-          {
-          	case INT: active_func_ptr->param_list[i].offset = cur_offset + INT_SIZE;
-            				cur_offset += INT_SIZE;
-            	break;
-            default: active_func_ptr->param_list[i].offset = cur_offset + BOOL_SIZE;
-            				cur_offset += BOOL_SIZE;
-            break;
-          }
-        }
-    		active_func_ptr->paramlist_size = cur_offset; //Setting paramlist size
+    		active_func_ptr->paramlist_size = (yyvsp[-2].attr_el)->ival; //Setting paramlist size
     //Code Generation
-    		(yyval.attr_el)->code = (yyvsp[-5].attr_el)->label + ":\n";
+    		(yyval.attr_el)->dakshina = (yyvsp[-5].attr_el)->label + ":\n";
         //Store return $ra to stack and set frame pointer to $ra
-        (yyval.attr_el)->code += "sw $ra 0($sp) \n";
-        (yyval.attr_el)->code += "move $fp $sp \n";
-    		(yyval.attr_el)->code += "addiu $sp $sp -4\n";
-    		(yyval.attr_el)->code += (yyvsp[0].attr_el)->code;
-    		(yyval.attr_el)->code += "move $sp $fp\n";
-    		(yyval.attr_el)->code += "lw $ra 0($fp)\n";          // $ra <- 0($fp)
-    		(yyval.attr_el)->code += "addiu $sp $sp 4\n";
+        (yyval.attr_el)->dakshina += "sw $ra 0($sp) \n";
+        (yyval.attr_el)->dakshina += "move $fp $sp \n";
+    		(yyval.attr_el)->dakshina += "addiu $sp $sp -4\n";
+    		(yyval.attr_el)->dakshina += (yyvsp[0].attr_el)->dakshina;
+    		(yyval.attr_el)->dakshina += "move $sp $fp\n";
+    		(yyval.attr_el)->dakshina += "lw $ra 0($fp)\n";          // $ra <- 0($fp)
+    		(yyval.attr_el)->dakshina += "addiu $sp $sp 4\n";
     		//Pop parameters
-    		stringstream s;
+    		stringstream s;//int ko string karne ka aur koi raasta nahe mila
     		s << active_func_ptr->paramlist_size;
-    		(yyval.attr_el)->code += "addiu $sp $sp " + s.str() + "\n";
-    		(yyval.attr_el)-> code += "jr $ra\n";
+    		(yyval.attr_el)->dakshina += "addiu $sp $sp " + s.str() + "\n";
+    		(yyval.attr_el)-> dakshina += "jr $ra\n";
 
     		//Semantic again
     		active_func_ptr = NULL;
 	}
-#line 1907 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1906 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 20:
-#line 559 "mad_parser.y" /* yacc.c:1646  */
+  case 21:
+#line 551 "mad_parser.y" /* yacc.c:1646  */
     {
     (yyval.attr_el) = new attr();
 		if (func_table.count((yyvsp[0].node_con)) > 0)
     {
-    	has_error = true;
-      pretty_print_error ("Semantic error: Redeclaration of function name");
+    	arey_galti_hai_kya = true;
+      pretty_print_error ("Sem mein galti: function k liye naam khatam ho gye kya :P");
     }
     else
     {
     	func_record f_temp;
-      func_table[string((yyvsp[0].node_con))] = f_temp;
+      func_table[daram((yyvsp[0].node_con))] = f_temp;
       //Setting active_func_ptr
-      active_func_ptr = &func_table[string((yyvsp[0].node_con))];
-      active_func_ptr -> name = string((yyvsp[0].node_con));
+      active_func_ptr = &func_table[daram((yyvsp[0].node_con))];
+      active_func_ptr -> peru = daram((yyvsp[0].node_con));
       active_func_ptr -> return_type = (yyvsp[-1].attr_el)->type;
     }
     (yyval.attr_el)->type = VOIDF;
     (yyval.attr_el)->label = (yyvsp[0].node_con);
   }
-#line 1931 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1930 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 21:
-#line 579 "mad_parser.y" /* yacc.c:1646  */
+  case 22:
+#line 571 "mad_parser.y" /* yacc.c:1646  */
     {
       //Nothing to do - check for errors and proceed
       (yyval.attr_el) = new attr();
-      if (has_error)
+      if (arey_galti_hai_kya)
       {
         (yyval.attr_el)->type = ERR;
-        (yyval.attr_el)->code = "";
+        (yyval.attr_el)->dakshina = "";
       }
       else
       {
         active_func_ptr->param_list[(yyvsp[-2].attr_el)->ival].offset = (yyvsp[0].attr_el)->ival + ( (yyvsp[-3].attr_el)->ival );
-        // cout << active_func_ptr->param_list[$2->ival].name << " has offset " << active_func_ptr->param_list[$2->ival].offset << endl;
-        (yyval.attr_el)->code = (yyvsp[-3].attr_el)->code + (yyvsp[-2].attr_el)->code;
+        // cout << active_func_ptr->param_list[$2->ival].peru << " has offset " << active_func_ptr->param_list[$2->ival].offset << endl;
+        (yyval.attr_el)->dakshina = (yyvsp[-3].attr_el)->dakshina + (yyvsp[-2].attr_el)->dakshina;
         (yyval.attr_el)->ival = (yyvsp[0].attr_el)->ival + ((yyvsp[-3].attr_el)->ival);
       }
   }
-#line 1952 "mad_parser.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 22:
-#line 595 "mad_parser.y" /* yacc.c:1646  */
-    {
-    //Nothing to do
-    (yyval.attr_el) = new attr();
-    (yyval.attr_el)->code = "";
-    (yyval.attr_el)->ival = 0;
-  }
-#line 1963 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1951 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 601 "mad_parser.y" /* yacc.c:1646  */
+#line 587 "mad_parser.y" /* yacc.c:1646  */
     {
-  	has_error = true;
+    //Nothing to do
+    (yyval.attr_el) = new attr();
+    (yyval.attr_el)->dakshina = "";
+    (yyval.attr_el)->ival = 0;
+  }
+#line 1962 "mad_parser.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 24:
+#line 593 "mad_parser.y" /* yacc.c:1646  */
+    {
+  	arey_galti_hai_kya = true;
     pretty_print_error (comma_error);
     (yyval.attr_el) = new attr();
     (yyval.attr_el)->type = ERR;
   }
-#line 1974 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1973 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 24:
-#line 607 "mad_parser.y" /* yacc.c:1646  */
+  case 25:
+#line 599 "mad_parser.y" /* yacc.c:1646  */
     {
-  	has_error = true;
+  	arey_galti_hai_kya = true;
     pretty_print_error (identifier_error);
     (yyval.attr_el) = new attr();
     (yyval.attr_el)->type = ERR;
   }
-#line 1985 "mad_parser.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 25:
-#line 615 "mad_parser.y" /* yacc.c:1646  */
-    {
-		(yyval.attr_el) = new attr();
-
-  	if (has_error)
-    {
-    	(yyval.attr_el)->type = ERR;
-      (yyval.attr_el)->code = "";
-    }
-  	else
-    {
-    	(yyval.attr_el)->code = (yyvsp[-2].attr_el)->code + (yyvsp[-1].attr_el)->code;
-    }
-  	//Scope resolution
-    map<string, var_record> temp;
-  	sym_table[scope] = temp;
-  	scope--;
-  }
-#line 2007 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 1984 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 640 "mad_parser.y" /* yacc.c:1646  */
-    { scope++; }
-#line 2013 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 607 "mad_parser.y" /* yacc.c:1646  */
+    {
+		(yyval.attr_el) = new attr();
+
+  	if (arey_galti_hai_kya)
+    {
+    	(yyval.attr_el)->type = ERR;
+      (yyval.attr_el)->dakshina = "";
+    }
+  	else
+    {
+    	(yyval.attr_el)->dakshina = (yyvsp[-2].attr_el)->dakshina + (yyvsp[-1].attr_el)->dakshina;
+    }
+  	//vyavadhi resolution
+    map<daram, var_record> temp;
+  	sym_table[vyavadhi] = temp;
+  	vyavadhi--;
+  }
+#line 2006 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 643 "mad_parser.y" /* yacc.c:1646  */
-    {
-  	//Nothing to do
-    (yyval.attr_el) = new attr();
-    (yyval.attr_el)->code = "";
-
-  }
-#line 2024 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 635 "mad_parser.y" /* yacc.c:1646  */
+    { vyavadhi++; }
+#line 2012 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 649 "mad_parser.y" /* yacc.c:1646  */
+#line 638 "mad_parser.y" /* yacc.c:1646  */
+    {
+  	//Nothing to do
+    (yyval.attr_el) = new attr();
+    (yyval.attr_el)->dakshina = "";
+
+  }
+#line 2023 "mad_parser.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 29:
+#line 644 "mad_parser.y" /* yacc.c:1646  */
     {
     //Nothing to do - check for error in further productions
     (yyval.attr_el) = new attr();
 
-    if (has_error)
+    if (arey_galti_hai_kya)
     {
       (yyval.attr_el)->type = ERR;
-      (yyval.attr_el)->code = "";
+      (yyval.attr_el)->dakshina = "";
     }
     else
-      (yyval.attr_el)->code = (yyvsp[-1].attr_el)->code + (yyvsp[0].attr_el)->code;
+      (yyval.attr_el)->dakshina = (yyvsp[-1].attr_el)->dakshina + (yyvsp[0].attr_el)->dakshina;
   }
-#line 2041 "mad_parser.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 29:
-#line 664 "mad_parser.y" /* yacc.c:1646  */
-    {
-    //Nothing to do
-    (yyval.attr_el) = new attr();
-    (yyval.attr_el)->code = "";
-
-  }
-#line 2052 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2040 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 670 "mad_parser.y" /* yacc.c:1646  */
+#line 659 "mad_parser.y" /* yacc.c:1646  */
+    {
+    //Nothing to do
+    (yyval.attr_el) = new attr();
+    (yyval.attr_el)->dakshina = "";
+
+  }
+#line 2051 "mad_parser.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 31:
+#line 665 "mad_parser.y" /* yacc.c:1646  */
     {
     //Semantic Analyses - chaining
     (yyval.attr_el) = new attr();
-    if (!has_error)
+    if (!arey_galti_hai_kya)
     {
-    	(yyval.attr_el)->code = (yyvsp[-1].attr_el)->code + "\n" + (yyvsp[0].attr_el)->code;
+    	(yyval.attr_el)->dakshina = (yyvsp[-1].attr_el)->dakshina + "\n" + (yyvsp[0].attr_el)->dakshina;
     }
     else
     {
       (yyval.attr_el)->type = ERR;
-      (yyval.attr_el)->code = "";
+      (yyval.attr_el)->dakshina = "";
     }
   }
-#line 2070 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2069 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 31:
-#line 685 "mad_parser.y" /* yacc.c:1646  */
+  case 32:
+#line 680 "mad_parser.y" /* yacc.c:1646  */
     {
     //Nothing to do
     (yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[-1].attr_el));
   }
-#line 2079 "mad_parser.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 32:
-#line 689 "mad_parser.y" /* yacc.c:1646  */
-    {
-    //Nothing to do
-    (yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[0].attr_el));
-  }
-#line 2088 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2078 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 693 "mad_parser.y" /* yacc.c:1646  */
+#line 684 "mad_parser.y" /* yacc.c:1646  */
     {
     //Nothing to do
     (yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[0].attr_el));
   }
-#line 2097 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2087 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 697 "mad_parser.y" /* yacc.c:1646  */
+#line 688 "mad_parser.y" /* yacc.c:1646  */
     {
     //Nothing to do
     (yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[0].attr_el));
   }
-#line 2106 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2096 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 701 "mad_parser.y" /* yacc.c:1646  */
+#line 692 "mad_parser.y" /* yacc.c:1646  */
     {
     //Nothing to do
     (yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[0].attr_el));
   }
-#line 2115 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2105 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 705 "mad_parser.y" /* yacc.c:1646  */
-    { (yyval.attr_el) = new attr(); (yyval.attr_el)->type = ERR; has_error = true; pretty_print_error("Possible missing semicolon with alr_subexpression"); }
-#line 2121 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 696 "mad_parser.y" /* yacc.c:1646  */
+    {
+    //Nothing to do
+    (yyval.attr_el) = new attr(); copy_attr((yyval.attr_el),(yyvsp[0].attr_el));
+  }
+#line 2114 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 708 "mad_parser.y" /* yacc.c:1646  */
+#line 700 "mad_parser.y" /* yacc.c:1646  */
+    { (yyval.attr_el) = new attr(); (yyval.attr_el)->type = ERR; arey_galti_hai_kya = true; pretty_print_error("Possible missing semicolon with alr_subexpression"); }
+#line 2120 "mad_parser.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 38:
+#line 703 "mad_parser.y" /* yacc.c:1646  */
     {
 		(yyval.attr_el) = new attr();
 		if ((yyvsp[-3].attr_el)->type == CHAR )
     {
-    	has_error = true;
+    	arey_galti_hai_kya = true;
       (yyval.attr_el)->type = ERR;
-      pretty_print_error ("Incompatible types: Expected boolean expression in if condition");
+      pretty_print_error ("Incompatible types: if mein boolean value dene ka, nahe toh apun error dega.");
     }
 		//Code Generation
-	    string startElse,endElse;
+	    daram startElse,endElse;
 	    startElse = get_label();
 	    endElse = get_label();
 
-	    (yyval.attr_el) -> code = (yyvsp[-3].attr_el)-> code;
+	    (yyval.attr_el) -> dakshina = (yyvsp[-3].attr_el)-> dakshina;
       if ((yyvsp[-3].attr_el)->type == INT){
-        (yyval.attr_el)->code += intToBool();
+        (yyval.attr_el)->dakshina += intToBool();
       }
-	    (yyval.attr_el) -> code += "li $t1 0x1\n";
-	    (yyval.attr_el) -> code += "bne $t0 $t1 " + startElse + "\n";
-	    (yyval.attr_el) -> code += (yyvsp[-1].attr_el) ->code;
-	    (yyval.attr_el) -> code += "b " + endElse + "\n";
-	    (yyval.attr_el) -> code += startElse + ":\n";
-	    (yyval.attr_el) -> code += (yyvsp[0].attr_el)->code;
-	    (yyval.attr_el) -> code += endElse + ":\n";
+	    (yyval.attr_el) -> dakshina += "li $t1 0x1\n";
+	    (yyval.attr_el) -> dakshina += "bne $t0 $t1 " + startElse + "\n";
+	    (yyval.attr_el) -> dakshina += (yyvsp[-1].attr_el) ->dakshina;
+	    (yyval.attr_el) -> dakshina += "b " + endElse + "\n";
+	    (yyval.attr_el) -> dakshina += startElse + ":\n";
+	    (yyval.attr_el) -> dakshina += (yyvsp[0].attr_el)->dakshina;
+	    (yyval.attr_el) -> dakshina += endElse + ":\n";
 
 	}
-#line 2152 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2151 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 38:
-#line 736 "mad_parser.y" /* yacc.c:1646  */
+  case 39:
+#line 731 "mad_parser.y" /* yacc.c:1646  */
     {
     	(yyval.attr_el) = new attr();
     	//Semantic Analyses - no check
     	//CodeGen
-	    (yyval.attr_el)-> code = "\n";
+	    (yyval.attr_el)-> dakshina = "\n";
 	}
-#line 2163 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2162 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 39:
-#line 742 "mad_parser.y" /* yacc.c:1646  */
+  case 40:
+#line 737 "mad_parser.y" /* yacc.c:1646  */
     {
 		(yyval.attr_el) = new attr();
     //Semantic Analyses - no check
 		//Code Generation
-		(yyval.attr_el)->code = (yyvsp[0].attr_el)->code;
+		(yyval.attr_el)->dakshina = (yyvsp[0].attr_el)->dakshina;
 
 	}
-#line 2175 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2174 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 40:
-#line 751 "mad_parser.y" /* yacc.c:1646  */
+  case 41:
+#line 746 "mad_parser.y" /* yacc.c:1646  */
     {
     (yyval.attr_el) = new attr();
     //Semantic Analyses
     if ((yyvsp[-2].attr_el)->type != BOOL)
     {
-    	has_error = true;
+    	arey_galti_hai_kya = true;
       (yyval.attr_el)->type = ERR;
-      pretty_print_error ("Incompatible types: Expected boolean expression in while condition");
+      pretty_print_error ("Incompatible types: while mein boolean value dene ka nahe toh apan error dega");
     }
 
 		//Code Generation
-    if (!has_error)
+    if (!arey_galti_hai_kya)
     {
-      string startWhile = get_label();
-      string endWhile = get_label();
+      daram startWhile = get_label();
+      daram endWhile = get_label();
       //Start While loop
-      (yyval.attr_el)->code = startWhile + ":\n";
+      (yyval.attr_el)->dakshina = startWhile + ":\n";
       //Evaluate alr_subexpression
-      (yyval.attr_el)->code += (yyvsp[-2].attr_el)->code;
-      (yyval.attr_el)->code += "li $t1 0x1\n";
-      (yyval.attr_el)->code += "bne $t0 $t1 " + endWhile + "\n";
+      (yyval.attr_el)->dakshina += (yyvsp[-2].attr_el)->dakshina;
+      (yyval.attr_el)->dakshina += "li $t1 0x1\n";
+      (yyval.attr_el)->dakshina += "bne $t0 $t1 " + endWhile + "\n";
       //Perform main Statement Block
-      (yyval.attr_el)->code += (yyvsp[0].attr_el)->code;
-      (yyval.attr_el)->code += "b " + startWhile + "\n";
+      (yyval.attr_el)->dakshina += (yyvsp[0].attr_el)->dakshina;
+      (yyval.attr_el)->dakshina += "b " + startWhile + "\n";
       //FinishWhile
-      (yyval.attr_el)->code += endWhile + ":\n";
+      (yyval.attr_el)->dakshina += endWhile + ":\n";
     }
 	}
-#line 2208 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2207 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 41:
-#line 781 "mad_parser.y" /* yacc.c:1646  */
+  case 42:
+#line 776 "mad_parser.y" /* yacc.c:1646  */
     {
     (yyval.attr_el) = new attr();
     //Semantic Analyses
 		if ( active_func_ptr->return_type != VOIDF )
     {
       		(yyval.attr_el)->type = ERR;
-          has_error = true;
+          arey_galti_hai_kya = true;
           pretty_print_error("Incompatible types: function return type not void");
     }
 
@@ -2223,16 +2222,16 @@ yyreduce:
     //Nothing to do
 
 	}
-#line 2227 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2226 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 42:
-#line 795 "mad_parser.y" /* yacc.c:1646  */
+  case 43:
+#line 790 "mad_parser.y" /* yacc.c:1646  */
     {
     	(yyval.attr_el) = new attr();
     	//Semantic Analyses
     	copy_attr((yyval.attr_el),(yyvsp[-1].attr_el));
-      // cout << active_func_ptr-> name << " HYT "<< func_table[active_func_ptr->name].return_type << endl ;
+      // cout << active_func_ptr-> peru << " HYT "<< func_table[active_func_ptr->peru].return_type << endl ;
       // cout << $2->type << " " << active_func_ptr->return_type << endl;
     	int downcast_needed = cast(active_func_ptr->return_type, (yyvsp[-1].attr_el)->type, 0);
       if ( active_func_ptr->return_type != (yyvsp[-1].attr_el)->type )
@@ -2240,33 +2239,33 @@ yyreduce:
         if (downcast_needed < 0 || (downcast_needed == 2 && (yyvsp[-1].attr_el)->type == CHAR) )
         {
           (yyval.attr_el)->type = ERR;
-          has_error = true;
+          arey_galti_hai_kya = true;
           pretty_print_error("Incompatible types: function return type and returned expression");
         }
         else
         {
         	//CodeGen - extra
-        	(yyval.attr_el)->code += intToBool();
+        	(yyval.attr_el)->dakshina += intToBool();
         }
       }
 	}
-#line 2254 "mad_parser.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 43:
-#line 817 "mad_parser.y" /* yacc.c:1646  */
-    {  (yyval.attr_el) = new attr(); (yyval.attr_el)->type = ERR; pretty_print_error(semicolon_error_return); }
-#line 2260 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2253 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 818 "mad_parser.y" /* yacc.c:1646  */
+#line 812 "mad_parser.y" /* yacc.c:1646  */
     {  (yyval.attr_el) = new attr(); (yyval.attr_el)->type = ERR; pretty_print_error(semicolon_error_return); }
-#line 2266 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2259 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 821 "mad_parser.y" /* yacc.c:1646  */
+#line 813 "mad_parser.y" /* yacc.c:1646  */
+    {  (yyval.attr_el) = new attr(); (yyval.attr_el)->type = ERR; pretty_print_error(semicolon_error_return); }
+#line 2265 "mad_parser.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 46:
+#line 816 "mad_parser.y" /* yacc.c:1646  */
     {
         // $$= new attr();
 	   //Semantic analyses - Nothing to check
@@ -2274,14 +2273,13 @@ yyreduce:
 
 	   //CodeGen
 
-	   // Tree stuff
-	   // $$ = as_tree_n("alr_subexpression", NONTERMINAL); $$->child = $1;
+
 	}
-#line 2281 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2279 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 46:
-#line 832 "mad_parser.y" /* yacc.c:1646  */
+  case 47:
+#line 826 "mad_parser.y" /* yacc.c:1646  */
     {
       //  $$= new attr();
 
@@ -2290,14 +2288,13 @@ yyreduce:
 
 	   //CodeGen - Nothing to do
 
-	   //Tree stuff
-	   // $$ = as_tree_n("alr_subexpression", NONTERMINAL); $$->child = $1;
+
 	}
-#line 2297 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2294 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 47:
-#line 843 "mad_parser.y" /* yacc.c:1646  */
+  case 48:
+#line 836 "mad_parser.y" /* yacc.c:1646  */
     { //Function call
 
           (yyval.attr_el)= new attr();
@@ -2306,8 +2303,8 @@ yyreduce:
         if ( func_table.count((yyvsp[-3].node_con)) == 0 )
         {
             (yyval.attr_el)->type = ERR;
-            has_error = true;
-            pretty_print_error("Semantic error: Function not declared");
+            arey_galti_hai_kya = true;
+            pretty_print_error("Sem mein galti: Arey function toh declare kar do bhai.");
         }
     		else
           call_name_ptr = &func_table[(yyvsp[-3].node_con)];
@@ -2315,21 +2312,21 @@ yyreduce:
     		if ( call_name_ptr->param_list.size() != call_param_list.size() )
         {
             (yyval.attr_el)->type = ERR;
-            has_error = true;
-            pretty_print_error("Semantic error: Parameter list length mismatch");
+            arey_galti_hai_kya = true;
+            pretty_print_error("Sem mein galti: Upar kuch aur declare karto ho ,neeche kch aur parameter ki list dekh k use karo.");
         }
         else
         {
             for ( int i = 0; i < call_param_list.size(); i++ )
             {
-                // cout << " call_param_list: " << call_param_list[i]->name << " " << call_param_list[i]->type << endl;
+                // cout << " call_param_list: " << call_param_list[i]->peru << " " << call_param_list[i]->type << endl;
                 // cout << " call_name_ptr ki list:  " << ca
 
                 if ( call_param_list[i]->type != call_name_ptr->param_list[i].type )
                 {
-                    has_error = true;
+                    arey_galti_hai_kya = true;
                     (yyval.attr_el)->type = ERR;
-                    pretty_print_error ("Semantic error: Parameter type mismatch in parameter list");
+                    pretty_print_error ("Sem mein galti: Parameter type enti? mis_match_in_parameter_list");
                 }
             }
         }
@@ -2337,9 +2334,9 @@ yyreduce:
 
         //CodeGeneration
         // $$->type = func_table[$1].return_type;
-    		(yyval.attr_el)->code = "sw $fp 0($sp) \n"; // $fp -> 0($sp)
-        (yyval.attr_el)->code += "addiu $sp $sp -4\n";
-    		string eleType;
+    		(yyval.attr_el)->dakshina = "sw $fp 0($sp) \n"; // $fp -> 0($sp)
+        (yyval.attr_el)->dakshina += "addiu $sp $sp -4\n";
+    		daram eleType;
     		int eleSize;
         for (int i=0;i< call_param_list.size(); i++){
 
@@ -2352,205 +2349,207 @@ yyreduce:
             eleSize = 1;
           }
             if (call_param_list[i]->is_param == true){
-              	stringstream s;
+              	stringstream s;//int ko string karne ka aur koi raasta nahe mila
               	s << call_param_list[i]->offset;
-            		(yyval.attr_el)->code += eleType + " $t1 " + s.str() + "($fp) \n";
+            		(yyval.attr_el)->dakshina += eleType + " $t1 " + s.str() + "($fp) \n";
             }
           else{
-               (yyval.attr_el)->code += eleType + " $t1 " + get_mips_name(call_param_list[i]) + "\n";
+               (yyval.attr_el)->dakshina += eleType + " $t1 " + get_mips_name(call_param_list[i]) + "\n";
           }
-          (yyval.attr_el)->code += "sw $t1 0($sp)\n";
+          (yyval.attr_el)->dakshina += "sw $t1 0($sp)\n";
           stringstream s1; s1 <<eleSize;
-					(yyval.attr_el)->code += "addiu $sp $sp -" + s1.str() + "\n";
+					(yyval.attr_el)->dakshina += "addiu $sp $sp -" + s1.str() + "\n";
         }
-    		(yyval.attr_el)->code += "jal " +string((yyvsp[-3].node_con)) + "\n";
+    		(yyval.attr_el)->dakshina += "jal " +daram((yyvsp[-3].node_con)) + "\n";
 
 				//Back to Semantic
         call_name_ptr = NULL;
   }
-#line 2372 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2369 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 48:
-#line 913 "mad_parser.y" /* yacc.c:1646  */
+  case 49:
+#line 906 "mad_parser.y" /* yacc.c:1646  */
     {
 		//Semantic Analyses - no checks needed
 		//CodeGen
     (yyval.attr_el) = new attr();
 		copy_attr((yyval.attr_el),(yyvsp[-1].attr_el));
   }
-#line 2383 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2380 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 49:
-#line 919 "mad_parser.y" /* yacc.c:1646  */
+  case 50:
+#line 912 "mad_parser.y" /* yacc.c:1646  */
     {
 
         (yyval.attr_el) = new attr();
         // cout<< $1->type << " " << $4->type <<endl;
 	    //Semantic Analyses
-      //cout << $1->type << "\t"<< $1->code <<endl;
+      //cout << $1->type << "\t"<< $1->dakshina <<endl;
 	    if (cast((yyvsp[-2].attr_el)->type, (yyvsp[0].attr_el)->type, 1) < 0)
 	    {
-	        has_error = 1;
+	        arey_galti_hai_kya = 1;
 	        (yyval.attr_el)->type = ERR;
-	        pretty_print_error ("Semantic error: Arithmetic operation on incompatible types");
+	        pretty_print_error ("Sem mein galti: Arithmetic operation barabar waalo p lagaao");
 	    }
 
+//Third SEGEMENT
+
 	    //Code Generation
-	    if (!has_error){
-        (yyval.attr_el)->code = (yyvsp[-2].attr_el)->code;
-        (yyval.attr_el)->code += "sw $t0 0($sp) \n";
-        (yyval.attr_el)->code += "addiu $sp $sp -4\n";
-        (yyval.attr_el)->code +=  (yyvsp[0].attr_el)->code;
-        (yyval.attr_el)->code += "lw $t1 4($sp)\n";
-        (yyval.attr_el)->code += "addiu $sp $sp 4\n";
+	    if (!arey_galti_hai_kya){
+        (yyval.attr_el)->dakshina = (yyvsp[-2].attr_el)->dakshina;
+        (yyval.attr_el)->dakshina += "sw $t0 0($sp) \n";
+        (yyval.attr_el)->dakshina += "addiu $sp $sp -4\n";
+        (yyval.attr_el)->dakshina +=  (yyvsp[0].attr_el)->dakshina;
+        (yyval.attr_el)->dakshina += "lw $t1 4($sp)\n";
+        (yyval.attr_el)->dakshina += "addiu $sp $sp 4\n";
         // cout << $2 << " " << ($2 == "+") <<endl;
-	        if (string((yyvsp[-1].node_con)) == string("+")){
-	            (yyval.attr_el)->code += "add $t0 $t0 $t1\n";
+	        if (daram((yyvsp[-1].node_con)) == daram("+")){
+	            (yyval.attr_el)->dakshina += "add $t0 $t0 $t1\n";
 	        }
-	        else if ( string((yyvsp[-1].node_con)) == string("-")){
-	            (yyval.attr_el)->code += "sub $t0 $t1 $t0\n";
+	        else if ( daram((yyvsp[-1].node_con)) == daram("-")){
+	            (yyval.attr_el)->dakshina += "sub $t0 $t1 $t0\n";
 	        }
-	        else if ( string((yyvsp[-1].node_con)) == string("*")){
-	            (yyval.attr_el)->code += "mul $t0 $t0 $t1\n";
+	        else if ( daram((yyvsp[-1].node_con)) == daram("*")){
+	            (yyval.attr_el)->dakshina += "mul $t0 $t0 $t1\n";
 	        }
-	        else if ( string((yyvsp[-1].node_con)) == string("/")){
-	            (yyval.attr_el)->code += "div $t0 $t1 $t0\n";
+	        else if ( daram((yyvsp[-1].node_con)) == daram("/")){
+	            (yyval.attr_el)->dakshina += "div $t0 $t1 $t0\n";
 	        }
         (yyval.attr_el)->type = INT;
 	    }
 	}
-#line 2425 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2424 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 50:
-#line 956 "mad_parser.y" /* yacc.c:1646  */
+  case 51:
+#line 951 "mad_parser.y" /* yacc.c:1646  */
     {
         (yyval.attr_el)= new attr();
 		//Semantic analyses - no checks
 		(yyval.attr_el) = (yyvsp[-1].attr_el);
 		//Code gen
-		if(!has_error){
-		    (yyval.attr_el)->code += "neg $t0 $t0 \n";
+		if(!arey_galti_hai_kya){
+		    (yyval.attr_el)->dakshina += "neg $t0 $t0 \n";
 		}
 	}
-#line 2439 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2438 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 51:
-#line 965 "mad_parser.y" /* yacc.c:1646  */
+  case 52:
+#line 960 "mad_parser.y" /* yacc.c:1646  */
     {
         (yyval.attr_el) = new attr();
 	    //Semantic Analyses
 	    if ( !are_comparable((yyvsp[-2].attr_el)->type, (yyvsp[0].attr_el)->type) )
 	    {
-	        has_error = true;
+	        arey_galti_hai_kya = true;
 	        (yyval.attr_el)->type = ERR;
-	        pretty_print_error ("Semantic error: Relational operator between incompatible types");
+	        pretty_print_error ("Sem mein galti: Relational barabari barabar waalo k saath karo");
 	    }
 
 		//Code Generation
-		if (!has_error){
+		if (!arey_galti_hai_kya){
 		    (yyval.attr_el)->type = BOOL;
-        (yyval.attr_el)->code = (yyvsp[-2].attr_el)->code;
-        (yyval.attr_el)->code += "sw $t0 0($sp) \n";
-        (yyval.attr_el)->code += "addiu $sp $sp -4\n";
-        (yyval.attr_el)->code += (yyvsp[0].attr_el)->code;
-        (yyval.attr_el)->code += "lw $t1 4($sp)\n";
-        (yyval.attr_el)->code += "addiu $sp $sp 4\n";
-	        if (string((yyvsp[-1].node_con)) == string("==") ){
-	            (yyval.attr_el)->code += "seq $t0 $t1 $t0\n";
+        (yyval.attr_el)->dakshina = (yyvsp[-2].attr_el)->dakshina;
+        (yyval.attr_el)->dakshina += "sw $t0 0($sp) \n";
+        (yyval.attr_el)->dakshina += "addiu $sp $sp -4\n";
+        (yyval.attr_el)->dakshina += (yyvsp[0].attr_el)->dakshina;
+        (yyval.attr_el)->dakshina += "lw $t1 4($sp)\n";
+        (yyval.attr_el)->dakshina += "addiu $sp $sp 4\n";
+	        if (daram((yyvsp[-1].node_con)) == daram("==") ){
+	            (yyval.attr_el)->dakshina += "seq $t0 $t1 $t0\n";
 	        }
-	        else if (string((yyvsp[-1].node_con)) == string("<") ){
-	            (yyval.attr_el)->code += "slt $t0 $t1 $t0\n";
+	        else if (daram((yyvsp[-1].node_con)) == daram("<") ){
+	            (yyval.attr_el)->dakshina += "slt $t0 $t1 $t0\n";
 	        }
-	        else if ( string((yyvsp[-1].node_con)) == string("<=")){
-	            (yyval.attr_el)->code += "sle $t0 $t1 $t0\n";
+	        else if ( daram((yyvsp[-1].node_con)) == daram("<=")){
+	            (yyval.attr_el)->dakshina += "sle $t0 $t1 $t0\n";
 	        }
-	        else if (string((yyvsp[-1].node_con)) == string(">")){
-	            (yyval.attr_el)->code += "sgt $t0 $t1 $t0\n";
+	        else if (daram((yyvsp[-1].node_con)) == daram(">")){
+	            (yyval.attr_el)->dakshina += "sgt $t0 $t1 $t0\n";
 	        }
-	        else if (string((yyvsp[-1].node_con)) == string(">=")){
-	            (yyval.attr_el)->code += "sge $t0 $t1 $t0\n";
+	        else if (daram((yyvsp[-1].node_con)) == daram(">=")){
+	            (yyval.attr_el)->dakshina += "sge $t0 $t1 $t0\n";
 	        }
-	        else if (string((yyvsp[-1].node_con)) == string("!=")){
-	            (yyval.attr_el)->code += "seq $t0 $t1 $t0\n";
-	            (yyval.attr_el)->code += "xori $t0 $t0 0x1\n";
+	        else if (daram((yyvsp[-1].node_con)) == daram("!=")){
+	            (yyval.attr_el)->dakshina += "seq $t0 $t1 $t0\n";
+	            (yyval.attr_el)->dakshina += "xori $t0 $t0 0x1\n";
 	        }
 
 		}
 	}
-#line 2485 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2484 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 52:
-#line 1007 "mad_parser.y" /* yacc.c:1646  */
+  case 53:
+#line 1002 "mad_parser.y" /* yacc.c:1646  */
     {
         (yyval.attr_el) = new attr();
         //Semantic Analyses
         if ( ((yyvsp[-2].attr_el)->type == CHAR || (yyvsp[0].attr_el)->type == CHAR) )
         {
-            has_error = true;
+            arey_galti_hai_kya = true;
             (yyval.attr_el)->type = ERR;
-            pretty_print_error ("Semantic Error: Logical comparison with a CHAR type");
+            pretty_print_error ("Sem mein galti: Gotcha !! char ko bool ki tarah mat use karo yaar.");
         }
         //Code Generation
-        if (!has_error){
+        if (!arey_galti_hai_kya){
             (yyval.attr_el)->type = BOOL;
 
-            (yyval.attr_el)->code = (yyvsp[-2].attr_el)->code;
+            (yyval.attr_el)->dakshina = (yyvsp[-2].attr_el)->dakshina;
             if ((yyvsp[-2].attr_el)->type == INT){
-              (yyval.attr_el)->code += intToBool();
+              (yyval.attr_el)->dakshina += intToBool();
             }
-            (yyval.attr_el)->code += "sw $t0 0($sp) \n";
-            (yyval.attr_el)->code += "addiu $sp $sp -4\n";
-            (yyval.attr_el)->code += (yyvsp[0].attr_el)->code;
+            (yyval.attr_el)->dakshina += "sw $t0 0($sp) \n";
+            (yyval.attr_el)->dakshina += "addiu $sp $sp -4\n";
+            (yyval.attr_el)->dakshina += (yyvsp[0].attr_el)->dakshina;
 
           if ((yyvsp[0].attr_el)->type == INT){
-	            (yyval.attr_el)->code += intToBool();
+	            (yyval.attr_el)->dakshina += intToBool();
 	        }
-            (yyval.attr_el)->code += "lw $t1 4($sp)\n";
-            (yyval.attr_el)->code += "addiu $sp $sp 4\n";
+            (yyval.attr_el)->dakshina += "lw $t1 4($sp)\n";
+            (yyval.attr_el)->dakshina += "addiu $sp $sp 4\n";
 
-            if (string((yyvsp[-1].node_con)) == string("&&")){
-                (yyval.attr_el)->code += "and $t0 $t0 $t1\n";
+            if (daram((yyvsp[-1].node_con)) == daram("&&")){
+                (yyval.attr_el)->dakshina += "and $t0 $t0 $t1\n";
             }
-            else if (string((yyvsp[-1].node_con)) == string("||")){
-                (yyval.attr_el)->code += "or $t0 $t0 $t1\n";
+            else if (daram((yyvsp[-1].node_con)) == daram("||")){
+                (yyval.attr_el)->dakshina += "or $t0 $t0 $t1\n";
             }
 
         }
 	}
-#line 2526 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2525 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 53:
-#line 1043 "mad_parser.y" /* yacc.c:1646  */
+  case 54:
+#line 1038 "mad_parser.y" /* yacc.c:1646  */
     {
     (yyval.attr_el)  = new attr();
 		if ((yyvsp[0].attr_el)->type == CHAR)
 		{
-		    has_error = true;
+		    arey_galti_hai_kya = true;
 		    (yyval.attr_el)->type = ERR;
-            pretty_print_error ("Semantic Error: Logical NOT on CHAR type");
+            pretty_print_error ("Sem mein galti: Phir se. !CHAR allowed nahe h bhai.");
 		}
 
 		//Code Generation
-		if (!has_error){
+		if (!arey_galti_hai_kya){
         (yyval.attr_el)->type = BOOL;
-		    (yyval.attr_el)->code = (yyvsp[0].attr_el)->code;
+		    (yyval.attr_el)->dakshina = (yyvsp[0].attr_el)->dakshina;
 		    if ((yyvsp[0].attr_el)->type == INT){
-		        (yyval.attr_el)->code+= intToBool();
+		        (yyval.attr_el)->dakshina+= intToBool();
 		    }
-		    (yyval.attr_el)->code += "xori $t0 $t0 0x1\n";
+		    (yyval.attr_el)->dakshina += "xori $t0 $t0 0x1\n";
 		}
 	}
-#line 2550 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2549 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 54:
-#line 1062 "mad_parser.y" /* yacc.c:1646  */
+  case 55:
+#line 1057 "mad_parser.y" /* yacc.c:1646  */
     {
         (yyval.attr_el)= new attr();
         //Semantic
@@ -2562,53 +2561,53 @@ yyreduce:
         {
           (yyval.attr_el)->type = ERR;
 	        (yyval.attr_el)->ival = -1;
-	        pretty_print_error("Semantic Error: Incompatible types in equality assignment");
-	        has_error = true;
+	        pretty_print_error("Sem mein galti: equality: barabar waalo k saath");
+	        arey_galti_hai_kya = true;
         }
 
         //Code Generation
-        if (!has_error)
+        if (!arey_galti_hai_kya)
         {
-            var_record *lhsRecord = get_record((yyvsp[-2].attr_el)->code);
-            (yyval.attr_el) -> code = (yyvsp[0].attr_el)->code;
+            var_record *lhsRecord = get_record((yyvsp[-2].attr_el)->dakshina);
+            (yyval.attr_el) -> dakshina = (yyvsp[0].attr_el)->dakshina;
 
 
             if ( cast((yyvsp[-2].attr_el)->type, (yyvsp[0].attr_el)->type, 0) == 2)
             {
                 //CodeGen - no other casting test needed because only allowed downcast is from int to bool
-                (yyval.attr_el)->code += "#Casting of RHS\n";
-                (yyval.attr_el)->code += intToBool();
+                (yyval.attr_el)->dakshina += "#Casting of RHS\n";
+                (yyval.attr_el)->dakshina += intToBool();
             }
-            if ( (yyvsp[-2].attr_el)->type != ERR && (yyvsp[-2].attr_el)->code == "$" )
+            if ( (yyvsp[-2].attr_el)->type != ERR && (yyvsp[-2].attr_el)->dakshina == "$" )
             {
                 lhsRecord = &active_func_ptr->param_list[(yyvsp[-2].attr_el)->ival];
-                stringstream s;
+                stringstream s;//int ko string karne ka aur koi raasta nahe mila
                 s << lhsRecord->offset;
-                (yyval.attr_el)->code += "sw $t0 " + s.str() + "($fp) \n";
+                (yyval.attr_el)->dakshina += "sw $t0 " + s.str() + "($fp) \n";
             }
 
             if ((yyvsp[-2].attr_el)->ival == -1 && (yyvsp[-2].attr_el)->type != ERR ){
                   //ID
-                  (yyval.attr_el)->code += store_mips_id(lhsRecord);
+                  (yyval.attr_el)->dakshina += store_mips_id(lhsRecord);
 
               }
               else if ((yyvsp[-2].attr_el)->type != ERR){
                   //ID[const]
-                  (yyval.attr_el)->code += store_mips_array(lhsRecord,(yyvsp[-2].attr_el)->ival);
+                  (yyval.attr_el)->dakshina += store_mips_array(lhsRecord,(yyvsp[-2].attr_el)->ival);
               }
         }
 	}
-#line 2602 "mad_parser.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 55:
-#line 1110 "mad_parser.y" /* yacc.c:1646  */
-    { (yyval.attr_el) = new attr(); (yyval.attr_el)->type = ERR; pretty_print_error("Missing identifier name"); }
-#line 2608 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2601 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 56:
-#line 1115 "mad_parser.y" /* yacc.c:1646  */
+#line 1105 "mad_parser.y" /* yacc.c:1646  */
+    { (yyval.attr_el) = new attr(); (yyval.attr_el)->type = ERR; pretty_print_error("Missing identifier peru"); }
+#line 2607 "mad_parser.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 57:
+#line 1109 "mad_parser.y" /* yacc.c:1646  */
     {
 	   //Semantic Analyses
      (yyval.attr_el) = new attr();
@@ -2627,14 +2626,13 @@ yyreduce:
 
 	   //CodeGen
 
-	   //Tree stuff
-	   // $$ = as_tree_n("id_list", NONTERMINAL); $$->child = $1; node *comma = as_tree_n("COMMA", TERMINAL); $$->child->sibling = comma; comma->sibling = $3;
+
 	}
-#line 2634 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2632 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 57:
-#line 1136 "mad_parser.y" /* yacc.c:1646  */
+  case 58:
+#line 1129 "mad_parser.y" /* yacc.c:1646  */
     {
       (yyval.attr_el) = new attr();
 	   //Semantic Analyses
@@ -2650,28 +2648,28 @@ yyreduce:
        		call_param_list.push_back( get_record((yyvsp[0].attr_el)->label) );
        }
      }
-    //  cout << "Last: " << call_param_list.back()->name << endl ;
+    //  cout << "Last: " << call_param_list.back()->peru << endl ;
 	   //CodeGen
 
-	   // $$ = as_tree_n("id_list", NONTERMINAL); $$->child = $1;
+
 	}
-#line 2659 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2657 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 58:
-#line 1156 "mad_parser.y" /* yacc.c:1646  */
+  case 59:
+#line 1149 "mad_parser.y" /* yacc.c:1646  */
     {
       (yyval.attr_el) = new attr();
 	   //Semantic Analyses  - no checks needed
 	   //CodeGen - nothing to do
 
-	   // $$ = as_tree_n("id_list", NONTERMINAL); $$->child = as_tree_n("EPSILON", TERMINAL);
+
 	}
-#line 2671 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2669 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 59:
-#line 1170 "mad_parser.y" /* yacc.c:1646  */
+  case 60:
+#line 1160 "mad_parser.y" /* yacc.c:1646  */
     {
 	    //Semantic Analyses -> param
       (yyval.attr_el) = new attr();
@@ -2681,45 +2679,45 @@ yyreduce:
 	        //Check if valid parameter
 	        int flag = -1;
 	        for ( int i = 0; i < active_func_ptr->param_list.size(); i++ )
-	            if ( active_func_ptr->param_list[i].name == (yyvsp[0].node_con) )
+	            if ( active_func_ptr->param_list[i].peru == (yyvsp[0].node_con) )
 	                { flag = i; break; }
 	        if (flag >= 0)
 	        {
 	            (yyval.attr_el)->type = active_func_ptr->param_list[flag].type;
 	            (yyval.attr_el)->ival = flag;
-	            (yyval.attr_el)->code = "$";
+	            (yyval.attr_el)->dakshina = "$";
 	        }
 	        else
 	        {
 	            (yyval.attr_el)->type = ERR;
     	        (yyval.attr_el)->ival = -1;
-    	        pretty_print_error("Semantic Error: ID not declared before use");
-    	        has_error = true;
+    	        pretty_print_error("Sem mein galti: Arey ID declare kar k use karo bhai");
+    	        arey_galti_hai_kya = true;
 	        }
 	    }
 	    else if ( id_rec->var_type != SIMPLE )
 	    {
 	        (yyval.attr_el)->type = ERR;
-	        pretty_print_error("Semantic Error: Array accessed as scalar.");
-	        has_error = true;
+	        pretty_print_error("Sem Error:Don't try to access array as a unit scalar.");
+	        arey_galti_hai_kya = true;
 	    }
 	    else
 	    {
 	        (yyval.attr_el)->type = id_rec->type;
-	        (yyval.attr_el)->code = (yyvsp[0].node_con);
+	        (yyval.attr_el)->dakshina = (yyvsp[0].node_con);
 	        (yyval.attr_el)->ival = -1;
 	    }
 	    //CodeGen
 	    //No codegen
 
-	    //Tree-related stuff
-	    // $$ = as_tree_n("use_ID", NONTERMINAL); $$->info = "use_ID";
+
+
 	}
-#line 2719 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2717 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 60:
-#line 1213 "mad_parser.y" /* yacc.c:1646  */
+  case 61:
+#line 1203 "mad_parser.y" /* yacc.c:1646  */
     {
         (yyval.attr_el) = new attr();
         //Semantic Analyses
@@ -2727,14 +2725,14 @@ yyreduce:
         if ( id_rec == NULL )
         {
             (yyval.attr_el)->type = ERR;
-	        pretty_print_error("Semantic Error: ID not declared before use");
-	        has_error = true;
+	        pretty_print_error("Sem mein galti: Arey ID declare kar k use karo bhai");
+	        arey_galti_hai_kya = true;
         }
         else if ( id_rec->var_type != ARRAY )
 	    {
 	        (yyval.attr_el)->type = ERR;
-	        pretty_print_error("Semantic Error: Scalar accessed as array.");
-	        has_error = true;
+	        pretty_print_error("Sem mein galti: Don't try to access scalar as an Array.");
+	        arey_galti_hai_kya = true;
 	    }
 	    else
 	    {
@@ -2742,35 +2740,34 @@ yyreduce:
 	        if(iconst < 0 || iconst >= id_rec->dim)
 	        {
 	            (yyval.attr_el)->type = ERR;
-	            pretty_print_error("Semantic Error: Array dimensions violated.");
-	            has_error = true;
+	            pretty_print_error("Sem mein galti: Arre array se bahar chale gaye.");
+	            arey_galti_hai_kya = true;
 	        }
 	        (yyval.attr_el)->type = id_rec->type;
 	        (yyval.attr_el)->ival = iconst;
-	        (yyval.attr_el)->code = (yyvsp[-3].node_con);
+	        (yyval.attr_el)->dakshina = (yyvsp[-3].node_con);
 	    }
 
         //CodeGen
-        //No code generated in this production
+        //No dakshina generated in this production
 
-        //Tree-related stuff
-	    // $$ = as_tree_n("use_ID[arr]", NONTERMINAL); $$->info = "use_ID[arr]";
+
 	}
-#line 2760 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2757 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 61:
-#line 1251 "mad_parser.y" /* yacc.c:1646  */
+  case 62:
+#line 1240 "mad_parser.y" /* yacc.c:1646  */
     {
 	   // Semantic
     (yyval.attr_el) = new attr();
-    if (scope == 1)
+    if (vyavadhi == 1)
     {
     	var_record id_rec;
       id_rec.is_param = true;
       id_rec.var_type = SIMPLE;
-      id_rec.name = (yyvsp[0].node_con);
-      id_rec.scope = scope;
+      id_rec.peru = (yyvsp[0].node_con);
+      id_rec.vyavadhi = vyavadhi;
       id_rec.dim = 0;
       id_rec.type = ((yyvsp[-1].attr_el))->type;
       active_func_ptr->param_list.push_back(id_rec);
@@ -2778,79 +2775,79 @@ yyreduce:
     }
     else
     {
-       if( sym_table.count(scope) > 0 && sym_table[scope].count((yyvsp[0].node_con)) != 0 )
+       if( sym_table.count(vyavadhi) > 0 && sym_table[vyavadhi].count((yyvsp[0].node_con)) != 0 )
        {
             (yyval.attr_el)->type = ERR;
-            pretty_print_error("Semantic Error: ID redeclaration in same scope.");
-            has_error = true;
+            pretty_print_error("Sem mein galti: Kripya is ID ko scope k bahar ja dobara declare karo.");
+            arey_galti_hai_kya = true;
        }
        else
        {
               var_record id_rec;
          			id_rec.is_param = false;
               id_rec.var_type = SIMPLE;
-              id_rec.name = (yyvsp[0].node_con);
-              id_rec.scope = scope;
+              id_rec.peru = (yyvsp[0].node_con);
+              id_rec.vyavadhi = vyavadhi;
               id_rec.dim = 0;
               id_rec.type = ((yyvsp[-1].attr_el))->type;
-              if (!sym_table.count(scope))
+              if (!sym_table.count(vyavadhi))
               {
-                map <string,var_record> temp;
+                map <daram,var_record> temp;
                 temp[(yyvsp[0].node_con)] = id_rec;
-                sym_table[scope] = temp;
+                sym_table[vyavadhi] = temp;
               }
               else{
-                sym_table[scope][(yyvsp[0].node_con)] = id_rec;
+                sym_table[vyavadhi][(yyvsp[0].node_con)] = id_rec;
               }
          			(yyval.attr_el)->ival = -1;
-              //cout << id_rec.type <<"\t"<<id_rec.name<<"\n";
+              //cout << id_rec.type <<"\t"<<id_rec.peru<<"\n";
               // cout << $1 << " inserted." << endl;
        }
 
        //CodeGen
-       mips_name.push_back( sym_table[scope][(yyvsp[0].node_con)] ); //For adding to data declarations
+       sym_table[vyavadhi][(yyvsp[0].node_con)].mips_name = get_mips_name(&sym_table[vyavadhi][(yyvsp[0].node_con)]);
+       mips_name.push_back( sym_table[vyavadhi][(yyvsp[0].node_con)] ); //For adding to data declarations
     }
 
-       //Tree stuff
-	   // $$ = as_tree_n("decl_ID", NONTERMINAL); $$->info = "decl_ID";
+
 	}
-#line 2818 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2815 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 62:
-#line 1304 "mad_parser.y" /* yacc.c:1646  */
+  case 63:
+#line 1293 "mad_parser.y" /* yacc.c:1646  */
     {
       (yyval.attr_el) = new attr();
 	   //Semantic
-	   if( sym_table.count(scope) > 0 && sym_table[scope].count((yyvsp[-3].node_con)) != 0 )
+	   if( sym_table.count(vyavadhi) > 0 && sym_table[vyavadhi].count((yyvsp[-3].node_con)) != 0 )
 	   {
 	        (yyval.attr_el)->type = ERR;
-	        pretty_print_error("Semantic Error: ID redeclaration in same scope.");
-	        has_error = true;
+	        pretty_print_error("Sem mein galti: Kripya is ID ko scope k bahar ja dobara declare karo.");
+	        arey_galti_hai_kya = true;
 	   }
 	   else
 	   {
             var_record id_rec;
        			id_rec.is_param = false;
             id_rec.var_type = ARRAY;
-            id_rec.name = (yyvsp[-3].node_con);
-            id_rec.scope = scope;
+            id_rec.peru = (yyvsp[-3].node_con);
+            id_rec.vyavadhi = vyavadhi;
             id_rec.dim = atoi((yyvsp[-1].node_con));
             id_rec.type = (yyvsp[-4].attr_el)->type;
-            sym_table[scope][(yyvsp[-3].node_con)] = id_rec;
+            sym_table[vyavadhi][(yyvsp[-3].node_con)] = id_rec;
 	   }
 
        //CodeGen
-	   mips_name.push_back(sym_table[scope][(yyvsp[-3].node_con)]); //For adding to data declarations
+     sym_table[vyavadhi][(yyvsp[-3].node_con)].mips_name = get_mips_name(&sym_table[vyavadhi][(yyvsp[-3].node_con)]);
+	   mips_name.push_back(sym_table[vyavadhi][(yyvsp[-3].node_con)]); //For adding to data declarations
 
-	   //Tree stuff
-	   // $$ = as_tree_n("decl_ID[arr]", NONTERMINAL); $$->info = "decl_ID[arr]";
+
 	}
-#line 2850 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2847 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 63:
-#line 1333 "mad_parser.y" /* yacc.c:1646  */
+  case 64:
+#line 1322 "mad_parser.y" /* yacc.c:1646  */
     {
 	    //Semantic Analyses
       (yyval.attr_el) = new attr();
@@ -2860,7 +2857,7 @@ yyreduce:
 	    if ( id_rec == NULL )
 	    {
 	        for ( int i = 0; i < active_func_ptr->param_list.size(); i++ )
-	            if ( active_func_ptr->param_list[i].name == (yyvsp[0].node_con) )
+	            if ( active_func_ptr->param_list[i].peru == (yyvsp[0].node_con) )
 	                { flag = i;break; }
 	        if (flag >= 0)
 	        {
@@ -2868,22 +2865,22 @@ yyreduce:
 	            (yyval.attr_el)->type = active_func_ptr->param_list[flag].type;
             	(yyval.attr_el)->bval = true;
             	(yyval.attr_el)->ival = flag; //Indicates parameter
-              // cout << "var_use : " << active_func_ptr->param_list[flag].type << " " << active_func_ptr->param_list[flag].name << " " << active_func_ptr->param_list[flag].offset <<endl;
+              // cout << "var_use : " << active_func_ptr->param_list[flag].type << " " << active_func_ptr->param_list[flag].peru << " " << active_func_ptr->param_list[flag].offset <<endl;
 	        }
         	else
           {
             (yyval.attr_el)->type = ERR;
             (yyval.attr_el)->bval = false;
             (yyval.attr_el)->ival = -1;
-            pretty_print_error("Semantic Error: ID not declared before use");
-            has_error = true;
+            pretty_print_error("Sem mein galti: Arey ID declare kar k use karo bhai");
+            arey_galti_hai_kya = true;
           }
 	    }
 	    else if ( id_rec->var_type != SIMPLE )
 	    {
 	        (yyval.attr_el)->type = ERR;
-	        pretty_print_error("Semantic Error: Array accessed as scalar.");
-	        has_error = true;
+	        pretty_print_error("Sem mein galti: Array accessed as scalar.");
+	        arey_galti_hai_kya = true;
 	    }
 	    else
 	    {
@@ -2895,28 +2892,27 @@ yyreduce:
 	    }
 
 	    //CodeGen
-	    if (!has_error){
+	    if (!arey_galti_hai_kya){
 	        //Check in local variables -> if not found, check in param list -> if found, load param by offset
           if ( is_param )
             {
-                stringstream s;
+                stringstream s;//int ko string karne ka aur koi raasta nahe mila
                 s << active_func_ptr->param_list[flag].offset;
-                (yyval.attr_el)->code += "lw $t0 " + s.str() + "($fp) \n";
+                (yyval.attr_el)->dakshina += "lw $t0 " + s.str() + "($fp) \n";
             }
           else{
-              (yyval.attr_el)->code = load_mips_id( get_record((yyvsp[0].node_con)) );
+              (yyval.attr_el)->dakshina = load_mips_id( get_record((yyvsp[0].node_con)) );
           }
 	    }
 
 
-	    //Tree-related stuff
-	    // $$ = as_tree_n("use_ID", NONTERMINAL); $$->info = "use_ID";
+
 	}
-#line 2916 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2912 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 64:
-#line 1394 "mad_parser.y" /* yacc.c:1646  */
+  case 65:
+#line 1382 "mad_parser.y" /* yacc.c:1646  */
     {
 
         //Semantic Analyses
@@ -2925,14 +2921,14 @@ yyreduce:
         if ( id_rec == NULL )
         {
             (yyval.attr_el)->type = ERR;
-	        pretty_print_error("Semantic Error: ID not declared before use");
-	        has_error = true;
+	        pretty_print_error("Sem mein galti: Arey ID declare kar k use karo bhai");
+	        arey_galti_hai_kya = true;
         }
         else if ( id_rec->var_type != ARRAY )
 	    {
 	        (yyval.attr_el)->type = ERR;
-	        pretty_print_error("Semantic Error: Scalar accessed as array.");
-	        has_error = true;
+	        pretty_print_error("Sem mein galti: Arey scalar ko dekh k user karo, array nahe h woh.");
+	        arey_galti_hai_kya = true;
 	    }
 	    else
 	    {
@@ -2940,8 +2936,8 @@ yyreduce:
 	        if(iconst < 0 || iconst >= id_rec->dim)
 	        {
 	            (yyval.attr_el)->type - ERR;
-	            pretty_print_error("Semantic Error: Array dimensions violated.");
-	            has_error = true;
+	            pretty_print_error("Sem mein galti: Array apne aukaat k bahar chala gya.");
+	            arey_galti_hai_kya = true;
 	        }
 	        (yyval.attr_el)->type = id_rec->type;
 	        (yyval.attr_el)->ival = iconst;
@@ -2949,35 +2945,34 @@ yyreduce:
 	    }
 
         //CodeGen
-        if (!has_error){
-            (yyval.attr_el)->code = load_mips_array( get_record((yyvsp[-3].node_con)),atoi((yyvsp[-1].node_con)));
+        if (!arey_galti_hai_kya){
+            (yyval.attr_el)->dakshina = load_mips_array( get_record((yyvsp[-3].node_con)),atoi((yyvsp[-1].node_con)));
         }
 
-        //Tree-related stuff
-	    // $$ = as_tree_n("use_ID[arr]", NONTERMINAL); $$->info = "use_ID[arr]";
+
 	}
-#line 2960 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2955 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 65:
-#line 1435 "mad_parser.y" /* yacc.c:1646  */
+  case 66:
+#line 1422 "mad_parser.y" /* yacc.c:1646  */
     {
 
 	    //Semantic Analyses
         (yyval.attr_el) = new attr();
         (yyval.attr_el)->ival =  atoi((yyvsp[0].node_con));
         (yyval.attr_el)->type = INT;
-        string s = (yyvsp[0].node_con);
-        (yyval.attr_el)->code = "li $t0 " + s + "\n";
+        daram s = (yyvsp[0].node_con);
+        (yyval.attr_el)->dakshina = "li $t0 " + s + "\n";
 
 	    //CodeGen
 	    //No codegen assoc with this production
     }
-#line 2977 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2972 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 66:
-#line 1447 "mad_parser.y" /* yacc.c:1646  */
+  case 67:
+#line 1434 "mad_parser.y" /* yacc.c:1646  */
     {
 	    //Semantic Analyses
         (yyval.attr_el) = new attr();
@@ -2986,29 +2981,28 @@ yyreduce:
 
 	    //CodeGen
 
-        string s = (yyvsp[0].node_con);
-        (yyval.attr_el)->code = "li $t0 \'" + s + "\' \n";
+        daram s = (yyvsp[0].node_con);
+        (yyval.attr_el)->dakshina = "li $t0 \'" + s + "\' \n";
 
 
-	    //Tree-related stuff
-	    // $$ = as_tree_n("supported_constant", NONTERMINAL); $$->child = as_tree_n("INTCONST", VALUE); $$->child->info = $1;
+
 	}
-#line 2997 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 2991 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 67:
-#line 1462 "mad_parser.y" /* yacc.c:1646  */
+  case 68:
+#line 1448 "mad_parser.y" /* yacc.c:1646  */
     {
 	    //Semantic Analyses
       (yyval.attr_el) = new attr();
 	    if( !strcmp((yyvsp[0].node_con), "true") ){
           (yyval.attr_el)->bval = 1;
-          (yyval.attr_el)->code = "li $t0 1\n";
+          (yyval.attr_el)->dakshina = "li $t0 1\n";
       }
 
 	    else{
             (yyval.attr_el)->bval = 0;
-            (yyval.attr_el)->code = "li $t0 0\n";
+            (yyval.attr_el)->dakshina = "li $t0 0\n";
       }
 
 	    (yyval.attr_el)->type = BOOL;
@@ -3017,14 +3011,13 @@ yyreduce:
 	    //CodeGen
 
 
-	    //Tree-related stuff
-	    // $$ = as_tree_n("supported_constant", NONTERMINAL); $$->child = as_tree_n("BOOLCONST", VALUE); $$->child->info = $1;
+
 	}
-#line 3024 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 3017 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 68:
-#line 1484 "mad_parser.y" /* yacc.c:1646  */
+  case 69:
+#line 1469 "mad_parser.y" /* yacc.c:1646  */
     {
 
 	    //Semantic Analyses
@@ -3034,16 +3027,16 @@ yyreduce:
 	    (yyval.attr_el)->type = INT;
 
 	    //CodeGen
-      (yyval.attr_el)->code = "li $t0 -" + string((yyvsp[-1].node_con)) + "\n" ;
+      (yyval.attr_el)->dakshina = "li $t0 -" + daram((yyvsp[-1].node_con)) + "\n" ;
 	    //No codegen assoc with this production
 
 
 	}
-#line 3043 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 3036 "mad_parser.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 3047 "mad_parser.tab.c" /* yacc.c:1646  */
+#line 3040 "mad_parser.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -3271,16 +3264,16 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 1498 "mad_parser.y" /* yacc.c:1906  */
+#line 1483 "mad_parser.y" /* yacc.c:1906  */
 
 int num_times = 2;
 void pretty_print_error(const char* err_msg)
 {
-	has_error = true;
+	arey_galti_hai_kya = true;
 	cout<<"Line "<<yylineno<<": "<<err_msg<<endl;
 }
 
-void print_tree(node *cur, vector<int>& ancestors, int parent)
+void print_tree(node *cur, /* pointer to list of ints   */ vector<int>& ancestors, int parent)
 {
 	if(!cur) return;
 	//for(int i = 0; i < ancestors.size(); i++) cout<<ancestors[i]<<" "; cout<<endl;
@@ -3309,6 +3302,6 @@ int main()
 	vector<int> print_vec;
 	yydebug = 0;
 	yyparse();
-	if(!has_error)	cout<<""<<endl;
+	if(!arey_galti_hai_kya)	cout<<""<<endl;
 	else cout<<"Compilation terminating with errors"<<endl;
 }

@@ -1520,3 +1520,4 @@ int main()
 	if(!arey_galti_hai_kya)	cout<<""<<endl;
 	else cout<<"Compilation terminating with errors"<<endl;
 }
+

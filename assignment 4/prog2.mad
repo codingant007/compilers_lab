@@ -1,0 +1,23 @@
+
+int main()
+{
+	int x,y,z,a,b,c;
+	a = 1;
+	x = 5;
+	{
+		int a,b,c;
+		a = 2;
+		{
+			int a ;
+			a = 3;
+			z = a;
+		}
+		{
+			char a;
+			a = @a;
+			z = a;
+		}
+	}
+	y = z	;
+
+}

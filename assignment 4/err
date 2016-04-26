@@ -1,0 +1,431 @@
+mad_parser.y: warning: 19 shift/reduce conflicts [-Wconflicts-sr]
+mad_parser.y: In function ‘std::string get_data_string()’:
+mad_parser.y:108:64: error: no match for ‘operator==’ (operand types are ‘std::string {aka std::basic_string<char>}’ and ‘int’)
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                ^
+mad_parser.y:108:64: note: candidates are:
+In file included from /usr/include/c++/4.9/utility:70:0,
+                 from /usr/include/c++/4.9/algorithm:60,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:64,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/stl_pair.h:214:5: note: template<class _T1, class _T2> bool std::operator==(const std::pair<_T1, _T2>&, const std::pair<_T1, _T2>&)
+     operator==(const pair<_T1, _T2>& __x, const pair<_T1, _T2>& __y)
+     ^
+/usr/include/c++/4.9/bits/stl_pair.h:214:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::pair<_T1, _T2>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/bits/stl_algobase.h:67:0,
+                 from /usr/include/c++/4.9/algorithm:61,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:64,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/stl_iterator.h:292:5: note: template<class _Iterator> bool std::operator==(const std::reverse_iterator<_Iterator>&, const std::reverse_iterator<_Iterator>&)
+     operator==(const reverse_iterator<_Iterator>& __x,
+     ^
+/usr/include/c++/4.9/bits/stl_iterator.h:292:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::reverse_iterator<_Iterator>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/bits/stl_algobase.h:67:0,
+                 from /usr/include/c++/4.9/algorithm:61,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:64,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/stl_iterator.h:342:5: note: template<class _IteratorL, class _IteratorR> bool std::operator==(const std::reverse_iterator<_Iterator>&, const std::reverse_iterator<_IteratorR>&)
+     operator==(const reverse_iterator<_IteratorL>& __x,
+     ^
+/usr/include/c++/4.9/bits/stl_iterator.h:342:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::reverse_iterator<_Iterator>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/ext/alloc_traits.h:38:0,
+                 from /usr/include/c++/4.9/bits/stl_construct.h:61,
+                 from /usr/include/c++/4.9/bits/stl_tempbuf.h:60,
+                 from /usr/include/c++/4.9/bits/stl_algo.h:62,
+                 from /usr/include/c++/4.9/algorithm:62,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:64,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/allocator.h:128:5: note: template<class _T1, class _T2> bool std::operator==(const std::allocator<_Tp1>&, const std::allocator<_T2>&)
+     operator==(const allocator<_T1>&, const allocator<_T2>&)
+     ^
+/usr/include/c++/4.9/bits/allocator.h:128:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::allocator<_Tp1>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/ext/alloc_traits.h:38:0,
+                 from /usr/include/c++/4.9/bits/stl_construct.h:61,
+                 from /usr/include/c++/4.9/bits/stl_tempbuf.h:60,
+                 from /usr/include/c++/4.9/bits/stl_algo.h:62,
+                 from /usr/include/c++/4.9/algorithm:62,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:64,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/allocator.h:133:5: note: template<class _Tp> bool std::operator==(const std::allocator<_Tp1>&, const std::allocator<_Tp1>&)
+     operator==(const allocator<_Tp>&, const allocator<_Tp>&)
+     ^
+/usr/include/c++/4.9/bits/allocator.h:133:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::allocator<_Tp1>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/bits/char_traits.h:40:0,
+                 from /usr/include/c++/4.9/string:40,
+                 from /usr/include/c++/4.9/bitset:47,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:65,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/postypes.h:216:5: note: template<class _StateT> bool std::operator==(const std::fpos<_StateT>&, const std::fpos<_StateT>&)
+     operator==(const fpos<_StateT>& __lhs, const fpos<_StateT>& __rhs)
+     ^
+/usr/include/c++/4.9/bits/postypes.h:216:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::fpos<_StateT>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/string:52:0,
+                 from /usr/include/c++/4.9/bitset:47,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:65,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/basic_string.h:2505:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const std::basic_string<_CharT, _Traits, _Alloc>&, const std::basic_string<_CharT, _Traits, _Alloc>&)
+     operator==(const basic_string<_CharT, _Traits, _Alloc>& __lhs,
+     ^
+/usr/include/c++/4.9/bits/basic_string.h:2505:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   mismatched types ‘const std::basic_string<_CharT, _Traits, _Alloc>’ and ‘int’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/string:52:0,
+                 from /usr/include/c++/4.9/bitset:47,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:65,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/basic_string.h:2512:5: note: template<class _CharT> typename __gnu_cxx::__enable_if<std::__is_char<_Tp>::__value, bool>::__type std::operator==(const std::basic_string<_CharT>&, const std::basic_string<_CharT>&)
+     operator==(const basic_string<_CharT>& __lhs,
+     ^
+/usr/include/c++/4.9/bits/basic_string.h:2512:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   mismatched types ‘const std::basic_string<_CharT>’ and ‘int’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/string:52:0,
+                 from /usr/include/c++/4.9/bitset:47,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:65,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/basic_string.h:2526:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const _CharT*, const std::basic_string<_CharT, _Traits, _Alloc>&)
+     operator==(const _CharT* __lhs,
+     ^
+/usr/include/c++/4.9/bits/basic_string.h:2526:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   mismatched types ‘const _CharT*’ and ‘std::basic_string<char>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/string:52:0,
+                 from /usr/include/c++/4.9/bitset:47,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:65,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/basic_string.h:2538:5: note: template<class _CharT, class _Traits, class _Alloc> bool std::operator==(const std::basic_string<_CharT, _Traits, _Alloc>&, const _CharT*)
+     operator==(const basic_string<_CharT, _Traits, _Alloc>& __lhs,
+     ^
+/usr/include/c++/4.9/bits/basic_string.h:2538:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   mismatched types ‘const _CharT*’ and ‘int’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/bits/locale_facets.h:48:0,
+                 from /usr/include/c++/4.9/bits/basic_ios.h:37,
+                 from /usr/include/c++/4.9/ios:44,
+                 from /usr/include/c++/4.9/istream:38,
+                 from /usr/include/c++/4.9/sstream:38,
+                 from /usr/include/c++/4.9/complex:45,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:66,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/streambuf_iterator.h:204:5: note: template<class _CharT, class _Traits> bool std::operator==(const std::istreambuf_iterator<_CharT, _Traits>&, const std::istreambuf_iterator<_CharT, _Traits>&)
+     operator==(const istreambuf_iterator<_CharT, _Traits>& __a,
+     ^
+/usr/include/c++/4.9/bits/streambuf_iterator.h:204:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::istreambuf_iterator<_CharT, _Traits>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:66:0,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/complex:453:5: note: template<class _Tp> bool std::operator==(const std::complex<_Tp>&, const std::complex<_Tp>&)
+     operator==(const complex<_Tp>& __x, const complex<_Tp>& __y)
+     ^
+/usr/include/c++/4.9/complex:453:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::complex<_Tp>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:66:0,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/complex:458:5: note: template<class _Tp> bool std::operator==(const std::complex<_Tp>&, const _Tp&)
+     operator==(const complex<_Tp>& __x, const _Tp& __y)
+     ^
+/usr/include/c++/4.9/complex:458:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::complex<_Tp>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:66:0,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/complex:463:5: note: template<class _Tp> bool std::operator==(const _Tp&, const std::complex<_Tp>&)
+     operator==(const _Tp& __x, const complex<_Tp>& __y)
+     ^
+/usr/include/c++/4.9/complex:463:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   mismatched types ‘const std::complex<_Tp>’ and ‘int’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/deque:64:0,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:67,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/stl_deque.h:251:5: note: template<class _Tp, class _Ref, class _Ptr> bool std::operator==(const std::_Deque_iterator<_Tp, _Ref, _Ptr>&, const std::_Deque_iterator<_Tp, _Ref, _Ptr>&)
+     operator==(const _Deque_iterator<_Tp, _Ref, _Ptr>& __x,
+     ^
+/usr/include/c++/4.9/bits/stl_deque.h:251:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::_Deque_iterator<_Tp, _Ref, _Ptr>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/deque:64:0,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:67,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/stl_deque.h:258:5: note: template<class _Tp, class _RefL, class _PtrL, class _RefR, class _PtrR> bool std::operator==(const std::_Deque_iterator<_Tp, _Ref, _Ptr>&, const std::_Deque_iterator<_Tp, _RefR, _PtrR>&)
+     operator==(const _Deque_iterator<_Tp, _RefL, _PtrL>& __x,
+     ^
+/usr/include/c++/4.9/bits/stl_deque.h:258:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::_Deque_iterator<_Tp, _Ref, _Ptr>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/deque:64:0,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:67,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/stl_deque.h:2029:5: note: template<class _Tp, class _Alloc> bool std::operator==(const std::deque<_Tp, _Alloc>&, const std::deque<_Tp, _Alloc>&)
+     operator==(const deque<_Tp, _Alloc>& __x,
+     ^
+/usr/include/c++/4.9/bits/stl_deque.h:2029:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::deque<_Tp, _Alloc>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/iterator:66:0,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:76,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/stream_iterator.h:130:5: note: template<class _Tp, class _CharT, class _Traits, class _Dist> bool std::operator==(const std::istream_iterator<_Tp, _CharT, _Traits, _Dist>&, const std::istream_iterator<_Tp, _CharT, _Traits, _Dist>&)
+     operator==(const istream_iterator<_Tp, _CharT, _Traits, _Dist>& __x,
+     ^
+/usr/include/c++/4.9/bits/stream_iterator.h:130:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::istream_iterator<_Tp, _CharT, _Traits, _Dist>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/list:63:0,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:78,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/stl_list.h:285:5: note: template<class _Val> bool std::operator==(const std::_List_iterator<_Tp>&, const std::_List_const_iterator<_Val>&)
+     operator==(const _List_iterator<_Val>& __x,
+     ^
+/usr/include/c++/4.9/bits/stl_list.h:285:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::_List_iterator<_Tp>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/list:63:0,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:78,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/stl_list.h:1729:5: note: template<class _Tp, class _Alloc> bool std::operator==(const std::list<_Tp, _Alloc>&, const std::list<_Tp, _Alloc>&)
+     operator==(const list<_Tp, _Alloc>& __x, const list<_Tp, _Alloc>& __y)
+     ^
+/usr/include/c++/4.9/bits/stl_list.h:1729:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::list<_Tp, _Alloc>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/map:60:0,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:80,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/stl_tree.h:323:5: note: template<class _Val> bool std::operator==(const std::_Rb_tree_iterator<_Tp>&, const std::_Rb_tree_const_iterator<_Val>&)
+     operator==(const _Rb_tree_iterator<_Val>& __x,
+     ^
+/usr/include/c++/4.9/bits/stl_tree.h:323:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::_Rb_tree_iterator<_Tp>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/map:60:0,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:80,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/stl_tree.h:970:5: note: template<class _Key, class _Val, class _KeyOfValue, class _Compare, class _Alloc> bool std::operator==(const std::_Rb_tree<_Key, _Val, _KeyOfValue, _Compare, _Alloc>&, const std::_Rb_tree<_Key, _Val, _KeyOfValue, _Compare, _Alloc>&)
+     operator==(const _Rb_tree<_Key, _Val, _KeyOfValue, _Compare, _Alloc>& __x,
+     ^
+/usr/include/c++/4.9/bits/stl_tree.h:970:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::_Rb_tree<_Key, _Val, _KeyOfValue, _Compare, _Alloc>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/map:61:0,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:80,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/stl_map.h:1000:5: note: template<class _Key, class _Tp, class _Compare, class _Alloc> bool std::operator==(const std::map<_Key, _Tp, _Compare, _Alloc>&, const std::map<_Key, _Tp, _Compare, _Alloc>&)
+     operator==(const map<_Key, _Tp, _Compare, _Alloc>& __x,
+     ^
+/usr/include/c++/4.9/bits/stl_map.h:1000:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::map<_Key, _Tp, _Compare, _Alloc>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/map:62:0,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:80,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/stl_multimap.h:903:5: note: template<class _Key, class _Tp, class _Compare, class _Alloc> bool std::operator==(const std::multimap<_Key, _Tp, _Compare, _Alloc>&, const std::multimap<_Key, _Tp, _Compare, _Alloc>&)
+     operator==(const multimap<_Key, _Tp, _Compare, _Alloc>& __x,
+     ^
+/usr/include/c++/4.9/bits/stl_multimap.h:903:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::multimap<_Key, _Tp, _Compare, _Alloc>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/vector:64:0,
+                 from /usr/include/c++/4.9/queue:61,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:85,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/stl_vector.h:1511:5: note: template<class _Tp, class _Alloc> bool std::operator==(const std::vector<_Tp, _Alloc>&, const std::vector<_Tp, _Alloc>&)
+     operator==(const vector<_Tp, _Alloc>& __x, const vector<_Tp, _Alloc>& __y)
+     ^
+/usr/include/c++/4.9/bits/stl_vector.h:1511:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::vector<_Tp, _Alloc>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/queue:64:0,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:85,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/stl_queue.h:271:5: note: template<class _Tp, class _Seq> bool std::operator==(const std::queue<_Tp, _Seq>&, const std::queue<_Tp, _Seq>&)
+     operator==(const queue<_Tp, _Seq>& __x, const queue<_Tp, _Seq>& __y)
+     ^
+/usr/include/c++/4.9/bits/stl_queue.h:271:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::queue<_Tp, _Seq>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/set:61:0,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:86,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/stl_set.h:793:5: note: template<class _Key, class _Compare, class _Alloc> bool std::operator==(const std::set<_Key, _Compare, _Alloc>&, const std::set<_Key, _Compare, _Alloc>&)
+     operator==(const set<_Key, _Compare, _Alloc>& __x,
+     ^
+/usr/include/c++/4.9/bits/stl_set.h:793:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::set<_Key, _Compare, _Alloc>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/set:62:0,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:86,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/stl_multiset.h:777:5: note: template<class _Key, class _Compare, class _Alloc> bool std::operator==(const std::multiset<_Key, _Compare, _Alloc>&, const std::multiset<_Key, _Compare, _Alloc>&)
+     operator==(const multiset<_Key, _Compare, _Alloc>& __x,
+     ^
+/usr/include/c++/4.9/bits/stl_multiset.h:777:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::multiset<_Key, _Compare, _Alloc>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/stack:61:0,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:88,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/stl_stack.h:246:5: note: template<class _Tp, class _Seq> bool std::operator==(const std::stack<_Tp, _Seq>&, const std::stack<_Tp, _Seq>&)
+     operator==(const stack<_Tp, _Seq>& __x, const stack<_Tp, _Seq>& __y)
+     ^
+/usr/include/c++/4.9/bits/stl_stack.h:246:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::stack<_Tp, _Seq>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/valarray:587:0,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:94,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/valarray_after.h:414:5: note: template<class _Dom1, class _Dom2> std::_Expr<std::_BinClos<std::__equal_to, std::_Expr, std::_Expr, _Dom1, _Dom2>, typename std::__fun<std::__equal_to, typename _Dom1::value_type>::result_type> std::operator==(const std::_Expr<_Dom1, typename _Dom1::value_type>&, const std::_Expr<_Dom2, typename _Dom2::value_type>&)
+     _DEFINE_EXPR_BINARY_OPERATOR(==, __equal_to)
+     ^
+/usr/include/c++/4.9/bits/valarray_after.h:414:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::_Expr<_Dom1, typename _Dom1::value_type>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/valarray:587:0,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:94,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/valarray_after.h:414:5: note: template<class _Dom> std::_Expr<std::_BinClos<std::__equal_to, std::_Expr, std::_Constant, _Dom, typename _Dom::value_type>, typename std::__fun<std::__equal_to, typename _Dom1::value_type>::result_type> std::operator==(const std::_Expr<_Dom1, typename _Dom1::value_type>&, const typename _Dom::value_type&)
+     _DEFINE_EXPR_BINARY_OPERATOR(==, __equal_to)
+     ^
+/usr/include/c++/4.9/bits/valarray_after.h:414:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::_Expr<_Dom1, typename _Dom1::value_type>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/valarray:587:0,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:94,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/valarray_after.h:414:5: note: template<class _Dom> std::_Expr<std::_BinClos<std::__equal_to, std::_Constant, std::_Expr, typename _Dom::value_type, _Dom>, typename std::__fun<std::__equal_to, typename _Dom1::value_type>::result_type> std::operator==(const typename _Dom::value_type&, const std::_Expr<_Dom1, typename _Dom1::value_type>&)
+     _DEFINE_EXPR_BINARY_OPERATOR(==, __equal_to)
+     ^
+/usr/include/c++/4.9/bits/valarray_after.h:414:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   mismatched types ‘const std::_Expr<_Dom1, typename _Dom1::value_type>’ and ‘int’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/valarray:587:0,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:94,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/valarray_after.h:414:5: note: template<class _Dom> std::_Expr<std::_BinClos<std::__equal_to, std::_Expr, std::_ValArray, _Dom, typename _Dom::value_type>, typename std::__fun<std::__equal_to, typename _Dom1::value_type>::result_type> std::operator==(const std::_Expr<_Dom1, typename _Dom1::value_type>&, const std::valarray<typename _Dom::value_type>&)
+     _DEFINE_EXPR_BINARY_OPERATOR(==, __equal_to)
+     ^
+/usr/include/c++/4.9/bits/valarray_after.h:414:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::_Expr<_Dom1, typename _Dom1::value_type>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/valarray:587:0,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:94,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/valarray_after.h:414:5: note: template<class _Dom> std::_Expr<std::_BinClos<std::__equal_to, std::_ValArray, std::_Expr, typename _Dom::value_type, _Dom>, typename std::__fun<std::__equal_to, typename _Dom1::value_type>::result_type> std::operator==(const std::valarray<typename _Dom::value_type>&, const std::_Expr<_Dom1, typename _Dom1::value_type>&)
+     _DEFINE_EXPR_BINARY_OPERATOR(==, __equal_to)
+     ^
+/usr/include/c++/4.9/bits/valarray_after.h:414:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   mismatched types ‘const std::_Expr<_Dom1, typename _Dom1::value_type>’ and ‘int’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:94:0,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/valarray:1179:1: note: template<class _Tp> std::_Expr<std::_BinClos<std::__equal_to, std::_ValArray, std::_ValArray, _Tp, _Tp>, typename std::__fun<std::__equal_to, _Tp>::result_type> std::operator==(const std::valarray<_Tp>&, const std::valarray<_Tp>&)
+ _DEFINE_BINARY_OPERATOR(==, __equal_to)
+ ^
+/usr/include/c++/4.9/valarray:1179:1: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::valarray<_Tp>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:94:0,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/valarray:1179:1: note: template<class _Tp> std::_Expr<std::_BinClos<std::__equal_to, std::_ValArray, std::_Constant, _Tp, _Tp>, typename std::__fun<std::__equal_to, _Tp>::result_type> std::operator==(const std::valarray<_Tp>&, const _Tp&)
+ _DEFINE_BINARY_OPERATOR(==, __equal_to)
+ ^
+/usr/include/c++/4.9/valarray:1179:1: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const std::valarray<_Tp>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:94:0,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/valarray:1179:1: note: template<class _Tp> std::_Expr<std::_BinClos<std::__equal_to, std::_Constant, std::_ValArray, _Tp, _Tp>, typename std::__fun<std::__equal_to, _Tp>::result_type> std::operator==(const _Tp&, const std::valarray<_Tp>&)
+ _DEFINE_BINARY_OPERATOR(==, __equal_to)
+ ^
+/usr/include/c++/4.9/valarray:1179:1: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   mismatched types ‘const std::valarray<_Tp>’ and ‘int’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/x86_64-linux-gnu/c++/4.9/bits/c++allocator.h:33:0,
+                 from /usr/include/c++/4.9/bits/allocator.h:46,
+                 from /usr/include/c++/4.9/ext/alloc_traits.h:38,
+                 from /usr/include/c++/4.9/bits/stl_construct.h:61,
+                 from /usr/include/c++/4.9/bits/stl_tempbuf.h:60,
+                 from /usr/include/c++/4.9/bits/stl_algo.h:62,
+                 from /usr/include/c++/4.9/algorithm:62,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:64,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/ext/new_allocator.h:139:5: note: template<class _Tp> bool __gnu_cxx::operator==(const __gnu_cxx::new_allocator<_Tp>&, const __gnu_cxx::new_allocator<_Tp>&)
+     operator==(const new_allocator<_Tp>&, const new_allocator<_Tp>&)
+     ^
+/usr/include/c++/4.9/ext/new_allocator.h:139:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const __gnu_cxx::new_allocator<_Tp>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/bits/stl_algobase.h:67:0,
+                 from /usr/include/c++/4.9/algorithm:61,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:64,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/stl_iterator.h:815:5: note: template<class _Iterator, class _Container> bool __gnu_cxx::operator==(const __gnu_cxx::__normal_iterator<_Iterator, _Container>&, const __gnu_cxx::__normal_iterator<_Iterator, _Container>&)
+     operator==(const __normal_iterator<_Iterator, _Container>& __lhs,
+     ^
+/usr/include/c++/4.9/bits/stl_iterator.h:815:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const __gnu_cxx::__normal_iterator<_Iterator, _Container>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^
+In file included from /usr/include/c++/4.9/bits/stl_algobase.h:67:0,
+                 from /usr/include/c++/4.9/algorithm:61,
+                 from /usr/include/x86_64-linux-gnu/c++/4.9/bits/stdc++.h:64,
+                 from mad_parser.y:2:
+/usr/include/c++/4.9/bits/stl_iterator.h:808:5: note: template<class _IteratorL, class _IteratorR, class _Container> bool __gnu_cxx::operator==(const __gnu_cxx::__normal_iterator<_IteratorL, _Container>&, const __gnu_cxx::__normal_iterator<_IteratorR, _Container>&)
+     operator==(const __normal_iterator<_IteratorL, _Container>& __lhs,
+     ^
+/usr/include/c++/4.9/bits/stl_iterator.h:808:5: note:   template argument deduction/substitution failed:
+mad_parser.y:108:66: note:   ‘std::string {aka std::basic_string<char>}’ is not derived from ‘const __gnu_cxx::__normal_iterator<_IteratorL, _Container>’
+         if (temp_mips_name.count( get_mips_name(&mips_name[i]) ==0))
+                                                                  ^

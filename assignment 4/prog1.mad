@@ -1,0 +1,23 @@
+int new()
+{
+	int g,h,i;
+	g = 5;
+	h = g*4;
+	i = g * h;
+	return i;
+}
+
+int fib (int x,)
+{
+	int a;
+	a = new();
+  return a;
+}
+
+int main()
+{
+	int x,z;
+	x = 5;
+	z = fib(x);
+
+}
